@@ -1,13 +1,13 @@
 package com.jzprog.chatapp.src.model;
 
-public class HelloMessage {
+public class MessageDTO {
 
     private String message;
 
-    public HelloMessage() {
+    public MessageDTO() {
     }
 
-    public HelloMessage(String message) {
+    public MessageDTO(String message) {
         this.message = message;
     }
 
