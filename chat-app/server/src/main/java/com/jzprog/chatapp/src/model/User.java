@@ -1,9 +1,17 @@
 package com.jzprog.chatapp.src.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.JoinColumn;
 
 @Entity
 public class User {
@@ -14,6 +22,14 @@ public class User {
     private String username;
     private String password;
     private String email;
+    
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
+    @JoinTable(
+        name = "conv_user", 
+        joinColumns = { @JoinColumn(name = "user_id") }, 
+        inverseJoinColumns = { @JoinColumn(name = "conversation_id") }
+    )
+    Set<Conversation> conversations = new HashSet<>();
 
     protected User() {}
 
@@ -21,6 +37,10 @@ public class User {
         this.username= username;
         this.password= password;
         this.email = email;
+    }
+    
+    public Set<Conversation> getConversations() {
+        return conversations;
     }
 
     public Integer getId() {
@@ -38,6 +58,10 @@ public class User {
     public String getUsername() {
       return username;
     }
+    
+    public void setConversations(Set<Conversation> conversations) {
+        this.conversations = conversations;
+      }
 
     public void setId(Integer id) {
       this.id = id;

@@ -15,10 +15,8 @@ export default {
   name: 'Welcome',
   components: { Login },
   created(){
-     bus.$on('login', (username) => {
-       this.storeUsername(username).then(() => {
-         this.$router.push('home');
-       });
+     bus.$on('login', () => {
+       this.$router.push('home');
      });
    },
   data () {

@@ -1,32 +1,32 @@
 <template>
   <div>
-    <h4>{{ name }}</h4>
-     <input type="text" v-model="inputMessage">
-     <button type='button' @click.prevent='sendMessage()'>Send Message</button>
-     {{ title }}
+    <h4 style='font-weight: bold;'>User {{ getUserId || getUserLoginInfo()[0] }} - {{ getLoginUsername || getUserLoginInfo()[1] }}</h4>
+     <input type="text" v-model="inputMessage" placeholder="Conversation Title">
+     <button type='button' class='btn btn-success' @click.prevent='addNewConversation()'>Create New Conversation</button>
+     <button type='button' class='btn btn-danger' @click.prevent='logout()'>Logout</button>
      <div id="messDiv">
-       <ul>
-         <li v-for="(mes, index) in messages" :key="index">User {{ mes.postedBy }} : "  {{ mes.text }}  "</li>
-       </ul>
+       <Conversation  v-for="(conv, index) in conversations" :key="index"
+                      :title="conv.title"
+                      :date="conv.date">
+        </Conversation>
      </div>
-     <button type='button' @click.prevent='logout()'>Logout</button>
   </div>
 </template>
 
 <script>
 import bus from "@/common/eventBus";
-import { mapActions } from 'vuex';
+import Conversation from '@/components/Conversation';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'Home',
+  components: { Conversation },
   data () {
     return {
       inputMessage: '',
-      messages: [],
-      name: 'Home page',
+      conversations: [],
       stompClient: null,
-      socket: null,
-      title: ''
+      socket: null
     }
   },
   created () {
@@ -34,8 +34,8 @@ export default {
       this.$router.push('/');
     });
     const token = localStorage.getItem('token');
-    this.axios('/api/getMessages', { headers: { Authorization: `Bearer ${token}` } }).then(response => {
-      this.messages = response.data;
+    this.axios('/api/messages/getConversations', { headers: { Authorization: `Bearer ${token}` } }).then(response => {
+      this.conversations = response.data;
     })
     /* eslint-disable */
     var self = this;
@@ -43,15 +43,21 @@ export default {
     this.stompClient = Stomp.over(this.socket);
     this.stompClient.connect({}, function (frame) {
       console.log('Connected: ' + frame);
-      this.subscribe('/topic/greetings', function (message) {
-        self.messages.push(JSON.parse(message.body));
+      this.subscribe(`/topic/conversations/${self.getUserLoginInfo()[0]}`, function (message) {
+        self.conversations.push(JSON.parse(message.body));
       });
     });
       /* eslint-enable */
   },
   methods: {
-    sendMessage () {
-      this.stompClient.send('/app/src', {}, JSON.stringify({'message': this.inputMessage}));
+    getUserLoginInfo() {
+      const storageInfo = JSON.parse(localStorage.getItem('userInfo'));
+      const storageId = storageInfo ? storageInfo.id : '';
+      const storageUsername = storageInfo ? storageInfo.username : '';
+      return [ this.getUserId || storageId, this.getLoginUsername || storageUsername ];
+    },
+    addNewConversation() {
+      this.stompClient.send(`/app/src/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({'title': this.inputMessage}));
     },
     logout() {
       this.userLogout();
@@ -59,6 +65,12 @@ export default {
     ...mapActions([
         'userLogout',
     ]),
+  },
+  computed: {
+    ...mapGetters([
+        'getLoginUsername',
+        'getUserId'
+    ])
   }
 }
 </script>

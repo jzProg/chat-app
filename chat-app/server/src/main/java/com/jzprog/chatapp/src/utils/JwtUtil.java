@@ -13,7 +13,6 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
-
 public class JwtUtil implements Serializable {
 
 	private static final long serialVersionUID = -2550185165626007488L;

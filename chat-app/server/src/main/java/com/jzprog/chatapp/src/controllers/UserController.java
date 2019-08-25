@@ -1,7 +1,9 @@
 package com.jzprog.chatapp.src.controllers;
 
 import com.jzprog.chatapp.src.model.User;
+import com.jzprog.chatapp.src.model.UserDTO;
 import com.jzprog.chatapp.src.model.UserInfo;
+import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.utils.AuthenticationUtils;
 import com.jzprog.chatapp.src.utils.JwtUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,7 +21,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.http.HttpStatus;
-import com.jzprog.chatapp.src.database.UsersRepository;
 
 @CrossOrigin(origins = "http://localhost:9090")
 @RestController
@@ -32,7 +33,7 @@ public class UserController {
 	private AuthenticationManager authenticationManager;
 
     @Autowired
-    UsersRepository userRepo;
+    UserService userService;
     
     @Autowired
     UserDetailsService userDetailsService;
@@ -46,17 +47,17 @@ public class UserController {
        authenticate(userInfo.getUsername(), hashedPassword);
        final UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
 	   final String token = jwtTokenUtil.generateToken(userDetails);
-       return new ResponseEntity<>(token, HttpStatus.OK);
+	   UserDTO userDTO = new UserDTO(userService.searchForUserByUsername(userInfo.getUsername()).getId(), userInfo.getUsername(), token);
+       return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> register(@RequestBody UserInfo userInfo) throws Exception {
     	String hashedPassword = AuthenticationUtils.getHashedPassword(userInfo.getPassword());
-        User user = (User) userRepo.findUserByUsernameAndPassword(userInfo.getUsername(), hashedPassword);
+        User user = userService.searchForUserByUsernameAndPassword(userInfo.getUsername(), hashedPassword);
         if (user == null) {
           log.info("User doesn't exist! About to register a new one...");
-          user = new User(userInfo.getUsername(), hashedPassword, userInfo.getEmail());
-          userRepo.save(user);
+          userService.createNewUser(userInfo, hashedPassword);
           return new ResponseEntity<>("User succesfully created!", HttpStatus.OK);
         }
         return new ResponseEntity<>("User is already registered...", HttpStatus.FOUND);
