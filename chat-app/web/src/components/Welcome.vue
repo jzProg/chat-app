@@ -2,23 +2,35 @@
   <div class="hello">
     <img src="../assets/logo.png">
     <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li>
-        <router-link :to="'/home'">Home Page</router-link>
-      </li>
-    </ul>
+    <router-view></router-view>
   </div>
 </template>
 
 <script>
+import  Login  from './Login.vue'
+import bus from "@/common/eventBus";
+import { mapActions } from 'vuex';
+
 export default {
   name: 'Welcome',
+  components: { Login },
+  created(){
+     bus.$on('login', (username) => {
+       this.storeUsername(username).then(() => {
+         this.$router.push('home');
+       });
+     });
+   },
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      msg: 'Welcome to JZ messenger'
     }
-  }
+  },
+  methods: {
+      ...mapActions([
+          'storeUsername',
+      ]),
+    },
 }
 </script>
 
