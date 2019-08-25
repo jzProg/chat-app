@@ -1,6 +1,6 @@
 <template>
   <div class="hello">
-    <img src="../assets/logo.png">
+    <i class="fas fa-comment-dots fa-10x" style = "color:crimson;"></i>
     <h1>{{ msg }}</h1>
     <router-view></router-view>
   </div>
@@ -23,7 +23,7 @@ export default {
    },
   data () {
     return {
-      msg: 'Welcome to JZ messenger'
+      msg: 'Welcome to JZ Chat App'
     }
   },
   methods: {

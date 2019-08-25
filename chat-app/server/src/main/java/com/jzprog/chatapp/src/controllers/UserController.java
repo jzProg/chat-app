@@ -57,9 +57,9 @@ public class UserController {
           log.info("User doesn't exist! About to register a new one...");
           user = new User(userInfo.getUsername(), hashedPassword, userInfo.getEmail());
           userRepo.save(user);
-          return new ResponseEntity<>(user, HttpStatus.OK);
+          return new ResponseEntity<>("User succesfully created!", HttpStatus.OK);
         }
-        return new ResponseEntity<>(null, HttpStatus.FOUND);
+        return new ResponseEntity<>("User is already registered...", HttpStatus.FOUND);
     }
     
     private void authenticate(String username, String password) throws Exception {

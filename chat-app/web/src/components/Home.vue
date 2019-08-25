@@ -30,7 +30,6 @@ export default {
     }
   },
   created () {
-    console.log('CREATED');
     bus.$on('logout', () => {
       this.$router.push('/');
     });

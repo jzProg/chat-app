@@ -51,13 +51,14 @@ export default new Vuex.Store({
                   .then((response) => {
                     localStorage.setItem('token', response.data);
                     bus.$emit('login', payload.username);
-                  }).catch((error) => {
+                  })
+                  .catch((error) => {
                     console.log('login error: ', error);
                     commit({ type: 'setLoginErrorMessage', value: error });
                   });
     },
     createUserProfile({ commit }, payload) {
-      return axios.post('/api/user/registerUser', { username: payload.username, password: payload.password, email: payload.email })
+      return axios.post('/api/user/registerUser', { username: payload.username, password: payload.password, email: payload.email })            
                   .catch((error) => {
                     console.log('register error: ', error);
                     commit({ type: 'setRegisterErrorMessage', value: error });
