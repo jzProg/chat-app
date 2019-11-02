@@ -3,13 +3,15 @@ package com.jzprog.chatapp.src.model;
 import java.util.Date;
 
 public class ConversationDTO {
+	private Integer id;
 	private String title;
 	private Date date;
 
     public ConversationDTO() {
     }
 
-    public ConversationDTO(String title, Date date) {
+    public ConversationDTO(Integer id, String title, Date date) {
+    	this.id = id;
         this.title = title;
         this.setDate(date);
     }
@@ -28,6 +30,14 @@ public class ConversationDTO {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+	public Integer getId() {
+		return id;
+	}
+
+	public void setId(Integer id) {
+		this.id = id;
 	}
 
 }

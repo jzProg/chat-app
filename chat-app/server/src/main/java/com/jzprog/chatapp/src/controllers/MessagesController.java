@@ -2,10 +2,14 @@ package com.jzprog.chatapp.src.controllers;
 
 import com.jzprog.chatapp.src.model.Conversation;
 import com.jzprog.chatapp.src.model.ConversationDTO;
+import com.jzprog.chatapp.src.model.Message;
+import com.jzprog.chatapp.src.model.MessageDTO;
 import com.jzprog.chatapp.src.services.MessagingService;
 import com.jzprog.chatapp.src.utils.JwtUtil;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -35,38 +39,38 @@ public class MessagesController {
     @Autowired
     JwtUtil jwtUtil;
 
-    /*@RequestMapping("/getMessages") // todo implement correctly
-    public ResponseEntity<?> getMessages(@RequestHeader(value="Authorization") String authHeader) {      
-        String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));
-        User user = (User) userRepo.findUserByUsername(username);
-        List<Message> messages = (ArrayList<Message>) messageRepo.findByPostedBy(user.getId());
-        return new ResponseEntity<>(messages, HttpStatus.OK);
-    } */
+    @RequestMapping(value = "/getConversationMessages", method = RequestMethod.GET)
+    public ResponseEntity<?> getMessages(@RequestParam("id") String id, @RequestHeader(value="Authorization") String authHeader) {   
+    	List<MessageDTO> messages = new ArrayList<>();
+    	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id))) {
+            messages.add(new MessageDTO(mes.getText(), mes.getPostedBy()));
+        }
+        return new ResponseEntity<>(messages, HttpStatus.OK); 
+    }
     
     @RequestMapping("/getConversations")
     public ResponseEntity<?> getConversations(@RequestHeader(value="Authorization") String authHeader) {      
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
         List<ConversationDTO> conversationDTOs = new ArrayList<>();
         for (Conversation conv : messagingService.fetchUsersConversations(username)) {
-           conversationDTOs.add(new ConversationDTO(conv.getTitle(), conv.getCreatedDate()));
+           conversationDTOs.add(new ConversationDTO(conv.getId(), conv.getTitle(), conv.getCreatedDate()));
         }
         return new ResponseEntity<>(conversationDTOs, HttpStatus.OK);
     }
 
-    /*@MessageMapping("/src")  // todo implement correctly
-    @SendTo("/topic/message")
-    public Message addMessage(MessageDTO message) throws Exception {
+    @MessageMapping("/messages/{convId}")
+    @SendTo("/topic/conversation/{convId}")
+    public MessageDTO addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
         log.info("inside message topic!!!");
-        Message newMessage = new Message(message.getMessage(), 3);
-        messageRepo.save(newMessage);
-        return newMessage;
-    } */
+        Message newMessage = messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), new Date(), message.getAuthorId());     
+        return new MessageDTO(newMessage.getText(), newMessage.getPostedBy());
+    }
     
     @MessageMapping("/src/{userId}")
     @SendTo("/topic/conversations/{userId}")
     public ConversationDTO createConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
         Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date());
-        return new ConversationDTO(newConversation.getTitle(), newConversation.getCreatedDate());
+        return new ConversationDTO(newConversation.getId(), newConversation.getTitle(), newConversation.getCreatedDate());
     }
 
 }

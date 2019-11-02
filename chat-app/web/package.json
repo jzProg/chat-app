@@ -19,7 +19,8 @@
     "vue-axios": "^2.1.4",
     "vue-router": "^3.0.1",
     "vuex": "^3.1.1",
-    "webpack-dev-server": "^2.9.1"
+    "webpack-cli": "^3.3.10",
+    "webpack-dev-server": "^2.11.5"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
@@ -51,7 +52,7 @@
     "vue-loader": "^13.3.0",
     "vue-style-loader": "^3.0.1",
     "vue-template-compiler": "^2.5.2",
-    "webpack": "^3.6.0",
+    "webpack": "^3.12.0",
     "webpack-bundle-analyzer": "^3.3.2",
     "webpack-dev-middleware": "^1.12.0",
     "webpack-hot-middleware": "^2.18.2",

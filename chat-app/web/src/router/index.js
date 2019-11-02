@@ -5,6 +5,8 @@ import Home from '@/components/Home'
 import Register from '@/components/Register'
 import Profile from '@/components/Profile'
 import Login from '@/components/Login'
+import Messages from '@/components/MessagesList'
+import Conversations from '@/components/ConversationList'
 
 Vue.use(Router)
 
@@ -31,12 +33,16 @@ export default new Router({
       }
     },
     {
-      path: '/home',
-      name: 'Home',
+      path: '/home/',
       component: Home,
       children: [
         {
-          path: '/profile',
+          path: '',
+          name: 'Conversations',
+          component: Conversations
+        },
+        {
+          path: 'profile',
           name: 'Profile',
           component: Profile
         },
@@ -45,6 +51,6 @@ export default new Router({
         if (localStorage.getItem('token')) next();
         else next('/');
       }
-    }
+    },
   ]
 })

@@ -11,7 +11,7 @@ import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'Conversation',
-  props: ['title', 'date'],
+  props: ['id', 'title', 'date', 'getMessages'],
   data () {
     return {
 
@@ -23,6 +23,8 @@ export default {
   methods: {
     openConversation() {
       console.log('opening conversation...');
+      console.log(this.id);
+      this.getMessages(this.id);
     },
     ...mapActions([
         'userLogout',
@@ -42,10 +44,10 @@ export default {
     cursor: pointer;
     border-style: solid;
     min-height: 50px;
-    padding: 1%;
-    margin-top: 1%;
-    margin-left: 30%;
-    margin-right: 30%;
+    padding: 2%;
+    margin-left: 2%;
+    width: 100%;
+    margin-bottom: 1%;
   }
 
   #conversationDiv:hover{
