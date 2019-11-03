@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	       xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>web</artifactId>
+  <packaging>pom</packaging>
 
 	<parent>
 		<groupId>com.jzprog</groupId>
 		<artifactId>chat-app</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
-    <relativePath>../pom.xml</relativePath> 
+    <relativePath>../pom.xml</relativePath>
 	</parent>
 
 	<properties>
@@ -30,8 +34,8 @@
 							<goal>install-node-and-npm</goal>
 						</goals>
 						<configuration>
-							<nodeVersion>v6.11.4</nodeVersion>
-							<npmVersion>3.10.10</npmVersion>
+							<nodeVersion>v10.11.0</nodeVersion>
+							<npmVersion>6.4.1</npmVersion>
 							<nodeDownloadRoot>https://nodejs.org/dist/</nodeDownloadRoot>
 							<npmDownloadRoot>http://registry.npmjs.org/npm/-/</npmDownloadRoot>
 						</configuration>
@@ -84,4 +88,5 @@
 			</plugin>
 		</plugins>
 	</build>
+	
 </project>
