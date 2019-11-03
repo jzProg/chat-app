@@ -43,9 +43,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf().disable()
-		            .authorizeRequests().antMatchers("/api/user/**").permitAll() // permit access to user controller end points
-		                                .antMatchers("/gs-guide-websocket/**").permitAll() // permit access to socket end points
-		            .anyRequest().authenticated() // all other end points should be authenticated
+		            .authorizeRequests().antMatchers("/api/messages/**").authenticated() // messages controller end points should be authenticated		                           
+		            .anyRequest().permitAll() // permit access to all other end points
 		            .and() 
 		            .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint)
 		            .and()
