@@ -2,6 +2,7 @@ package com.jzprog.chatapp.src.model;
 
 import java.util.Date;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +16,7 @@ public class Message {
     private Integer id;
     private String text;
     private Integer postedBy;
+    @Column(name = "created_date", columnDefinition="DATETIME")
     private Date createdDate;
     private Integer conversationId;
 

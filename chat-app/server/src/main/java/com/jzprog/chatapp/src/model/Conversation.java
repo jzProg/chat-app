@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -18,6 +19,7 @@ public class Conversation {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
     private String title;	
+    @Column(name = "created_date", columnDefinition="DATETIME")
     private Date createdDate;	  
     
     @ManyToMany(fetch = FetchType.EAGER, mappedBy = "conversations")

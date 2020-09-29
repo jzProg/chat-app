@@ -5,6 +5,7 @@ import com.jzprog.chatapp.src.model.ConversationDTO;
 import com.jzprog.chatapp.src.model.Message;
 import com.jzprog.chatapp.src.model.MessageDTO;
 import com.jzprog.chatapp.src.services.MessagingService;
+import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.utils.JwtUtil;
 
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,13 +38,16 @@ public class MessagesController {
     MessagingService messagingService;
     
     @Autowired
+    UserService userService;
+    
+    @Autowired
     JwtUtil jwtUtil;
 
     @RequestMapping(value = "/getConversationMessages", method = RequestMethod.GET)
     public ResponseEntity<?> getMessages(@RequestParam("id") String id, @RequestHeader(value="Authorization") String authHeader) {   
     	List<MessageDTO> messages = new ArrayList<>();
     	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id))) {
-            messages.add(new MessageDTO(mes.getText(), mes.getPostedBy()));
+            messages.add(new MessageDTO(mes.getText(), mes.getPostedBy(), userService.searchForUserByUserId(mes.getPostedBy()).getUsername(), mes.getCreatedDate()));
         }
         return new ResponseEntity<>(messages, HttpStatus.OK); 
     }
@@ -62,14 +66,14 @@ public class MessagesController {
     @SendTo("/topic/conversation/{convId}")
     public MessageDTO addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
         log.info("inside message topic!!!");
-        Message newMessage = messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), new Date(), message.getAuthorId());     
-        return new MessageDTO(newMessage.getText(), newMessage.getPostedBy());
+        Message newMessage = messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), new Date(System.currentTimeMillis()), message.getAuthorId());     
+        return new MessageDTO(newMessage.getText(), newMessage.getPostedBy(), userService.searchForUserByUserId(newMessage.getPostedBy()).getUsername(), newMessage.getCreatedDate());
     }
     
     @MessageMapping("/src/{userId}")
     @SendTo("/topic/conversations/{userId}")
     public ConversationDTO createConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
-        Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date());
+        Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date(System.currentTimeMillis()));
         return new ConversationDTO(newConversation.getId(), newConversation.getTitle(), newConversation.getCreatedDate());
     }
 

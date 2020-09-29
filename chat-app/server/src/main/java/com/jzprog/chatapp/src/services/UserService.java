@@ -7,4 +7,5 @@ public interface UserService {
 	User searchForUserByUsername(String username);
 	User searchForUserByUsernameAndPassword(String username, String password);
 	void createNewUser(UserInfo userInfo, String password);
+	User searchForUserByUserId(Integer userId);
 }

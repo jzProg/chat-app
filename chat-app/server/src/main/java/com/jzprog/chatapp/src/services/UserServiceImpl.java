@@ -28,5 +28,10 @@ public class UserServiceImpl implements UserService {
 		User user = new User(userInfo.getUsername(), password, userInfo.getEmail());
         userRepo.save(user);
 	}
+	
+	@Override
+	public User searchForUserByUserId(Integer userId) {
+		return (User) userRepo.findUserById(userId);
+	}
 
 }

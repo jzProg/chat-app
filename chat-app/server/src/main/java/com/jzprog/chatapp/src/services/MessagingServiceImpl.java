@@ -1,11 +1,13 @@
 package com.jzprog.chatapp.src.services;
 
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.jzprog.chatapp.src.database.MessagesRepository;
 import com.jzprog.chatapp.src.database.UsersRepository;
@@ -29,12 +31,21 @@ public class MessagingServiceImpl implements MessagingService {
 	}
 	
 	@Override
+	@Transactional 
 	public Conversation createNewConversation(Integer userId, String title, Date date) {
 		Conversation newConversation = new Conversation(title.equals("") ? "Unamed" : title, date);      
         User currentUser = (User) userRepo.findUserById(userId);
         newConversation.getUsers().add(currentUser);
         currentUser.getConversations().add(newConversation);    
         userRepo.save(currentUser); 
+        for (Iterator<Conversation> it = currentUser.getConversations().iterator(); it.hasNext(); ) {
+        	Conversation conv = it.next();
+            if (conv.getTitle().equals(newConversation.getTitle()) && conv.getCreatedDate().equals(newConversation.getCreatedDate())) {
+            	newConversation.setId(conv.getId());
+            	break;
+            }
+            	
+        }
         return newConversation;
 	}
 	
