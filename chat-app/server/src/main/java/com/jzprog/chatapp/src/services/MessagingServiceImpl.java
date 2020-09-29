@@ -14,6 +14,7 @@ import com.jzprog.chatapp.src.database.UsersRepository;
 import com.jzprog.chatapp.src.model.Conversation;
 import com.jzprog.chatapp.src.model.Message;
 import com.jzprog.chatapp.src.model.User;
+import com.jzprog.chatapp.src.utils.SystemMessages;
 
 @Service
 public class MessagingServiceImpl implements MessagingService {
@@ -25,6 +26,7 @@ public class MessagingServiceImpl implements MessagingService {
 	MessagesRepository messagesRepo;
 	
 	@Override
+	@Transactional 
 	public Set<Conversation> fetchUsersConversations(String username) {
 		 User user = (User) userRepo.findUserByUsername(username);
 	     return user.getConversations();
@@ -33,7 +35,7 @@ public class MessagingServiceImpl implements MessagingService {
 	@Override
 	@Transactional 
 	public Conversation createNewConversation(Integer userId, String title, Date date) {
-		Conversation newConversation = new Conversation(title.equals("") ? "Unamed" : title, date);      
+		Conversation newConversation = new Conversation(title.isEmpty() ? SystemMessages.DEFAULT_CONVERSATION_NAME : title, date);      
         User currentUser = (User) userRepo.findUserById(userId);
         newConversation.getUsers().add(currentUser);
         currentUser.getConversations().add(newConversation);    
@@ -50,6 +52,7 @@ public class MessagingServiceImpl implements MessagingService {
 	}
 	
 	@Override
+	@Transactional 
 	public Message addNewMessageToConversation(Integer convId, String text, Date date, Integer author) {
 		Message newMessage = new Message(text, author, date, convId);
 		messagesRepo.save(newMessage); 
@@ -57,6 +60,7 @@ public class MessagingServiceImpl implements MessagingService {
 	}
 	
 	@Override
+	@Transactional 
 	public List<Message> fetchConversationMessages(Integer convId) {
 		 return messagesRepo.findByConversationId(convId);
 	}
