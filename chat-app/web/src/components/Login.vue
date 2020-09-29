@@ -34,7 +34,7 @@
 </template>
 
 <script>
-  import { mapActions, mapGetters, mapMutations } from 'vuex'
+  import { mapActions, mapGetters, mapMutations, mapState } from 'vuex'
 
   export default {
     name: 'Login',
@@ -55,7 +55,7 @@
         'userLogin',
       ]),
       login() {
-       this.userLogin({ username: this.enteredName, password: this.enteredPass });
+        this.userLogin({ username: this.enteredName, password: this.enteredPass });
       },
       removeErrorMessage() {
         this.setLoginErrorMessage({ value: '' });

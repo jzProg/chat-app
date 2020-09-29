@@ -1,7 +1,8 @@
 <template>
- <div id="conversationDiv" @click.prevent="openConversation()">
+ <div id="conversationDiv"
+      @click.prevent="openConversation()">
    <h4 style="font-weight: bold;">{{ title }}</h4>
-   <div> created: {{ date }}</div>
+   <div> created: {{ new Date(date).toLocaleString() }}</div>
  </div>
 </template>
 
@@ -12,14 +13,6 @@ import { mapActions, mapGetters } from 'vuex';
 export default {
   name: 'Conversation',
   props: ['id', 'title', 'date', 'getMessages'],
-  data () {
-    return {
-
-    }
-  },
-  created () {
-
-  },
   methods: {
     openConversation() {
       console.log('opening conversation...');
@@ -48,6 +41,7 @@ export default {
     margin-left: 2%;
     width: 100%;
     margin-bottom: 1%;
+    border-radius: 5px;
   }
 
   #conversationDiv:hover{

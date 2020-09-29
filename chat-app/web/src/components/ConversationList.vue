@@ -1,12 +1,21 @@
 <template>
   <div>
-    <input type="text" v-model="inputMessage" placeholder="Conversation Title">
-    <button type='button' class='btn btn-success' @click.prevent='addNewConversation()'>Create New Conversation</button>
-    <button type='button' class='btn btn-danger' @click.prevent='logout()'>Logout</button>
-    <div class="container" style="margin-top:2%;width:100%" >
+    <input type="text"
+           v-model="inputMessage"
+           placeholder="Conversation Title">
+    <button type='button'
+            class='btn btn-success'
+            @click.prevent='addNewConversation()'>Create New Conversation</button>
+    <button type='button'
+            class='btn btn-danger'
+            @click.prevent='logout()'>Logout</button>
+    <div class="container"
+         style="margin-top:2%;width:100%" >
       <div class="row">
-        <div id = "convDiv" class = "col-md-3" style = "">
+        <div id = "convDiv"
+             class = "col-md-5">
           <Conversation  v-for="(conv, index) in conversations"
+                         :style="getConvStyle(conv.id)"
                          :key="index"
                          :id="conv.id"
                          :title="conv.title"
@@ -14,7 +23,8 @@
                          :get-messages="goToConversationMessages">
            </Conversation>
         </div>
-        <div id = "messagesDiv" class = "col-md-9" style = "">
+        <div id = "messDiv"
+             class = "col-md-7">
           <Messages-of-Active-conversation v-if="activeConversationId"
                                            :send-new-message="sendNewMessage"
                                            :messages="activeConvMessages">
@@ -48,7 +58,7 @@ export default {
     const token = localStorage.getItem('token');
     this.authorId = this.getUserLoginInfo()[0];
     this.axios('/api/messages/getConversations', { headers: { Authorization: `Bearer ${token}` } }).then(response => {
-      this.conversations = response.data;
+      this.conversations = response.data.sort((item1, item2) => item1.date - item2.date);
     })
     /* eslint-disable */
     var self = this;
@@ -63,6 +73,9 @@ export default {
       /* eslint-enable */
   },
   methods: {
+    getConvStyle(id) {
+      return id === this.activeConversationId ? { backgroundColor: 'yellow' } : {};
+    },
     findConversationPositionById(id) {
       return this.conversations.findIndex(x => x.id === id);
     },
@@ -90,7 +103,7 @@ export default {
       this.stompClient.send(`/app/src/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({'title': this.inputMessage}));
     },
     sendNewMessage(newMessage) {
-        this.stompClient.send(`/app/messages/${this.convId}`, {}, JSON.stringify({'text': newMessage, 'authorId': this.authorId }));
+        this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({'text': newMessage, 'authorId': this.authorId }));
     },
     logout() {
       this.userLogout();
