@@ -1,6 +1,5 @@
 <template>
   <div>
-
     <button type='button'
             class='btn btn-success'
             @click.prevent='showModal = true;'>Create New Conversation</button>
@@ -56,6 +55,7 @@ export default {
       activeConvMessages: [],
       authorId: '',
       showModal: false,
+      activeSubscription: null,
     }
   },
   created () {
@@ -92,7 +92,7 @@ export default {
       return this.conversations.findIndex(x => x.id === id);
     },
     closePreviousConversation() {
-      // todo close topic of previous conversation
+      if (this.activeSubscription) this.activeSubscription.unsubscribe();
     },
     goToConversationMessages(convId) {
       this.closePreviousConversation();
@@ -101,7 +101,7 @@ export default {
       this.axios.get(`/api/messages/getConversationMessages?id=${convId}`, { headers: { Authorization: `Bearer ${token}` } }).then(response => {
         this.activeConvMessages = response.data;
       });
-      this.stompClient.subscribe(`/topic/conversation/${convId}`, (message) => {
+      this.activeSubscription = this.stompClient.subscribe(`/topic/conversation/${convId}`, (message) => {
         this.activeConvMessages.push(JSON.parse(message.body));
       });
     },
