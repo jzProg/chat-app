@@ -20,6 +20,7 @@
                          :id="conv.id"
                          :title="conv.title"
                          :date="conv.date"
+                         @delete="deleteConversation(conv.id)"
                          :get-messages="goToConversationMessages">
            </Conversation>
         </div>
@@ -59,20 +60,28 @@ export default {
     this.authorId = this.getUserLoginInfo()[0];
     this.axios('/api/messages/getConversations', { headers: { Authorization: `Bearer ${token}` } }).then(response => {
       this.conversations = response.data.sort((item1, item2) => item1.date - item2.date);
-    })
-    /* eslint-disable */
-    var self = this;
-    this.socket = new SockJS('http://localhost:8080/gs-guide-websocket');
-    this.stompClient = Stomp.over(this.socket);
-    this.stompClient.connect({}, function (frame) {
-      console.log('Connected: ' + frame);
-      this.subscribe(`/topic/conversations/${self.getUserLoginInfo()[0]}`, function (message) {
-        self.conversations.push(JSON.parse(message.body));
-      });
     });
-      /* eslint-enable */
+    this.connectToSocket();
   },
   methods: {
+    connectToSocket() {
+      this.socket = new SockJS('http://localhost:8080/gs-guide-websocket');
+      this.stompClient = Stomp.over(this.socket);
+      this.stompClient.connect({}, (frame) => {
+        console.log('Connected: ' + frame);
+        this.stompClient.subscribe(`/topic/conversations/${this.getUserLoginInfo()[0]}`, (message) => {
+          const conv = JSON.parse(message.body);
+          if (!conv.deleted) {
+            this.conversations.push(conv);
+          } else {
+            this.conversations.splice(this.conversations.findIndex(c => conv.id === c.id), 1);
+          }
+        });
+      }, (message) => {
+        console.log('Disconnect! Retrying connection...');
+        this.connectToSocket();
+      });
+    },
     getConvStyle(id) {
       return id === this.activeConversationId ? { backgroundColor: 'yellow' } : {};
     },
@@ -101,6 +110,9 @@ export default {
     },
     addNewConversation() {
       this.stompClient.send(`/app/src/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({'title': this.inputMessage}));
+    },
+    deleteConversation(id) {
+      this.stompClient.send(`/app/src/delete/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({'id': id}));
     },
     sendNewMessage(newMessage) {
         this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({'text': newMessage, 'authorId': this.authorId }));

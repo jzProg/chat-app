@@ -4,11 +4,14 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jzprog.chatapp.src.controllers.MessagesController;
+import com.jzprog.chatapp.src.database.ConversationsRepository;
 import com.jzprog.chatapp.src.database.MessagesRepository;
 import com.jzprog.chatapp.src.database.UsersRepository;
 import com.jzprog.chatapp.src.model.Conversation;
@@ -19,11 +22,17 @@ import com.jzprog.chatapp.src.utils.SystemMessages;
 @Service
 public class MessagingServiceImpl implements MessagingService {
 	
+    Logger log = Logger.getLogger(MessagingServiceImpl.class.getName());
+
+	
 	@Autowired
     UsersRepository userRepo;
 	
 	@Autowired
 	MessagesRepository messagesRepo;
+	
+	@Autowired
+	ConversationsRepository conversationsRepo;
 	
 	@Override
 	@Transactional 
@@ -53,16 +62,28 @@ public class MessagingServiceImpl implements MessagingService {
 	
 	@Override
 	@Transactional 
-	public Message addNewMessageToConversation(Integer convId, String text, Date date, Integer author) {
-		Message newMessage = new Message(text, author, date, convId);
+	public void addNewMessageToConversation(Integer convId, String text, Date date, Integer author) {
+		Message newMessage = new Message(text, author, date);
+		Conversation existingConversation = conversationsRepo.findById(convId);  
+		newMessage.setConversation(existingConversation);
 		messagesRepo.save(newMessage); 
-        return newMessage;
+	}
+	
+	@Override
+	@Transactional 
+	public void deleteConversation(Integer convId) {
+		Conversation existingConversation = conversationsRepo.findById(convId);
+        log.info("existing conv: "  + existingConversation);
+        conversationsRepo.delete(existingConversation);
+        for (User user : existingConversation.getUsers()) {
+            user.getConversations().remove(existingConversation);
+       }
 	}
 	
 	@Override
 	@Transactional 
 	public List<Message> fetchConversationMessages(Integer convId) {
-		 return messagesRepo.findByConversationId(convId);
+		return conversationsRepo.findById(convId).getMessages();
 	}
 
 }

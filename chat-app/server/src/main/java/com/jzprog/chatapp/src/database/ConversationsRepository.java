@@ -9,4 +9,5 @@ import com.jzprog.chatapp.src.model.Conversation;
 public interface ConversationsRepository extends CrudRepository<Conversation,Integer> {
 
 	Conversation findById(Integer id);
+
 }

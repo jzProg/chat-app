@@ -19,11 +19,14 @@ public class User {
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
+	
     private String username;
+    
     private String password;
+   
     private String email;
     
-    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
         name = "conv_user", 
         joinColumns = { @JoinColumn(name = "user_id") }, 

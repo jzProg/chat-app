@@ -6,6 +6,7 @@ public class ConversationDTO {
 	private Integer id;
 	private String title;
 	private Date date;
+	private boolean deleted;
 
     public ConversationDTO() {
     }
@@ -14,6 +15,7 @@ public class ConversationDTO {
     	this.id = id;
         this.title = title;
         this.setDate(date);
+        this.setDeleted(false);
     }
 
     public String getTitle() {
@@ -38,6 +40,14 @@ public class ConversationDTO {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 
 }

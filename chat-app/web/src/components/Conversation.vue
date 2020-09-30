@@ -3,6 +3,7 @@
       @click.prevent="openConversation()">
    <h4 style="font-weight: bold;">{{ title }}</h4>
    <div> created: {{ new Date(date).toLocaleString() }}</div>
+   <button @click.prevent="deleteConv()" class="btn btn-danger">delete</button>
  </div>
 </template>
 
@@ -14,6 +15,10 @@ export default {
   name: 'Conversation',
   props: ['id', 'title', 'date', 'getMessages'],
   methods: {
+    deleteConv() {
+      console.log('deleting conversation...');
+      this.$emit('delete');
+    },
     openConversation() {
       console.log('opening conversation...');
       console.log(this.id);

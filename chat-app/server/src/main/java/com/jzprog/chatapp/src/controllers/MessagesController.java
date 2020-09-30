@@ -66,8 +66,9 @@ public class MessagesController {
     @SendTo("/topic/conversation/{convId}")
     public MessageDTO addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
         log.info("inside message topic!!!");
-        Message newMessage = messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), new Date(System.currentTimeMillis()), message.getAuthorId());     
-        return new MessageDTO(newMessage.getText(), newMessage.getPostedBy(), userService.searchForUserByUserId(newMessage.getPostedBy()).getUsername(), newMessage.getCreatedDate());
+        Date createdDate = new Date(System.currentTimeMillis());
+        messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());     
+        return new MessageDTO(message.getText(), message.getAuthorId(), userService.searchForUserByUserId(message.getAuthorId()).getUsername(), createdDate);
     }
     
     @MessageMapping("/src/{userId}")
@@ -75,6 +76,15 @@ public class MessagesController {
     public ConversationDTO createConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
         Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date(System.currentTimeMillis()));
         return new ConversationDTO(newConversation.getId(), newConversation.getTitle(), newConversation.getCreatedDate());
+    }
+    
+    @MessageMapping("/src/delete/{userId}") 
+    @SendTo("/topic/conversations/{userId}")
+    public ConversationDTO deleteConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
+        messagingService.deleteConversation(Integer.valueOf(conv.getId()));
+        ConversationDTO deleted_conversation = new ConversationDTO(conv.getId(), conv.getTitle(), null);
+        deleted_conversation.setDeleted(true);
+        return deleted_conversation; 
     }
 
 }

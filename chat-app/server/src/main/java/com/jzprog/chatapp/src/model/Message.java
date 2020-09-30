@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class Message {
@@ -14,19 +16,24 @@ public class Message {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
+    
     private String text;
+    
     private Integer postedBy;
+    
     @Column(name = "created_date", columnDefinition="DATETIME")
     private Date createdDate;
-    private Integer conversationId;
+    
+    @ManyToOne
+    @JoinColumn(name = "conversation_id")
+    private Conversation conversation;
 
     protected Message() {}
 
-    public Message(String text, Integer postedBy, Date createdDate, Integer conversationId) {
+    public Message(String text, Integer postedBy, Date createdDate) {
         this.text= text;
         this.postedBy= postedBy;
         this.createdDate = createdDate;
-        this.conversationId = conversationId;
     }
 
     public Integer getId() {
@@ -57,15 +64,15 @@ public class Message {
     public String toString() {
          return String.format(
                 "Message[id=%d, text=%s, postedBy=%s, date=%s, conversation=%s]",
-               id, text, postedBy, createdDate, conversationId);
+               id, text, postedBy, createdDate, conversation);
     }
 
-	public Integer getConversationId() {
-		return conversationId;
+	public Conversation getConversation() {
+		return conversation;
 	}
 	
-	public void setConversationId(Integer conversationId) {
-		this.conversationId = conversationId;
+	public void setConversation(Conversation conversation) {
+		this.conversation = conversation;
 	}
 	
 	public Date getCreatedDate() {
