@@ -1,11 +1,9 @@
 <template>
   <div>
-    <input type="text"
-           v-model="inputMessage"
-           placeholder="Conversation Title">
+
     <button type='button'
             class='btn btn-success'
-            @click.prevent='addNewConversation()'>Create New Conversation</button>
+            @click.prevent='showModal = true;'>Create New Conversation</button>
     <button type='button'
             class='btn btn-danger'
             @click.prevent='logout()'>Logout</button>
@@ -33,6 +31,10 @@
         </div>
       </div>
       </div>
+      <CreateConversationModal v-if="showModal"
+                              @create="addNewConversation"
+                              @close="showModal = false;">
+      </CreateConversationModal>
    </div>
 </template>
 
@@ -40,19 +42,20 @@
 import { mapActions, mapGetters } from 'vuex';
 import Conversation from '@/components/Conversation';
 import MessagesOfActiveConversation from '@/components/MessagesList';
+import CreateConversationModal from '@/components/modals/CreateConversation';
 
 export default {
   name: 'Home',
-  components: { Conversation, MessagesOfActiveConversation },
+  components: { Conversation, MessagesOfActiveConversation, CreateConversationModal },
   data () {
     return {
-      inputMessage: '',
       conversations: [],
       stompClient: null,
       socket: null,
       activeConversationId: '',
       activeConvMessages: [],
       authorId: '',
+      showModal: false,
     }
   },
   created () {
@@ -108,8 +111,9 @@ export default {
       const storageUsername = storageInfo ? storageInfo.username : '';
       return [ this.getUserId || storageId, this.getLoginUsername || storageUsername ];
     },
-    addNewConversation() {
-      this.stompClient.send(`/app/src/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({'title': this.inputMessage}));
+    addNewConversation(name) {
+      this.stompClient.send(`/app/src/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({'title': name || ''}));
+      this.showModal = false;
     },
     deleteConversation(id) {
       this.stompClient.send(`/app/src/delete/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({'id': id}));

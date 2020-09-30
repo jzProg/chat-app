@@ -26,7 +26,7 @@ public class User {
    
     private String email;
     
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     @JoinTable(
         name = "conv_user", 
         joinColumns = { @JoinColumn(name = "user_id") }, 
