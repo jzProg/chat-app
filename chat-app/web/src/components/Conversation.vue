@@ -1,8 +1,9 @@
 <template>
- <div id="conversationDiv"
-      @click.prevent="openConversation()">
-   <h4 style="font-weight: bold;">{{ title }}</h4>
-   <div> created: {{ new Date(date).toLocaleString() }}</div>
+ <div id="conversationDiv">
+   <div @click.prevent="openConversation()">
+     <h4 style="font-weight: bold;">{{ title }}</h4>
+     <div> created: {{ new Date(date).toLocaleString() }}</div>
+   </div>
    <button @click.prevent="deleteConv()" class="btn btn-danger">delete</button>
  </div>
 </template>

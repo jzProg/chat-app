@@ -7,19 +7,17 @@ import com.jzprog.chatapp.src.model.MessageDTO;
 import com.jzprog.chatapp.src.services.MessagingService;
 import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.utils.JwtUtil;
-
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import java.util.logging.Logger;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import java.util.List;
@@ -43,7 +41,7 @@ public class MessagesController {
     @Autowired
     JwtUtil jwtUtil;
 
-    @RequestMapping(value = "/getConversationMessages", method = RequestMethod.GET)
+    @GetMapping(value = "/getConversationMessages")
     public ResponseEntity<?> getMessages(@RequestParam("id") String id, @RequestHeader(value="Authorization") String authHeader) {   
     	List<MessageDTO> messages = new ArrayList<>();
     	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id))) {
@@ -72,14 +70,16 @@ public class MessagesController {
     }
     
     @MessageMapping("/src/{userId}")
-    @SendTo("/topic/conversations/{userId}")
+    @SendTo("/topic/conversations")
     public ConversationDTO createConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
-        Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date(System.currentTimeMillis()));
-        return new ConversationDTO(newConversation.getId(), newConversation.getTitle(), newConversation.getCreatedDate());
+        Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date(System.currentTimeMillis()), conv.getMembers());
+        ConversationDTO newConversationDTO = new ConversationDTO(newConversation.getId(), newConversation.getTitle(), newConversation.getCreatedDate());
+        newConversationDTO.setMembers(conv.getMembers());
+        return newConversationDTO;
     }
     
     @MessageMapping("/src/delete/{userId}") 
-    @SendTo("/topic/conversations/{userId}")
+    @SendTo("/topic/conversations")
     public ConversationDTO deleteConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
         messagingService.deleteConversation(Integer.valueOf(conv.getId()));
         ConversationDTO deleted_conversation = new ConversationDTO(conv.getId(), conv.getTitle(), null);

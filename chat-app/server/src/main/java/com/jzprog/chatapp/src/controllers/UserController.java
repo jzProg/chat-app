@@ -8,10 +8,15 @@ import com.jzprog.chatapp.src.utils.AuthenticationUtils;
 import com.jzprog.chatapp.src.utils.JwtUtil;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -61,6 +66,18 @@ public class UserController {
           return new ResponseEntity<>("User succesfully created!", HttpStatus.OK);
         }
         return new ResponseEntity<>("User is already registered...", HttpStatus.FOUND);
+    }
+    
+    @GetMapping("/getUsers") 
+    public ResponseEntity<?> getUsersMatchingInput(@RequestParam("name") String inputName, @RequestHeader(value="Authorization") String authHeader) {
+    	List<UserDTO> listOfUsers = new ArrayList<>();
+        String username = jwtTokenUtil.getUsernameFromToken(authHeader.substring(7));      
+    	if (!inputName.isEmpty()) {
+    		for (User user : userService.searchForUsersMatchingString(inputName)) {
+        		if (!user.getUsername().equals(username)) listOfUsers.add(new UserDTO(user.getId(), user.getUsername(), null));
+             }	
+    	}
+        return new ResponseEntity<>(listOfUsers, HttpStatus.OK);
     }
     
     private void authenticate(String username, String password) throws Exception {

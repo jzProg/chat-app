@@ -72,11 +72,12 @@ export default {
       this.stompClient = Stomp.over(this.socket);
       this.stompClient.connect({}, (frame) => {
         console.log('Connected: ' + frame);
-        this.stompClient.subscribe(`/topic/conversations/${this.getUserLoginInfo()[0]}`, (message) => {
+        this.stompClient.subscribe(`/topic/conversations`, (message) => {
           const conv = JSON.parse(message.body);
           if (!conv.deleted) {
-            this.conversations.push(conv);
+            if (conv.members.indexOf(this.getUserLoginInfo()[1]) != -1) this.conversations.push(conv);
           } else {
+            this.clearIfIsActiveConversation(conv.id);
             this.conversations.splice(this.conversations.findIndex(c => conv.id === c.id), 1);
           }
         });
@@ -111,12 +112,21 @@ export default {
       const storageUsername = storageInfo ? storageInfo.username : '';
       return [ this.getUserId || storageId, this.getLoginUsername || storageUsername ];
     },
-    addNewConversation(name) {
-      this.stompClient.send(`/app/src/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({'title': name || ''}));
+    addNewConversation(name, members) {
+      members.push(this.getUserLoginInfo()[1]);
+      this.stompClient.send(`/app/src/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({ 'title': name || '', 'members' : members }));
       this.showModal = false;
     },
     deleteConversation(id) {
-      this.stompClient.send(`/app/src/delete/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({'id': id}));
+      this.clearIfIsActiveConversation(id);
+      this.stompClient.send(`/app/src/delete/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({ 'id': id }));
+    },
+    clearIfIsActiveConversation(id) {
+      if (this.activeConversationId === id) {
+        this.closePreviousConversation();
+        this.activeConvMessages = [];
+        this.activeConversationId = '';
+      }
     },
     sendNewMessage(newMessage) {
         this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({'text': newMessage, 'authorId': this.authorId }));

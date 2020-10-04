@@ -1,5 +1,7 @@
 package com.jzprog.chatapp.src.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +39,11 @@ public class UserServiceImpl implements UserService {
 	@Transactional 
 	public User searchForUserByUserId(Integer userId) {
 		return (User) userRepo.findUserById(userId);
+	}
+
+	@Override
+	public List<User> searchForUsersMatchingString(String str) {
+		return (List<User>) userRepo.findUsersMachingString(str);
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.jzprog.chatapp.src.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -41,11 +42,16 @@ public class MessagingServiceImpl implements MessagingService {
 	
 	@Override
 	@Transactional 
-	public Conversation createNewConversation(Integer userId, String title, Date date) {
+	public Conversation createNewConversation(Integer userId, String title, Date date, List<String> members) {
+		log.info(members.toString());
 		Conversation newConversation = new Conversation(title.isEmpty() ? SystemMessages.DEFAULT_CONVERSATION_NAME : title, date);      
         User currentUser = (User) userRepo.findUserById(userId);
-        newConversation.getUsers().add(currentUser);
-        currentUser.getConversations().add(newConversation);    
+        for (String memberName : members) {
+            User member = (User) userRepo.findUserByUsername(memberName);
+    		log.info(member.toString());
+            newConversation.getUsers().add(member);
+            member.getConversations().add(newConversation); 
+        }
         userRepo.save(currentUser); 
         for (Iterator<Conversation> it = currentUser.getConversations().iterator(); it.hasNext(); ) {
         	Conversation conv = it.next();
@@ -81,7 +87,11 @@ public class MessagingServiceImpl implements MessagingService {
 	@Override
 	@Transactional 
 	public List<Message> fetchConversationMessages(Integer convId) {
-		return conversationsRepo.findById(convId).getMessages();
+		Conversation existingConversation = conversationsRepo.findById(convId);  
+		if (existingConversation != null) {
+			return existingConversation.getMessages();
+		}
+		return new ArrayList<>();
 	}
 
 }

@@ -3,16 +3,31 @@
     <span slot = "close" id = 'closeSymbol' @click.prevent = "close">x</span><br>
     <h3 slot = "header">Create New Conversation</h3>
     <div slot = "body">
-      <input type="text"
+       <input type="text"
              v-model="inputMessage"
-             placeholder="Conversation Title">
+             placeholder="Conversation Title"><br>
+       <input type="text"
+             v-model="user"
+             @keyup.enter="search"
+             placeholder="Search Members">
+        <ul>
+          <li v-for="(cand, index) in candidates"
+              style="cursor: pointer"
+              @click.prevent="addMember(cand)">
+              {{ cand.username }}
+          </li>
+        </ul>
+        <div v-for="(member, index) in members"
+             style="backgroundColor: green; color: white; width: 50%; border-radius: 15px; margin-top:2%; margin: 0 auto">
+          {{ member }}
+        </div>
     </div>
     <div slot = "footer" class = "text-center">
       <button type = "button"
               class = "btn btn-primary"
               @click.prevent = "create()">
               Confirm
-     </button>
+      </button>
     </div>
   </Modal>
 </template>
@@ -27,11 +42,26 @@
     data() {
       return {
         inputMessage: '',
+        user: '',
+        candidates: [],
+        members: []
       }
     },
     methods: {
+      addMember(member) {
+        console.log("adding member...");
+        if (this.members.indexOf(member.username)) {
+          this.members.push(member.username);
+        }
+      },
+      search() {
+        const token = localStorage.getItem('token');
+        this.axios(`/api/user/getUsers?name=${this.user}`, { headers: { Authorization: `Bearer ${token}` }}).then(response => {
+          this.candidates = response.data;
+        });
+      },
       create() {
-        this.$emit('create', this.inputMessage);
+        this.$emit('create', this.inputMessage, this.members);
       },
       close() {
         this.$emit('close');

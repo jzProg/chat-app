@@ -1,11 +1,14 @@
 package com.jzprog.chatapp.src.model;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ConversationDTO {
 	private Integer id;
 	private String title;
 	private Date date;
+	private List<String> members;
 	private boolean deleted;
 
     public ConversationDTO() {
@@ -16,6 +19,7 @@ public class ConversationDTO {
         this.title = title;
         this.setDate(date);
         this.setDeleted(false);
+        this.members = new ArrayList<>();
     }
 
     public String getTitle() {
@@ -49,5 +53,15 @@ public class ConversationDTO {
 	public void setDeleted(boolean deleted) {
 		this.deleted = deleted;
 	}
+
+	public List<String> getMembers() {
+		return members;
+	}
+
+	public void setMembers(List<String> members) {
+		this.members = members;
+	}
+	
+	
 
 }
