@@ -1,0 +1,65 @@
+<databaseChangeLog
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    <changeSet author="john" id="1">
+        <createTable tableName="user">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="username" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(50)">
+             <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+         <createTable tableName="conversation">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="title" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime">
+             <constraints nullable="false"/>
+            </column>
+        </createTable>
+         <createTable tableName="message">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="text" type="VARCHAR(700)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="posted_by" type="INT">
+             <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="datetime">
+                <constraints nullable="false"/>
+            </column>
+            <column name="conversation_id" type="INT">
+              <constraints nullable="false" foreignKeyName="fk_conversation_id" references="conversation(id)"/>            
+            </column>
+        </createTable>
+         <createTable tableName="conv_user">
+            <column name="conversation_id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+             <column name="user_id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+        </createTable>
+        <rollback>
+            <dropTable tableName="user"/>
+            <dropTable tableName="conversation"/>
+            <dropTable tableName="message"/>
+            <dropTable tableName="conv_user"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

@@ -65,6 +65,10 @@
           <artifactId>hsqldb</artifactId>
           <scope>runtime</scope>
         </dependency>
+        <dependency>
+	    <groupId>org.liquibase</groupId>
+	     <artifactId>liquibase-core</artifactId>
+	</dependency>
     </dependencies>
 
     <properties>
@@ -74,10 +78,20 @@
 
     <build>
       <plugins>
-        <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-            </plugin>
+           <plugin>
+               <groupId>org.springframework.boot</groupId>
+               <artifactId>spring-boot-maven-plugin</artifactId>
+           </plugin>
+           <plugin>
+               <groupId>org.liguibase</groupId>
+               <artifactId>liquibase-maven-plugin</artifactId>
+               <version>3.5.2</version>
+               <configuration>
+                  <changeLogFile>
+                  src/main/resources/db/changelog/changelog-master.xml
+                  </changeLogFile>
+               </configuration>
+           </plugin>
         <plugin>
                 <artifactId>maven-resources-plugin</artifactId>
                 <executions>
@@ -97,6 +111,22 @@
                                         <include>static/</include>
                                         <include>index.html</include>
                                     </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                     <execution>
+                        <id>copy liquibase</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/db</outputDirectory>
+                            <overwrite>true</overwrite>
+                            <resources>
+                                <resource>
+                                    <directory>./src/main/db</directory>                               
                                 </resource>
                             </resources>
                         </configuration>
