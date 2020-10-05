@@ -4,6 +4,7 @@ import com.jzprog.chatapp.src.model.Conversation;
 import com.jzprog.chatapp.src.model.ConversationDTO;
 import com.jzprog.chatapp.src.model.Message;
 import com.jzprog.chatapp.src.model.MessageDTO;
+import com.jzprog.chatapp.src.model.User;
 import com.jzprog.chatapp.src.services.MessagingService;
 import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.utils.JwtUtil;
@@ -18,6 +19,8 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import java.util.List;
@@ -42,8 +45,12 @@ public class MessagesController {
     JwtUtil jwtUtil;
 
     @GetMapping(value = "/getConversationMessages")
-    public ResponseEntity<?> getMessages(@RequestParam("id") String id, @RequestHeader(value="Authorization") String authHeader) {   
-    	List<MessageDTO> messages = new ArrayList<>();
+    public ResponseEntity<?> getMessages(@RequestParam("id") String id, @RequestHeader(value="Authorization") String authHeader) {
+        String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
+        User user = userService.searchForUserByUsername(username);
+        boolean userHasConversation = !(user.getConversations().stream().filter(c -> c.getId().equals(Integer.parseInt(id))).collect(Collectors.toList()).isEmpty());
+    	if (!userHasConversation) return new ResponseEntity<>("User doesn't have access to this conversation...", HttpStatus.UNAUTHORIZED); 
+        List<MessageDTO> messages = new ArrayList<>();
     	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id))) {
             messages.add(new MessageDTO(mes.getText(), mes.getPostedBy(), userService.searchForUserByUserId(mes.getPostedBy()).getUsername(), mes.getCreatedDate()));
         }
@@ -63,7 +70,6 @@ public class MessagesController {
     @MessageMapping("/messages/{convId}")
     @SendTo("/topic/conversation/{convId}")
     public MessageDTO addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
-        log.info("inside message topic!!!");
         Date createdDate = new Date(System.currentTimeMillis());
         messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());     
         return new MessageDTO(message.getText(), message.getAuthorId(), userService.searchForUserByUserId(message.getAuthorId()).getUsername(), createdDate);
