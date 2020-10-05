@@ -1,16 +1,16 @@
 <template>
-  <transition name = "modal">
-    <div class = "modal-mask">
-      <div class = "modal-wrapper">
-        <div class = "modal-container">
-         <slot name = "close"></slot>
-          <div class = "modal-header">
-            <slot name = "header"></slot>
+  <transition name="modal">
+    <div class="modal-mask">
+      <div class="modal-wrapper">
+        <div class="modal-container">
+         <slot name="close"></slot>
+          <div class="modal-header">
+            <slot name="header"></slot>
           </div>
-          <div class = "modal-body">
+          <div class="modal-body">
             <slot name="body"></slot>
           </div>
-          <div class = "modal-footer">
+          <div class="modal-footer">
             <slot name="footer"></slot>
           </div>
         </div>

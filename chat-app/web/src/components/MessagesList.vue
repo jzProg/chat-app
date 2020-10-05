@@ -1,6 +1,7 @@
 <template>
  <div id="messagesDiv">
-   <div id="contentDiv" class="container">
+   <div id="contentDiv"
+        class="container">
      <div v-for="mes in messages"
           class="inner-message row">
         <div style="text-align: left;"
@@ -9,14 +10,16 @@
           {{ mes.text }}
         </div>
         <div style="color:lightgrey;"
-             class="col-md-3">{{ new Date(mes.createdDate).toLocaleString() }}</div>
+             class="col-md-3">
+             {{ new Date(mes.createdDate).toLocaleString() }}
+        </div>
      </div>
    </div>
    <div id="createMessageDiv">
      <input type="text"
+            id="inputMessage"
             v-model="newMessage"
             placeholder="New Message"
-            style="width: 60%; border-radius: 50px;padding:1%"
             @keyup.enter="sendNewMessage(newMessage); newMessage = '';">
    </div>
  </div>
@@ -65,15 +68,24 @@ export default {
     margin-left: 2%;
     border-radius: 5px;
   }
+
   .inner-message {
     width: 100%;
     margin-top: 1%;
   }
+
   #contentDiv{
     min-height: 450px;
     width: 100%;
   }
+
   #createMessageDiv{
     margin-top: 0%;
+  }
+
+  #inputMessage {
+    width: 60%;
+    border-radius: 50px;
+    padding: 1%;
   }
 </style>

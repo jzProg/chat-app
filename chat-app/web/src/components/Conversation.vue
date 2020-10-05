@@ -4,7 +4,10 @@
      <h4 style="font-weight: bold;">{{ title }}</h4>
      <div> created: {{ new Date(date).toLocaleString() }}</div>
    </div>
-   <button @click.prevent="deleteConv()" class="btn btn-danger">delete</button>
+   <button @click.prevent="deleteConv()"
+          class="btn btn-danger">
+          delete
+  </button>
  </div>
 </template>
 
@@ -21,8 +24,7 @@ export default {
       this.$emit('delete');
     },
     openConversation() {
-      console.log('opening conversation...');
-      console.log(this.id);
+      console.log('opening conversation...' + this.id);
       this.getMessages(this.id);
     },
     ...mapActions([

@@ -1,6 +1,8 @@
 <template>
   <div>
-    <h4 style='font-weight: bold;'>User {{ getUserId || getUserLoginInfo()[0] }} - {{ getLoginUsername || getUserLoginInfo()[1] }}</h4>
+    <h4 style='font-weight:bold'>
+      User {{ getUserId || getUserLoginInfo()[0] }} - {{ getLoginUsername || getUserLoginInfo()[1] }}
+    </h4>
     <router-view></router-view>
   </div>
 </template>

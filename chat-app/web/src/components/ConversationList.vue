@@ -44,7 +44,7 @@ import MessagesOfActiveConversation from '@/components/MessagesList';
 import CreateConversationModal from '@/components/modals/CreateConversation';
 
 export default {
-  name: 'Home',
+  name: 'Conversations',
   components: { Conversation, MessagesOfActiveConversation, CreateConversationModal },
   data () {
     return {
