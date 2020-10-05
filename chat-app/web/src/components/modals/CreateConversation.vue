@@ -1,8 +1,10 @@
 <template>
   <Modal>
-    <span slot = "close" id = 'closeSymbol' @click.prevent = "close">x</span><br>
-    <h3 slot = "header">Create New Conversation</h3>
-    <div slot = "body">
+    <span slot="close"
+          id='closeSymbol'
+          @click.prevent="close">x</span><br>
+    <h3 slot="header">Create New Conversation</h3>
+    <div slot="body">
        <input type="text"
              v-model="inputMessage"
              placeholder="Conversation Title"><br>
@@ -12,8 +14,8 @@
              placeholder="Search Members">
         <ul>
           <li v-for="(cand, index) in candidates"
-              style="cursor: pointer"
-              @click.prevent="addMember(cand)">
+              class="candidate"
+              @click.prevent="addMember(cand, index)">
               {{ cand.username }}
           </li>
         </ul>
@@ -22,11 +24,12 @@
           {{ member }}
         </div>
     </div>
-    <div slot = "footer" class = "text-center">
-      <button type = "button"
-              class = "btn btn-primary"
+    <div slot="footer"
+         class="text-center">
+      <button type="button"
+              class="btn btn-primary"
               :disabled="showConfirm()"
-              @click.prevent = "create()">
+              @click.prevent="create()">
               Confirm
       </button>
     </div>
@@ -49,10 +52,12 @@
       }
     },
     methods: {
-      addMember(member) {
-        console.log("adding member...");
-        if (this.members.indexOf(member.username)) {
+      addMember(member, index) {
+        if (this.members.indexOf(member.username) === -1) {
+          console.log("adding member...");
           this.members.push(member.username);
+          console.log("removing from candidate...");
+          this.candidates.splice(index, 1);
         }
       },
       search() {
@@ -81,5 +86,8 @@
    width: 50%;
    border-radius: 15px;
    margin: 0 auto 2%;
+ }
+ .candidate {
+   cursor: pointer;
  }
 </style>

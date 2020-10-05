@@ -19,7 +19,7 @@ public class LogAspect {
 
 	
 	@Around("@annotation(LogMethodInfo)")
-	public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
+	public Object logInitialInfo(ProceedingJoinPoint joinPoint) throws Throwable {
 		Object[] arguments = joinPoint.getArgs();
 		log.info("Inside: " + joinPoint.getSignature().getName() +"()" + " params: " + Arrays.toString(arguments));
 	    return joinPoint.proceed();
