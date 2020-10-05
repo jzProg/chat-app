@@ -27,7 +27,7 @@ public class LogAspect {
 	
 	@AfterReturning(pointcut = "@annotation(LogMethodInfo)", returning = "result")
 	public void logAfterReturning(JoinPoint joinPoint, Object result) {
-	    log.info("Returned: " + result.toString());
+	    log.info("Returned: " + (result != null ? result.toString() : "void"));
 	}
 	
 }

@@ -2,7 +2,9 @@
   <Modal>
     <span slot="close"
           id='closeSymbol'
-          @click.prevent="close">x</span><br>
+          @click.prevent="close">x
+    </span>
+    <br>
     <h3 slot="header">Create New Conversation</h3>
     <div slot="body">
        <input type="text"

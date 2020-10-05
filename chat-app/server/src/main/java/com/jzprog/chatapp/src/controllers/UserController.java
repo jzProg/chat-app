@@ -6,15 +6,18 @@ import com.jzprog.chatapp.src.model.UserInfo;
 import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.utils.AuthenticationUtils;
 import com.jzprog.chatapp.src.utils.JwtUtil;
+import com.jzprog.chatapp.src.utils.SystemMessages;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -52,7 +55,9 @@ public class UserController {
        authenticate(userInfo.getUsername(), hashedPassword);
        final UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
 	   final String token = jwtTokenUtil.generateToken(userDetails);
-	   UserDTO userDTO = new UserDTO(userService.searchForUserByUsername(userInfo.getUsername()).getId(), userInfo.getUsername(), token);
+	   User user = userService.searchForUserByUsername(userInfo.getUsername());
+	   UserDTO userDTO = new UserDTO(user.getId(), userInfo.getUsername(), token);
+	   userDTO.setImage(user.getImage());
        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
@@ -61,15 +66,16 @@ public class UserController {
     	String hashedPassword = AuthenticationUtils.getHashedPassword(userInfo.getPassword());
         User user = userService.searchForUserByUsernameAndPassword(userInfo.getUsername(), hashedPassword);
         if (user == null) {
-          log.info("User doesn't exist! About to register a new one...");
+          log.info(SystemMessages.USER_NOT_EXIST);
           userService.createNewUser(userInfo, hashedPassword);
-          return new ResponseEntity<>("User succesfully created!", HttpStatus.OK);
+          return new ResponseEntity<>(SystemMessages.USER_CREATED, HttpStatus.OK);
         }
-        return new ResponseEntity<>("User is already registered...", HttpStatus.FOUND);
+        return new ResponseEntity<>(SystemMessages.USER_ALREADY_REGISTERED, HttpStatus.FOUND);
     }
     
     @GetMapping("/getUsers") 
-    public ResponseEntity<?> getUsersMatchingInput(@RequestParam("name") String inputName, @RequestHeader(value="Authorization") String authHeader) {
+    public ResponseEntity<?> getUsersMatchingInput(@RequestParam("name") String inputName, 
+    		                                       @RequestHeader(value="Authorization") String authHeader) {
     	List<UserDTO> listOfUsers = new ArrayList<>();
         String username = jwtTokenUtil.getUsernameFromToken(authHeader.substring(7));      
     	if (!inputName.isEmpty()) {
@@ -78,6 +84,23 @@ public class UserController {
              }	
     	}
         return new ResponseEntity<>(listOfUsers, HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = "/updateProfileImage", method = RequestMethod.POST)
+    public ResponseEntity<?> updateProfileImage(@RequestParam("imageFile") MultipartFile file, 
+    		                                    @RequestParam("username") String username) {
+      if (file.isEmpty()) {
+    	  return new ResponseEntity<>(SystemMessages.IMAGE_FILE_UPLOAD_ERROR, HttpStatus.NO_CONTENT);
+      }
+      try {
+    	  User user = userService.updateProfileImage(username, file.getBytes());
+    	  UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), null);
+    	  userDTO.setImage(user.getImage());
+          return new ResponseEntity<>(userDTO, HttpStatus.OK);
+      } catch (IOException e) {
+          log.warning(e.getMessage());
+          return new ResponseEntity<>(SystemMessages.IMAGE_FILE_UPLOAD_EXCEPTION, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
     }
     
     private void authenticate(String username, String password) throws Exception {

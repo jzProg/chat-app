@@ -8,6 +8,8 @@ import com.jzprog.chatapp.src.model.User;
 import com.jzprog.chatapp.src.services.MessagingService;
 import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.utils.JwtUtil;
+import com.jzprog.chatapp.src.utils.SystemMessages;
+
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -49,7 +51,7 @@ public class MessagesController {
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
         User user = userService.searchForUserByUsername(username);
         boolean userHasConversation = !(user.getConversations().stream().filter(c -> c.getId().equals(Integer.parseInt(id))).collect(Collectors.toList()).isEmpty());
-    	if (!userHasConversation) return new ResponseEntity<>("User doesn't have access to this conversation...", HttpStatus.UNAUTHORIZED); 
+    	if (!userHasConversation) return new ResponseEntity<>(SystemMessages.USER_NO_ACCESS, HttpStatus.UNAUTHORIZED); 
         List<MessageDTO> messages = new ArrayList<>();
     	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id))) {
             messages.add(new MessageDTO(mes.getText(), mes.getPostedBy(), userService.searchForUserByUserId(mes.getPostedBy()).getUsername(), mes.getCreatedDate()));

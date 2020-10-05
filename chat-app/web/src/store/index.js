@@ -9,6 +9,7 @@ export default new Vuex.Store({
   state: {
     userInfo: {
       id: '',
+      image: '',
       loginUsername: '',
       notifications: [],
       messages: [],
@@ -17,6 +18,9 @@ export default new Vuex.Store({
     errorRegisterMessage: '',
   },
   getters: {
+    getUserImage(state) {
+      return state.userInfo.image;
+    },
     getMessages(state) {
       return state.userInfo.messages;
     },
@@ -37,6 +41,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setUserImage(state, payload) {
+      state.userInfo.image = payload.value;
+    },
     setNotifications(state, payload) {
       state.userInfo.notifications = payload.value;
     },
@@ -54,13 +61,20 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    uploadImage({ commit, state }, image) {
+      const formData = new FormData();
+      formData.append("imageFile", image);
+      formData.append("username", state.userInfo.loginUsername);
+      return axios.post('/api/user/updateProfileImage', formData);
+    },
     userLogin({ commit }, payload) {
       return axios.post('/api/user/auth', { username: payload.username, password: payload.password })
                   .then((response) => {
                     localStorage.setItem('token', response.data.token);
                     commit({ type: 'setLoginUsername', value: response.data.username });
                     commit({ type: 'setUserId', value: response.data.userId });
-                    localStorage.setItem('userInfo', JSON.stringify({ id: response.data.userId, username: response.data.username }))
+                    commit({ type: 'setUserImage', value: response.data.image });
+                    localStorage.setItem('userInfo', JSON.stringify({ id: response.data.userId, username: response.data.username, image: response.data.image  }));
                     bus.$emit('login', payload.username);
                   })
                   .catch((error) => {

@@ -3,7 +3,6 @@ import Router from 'vue-router'
 import Welcome from '@/components/Welcome'
 import Home from '@/components/Home'
 import Register from '@/components/Register'
-import Profile from '@/components/Profile'
 import Login from '@/components/Login'
 import Messages from '@/components/MessagesList'
 import Conversations from '@/components/ConversationList'
@@ -40,11 +39,6 @@ export default new Router({
           path: '',
           name: 'Conversations',
           component: Conversations
-        },
-        {
-          path: 'profile',
-          name: 'Profile',
-          component: Profile
         },
       ],
       beforeEnter: (to, from, next) => {

@@ -4,6 +4,7 @@ public class UserDTO {
 	private String username;
 	private String token;
 	private Integer userId;
+	private byte[] image;
 	
 	public UserDTO(Integer userId, String username, String token) {
 		this.setUsername(username);
@@ -35,4 +36,11 @@ public class UserDTO {
 		this.userId = userId;
 	}
 
+	public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
 }

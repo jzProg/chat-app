@@ -52,4 +52,16 @@ public class UserServiceImpl implements UserService {
 		return (List<User>) userRepo.findUsersMachingString(str);
 	}
 
+	@LogMethodInfo
+	@Override
+	@Transactional 
+	public User updateProfileImage(String username, byte[] newImagePath) {
+		User user = searchForUserByUsername(username);
+		if (user != null) {
+			user.setImage(newImagePath);
+			userRepo.save(user);
+		}
+		return user;
+	}
+
 }

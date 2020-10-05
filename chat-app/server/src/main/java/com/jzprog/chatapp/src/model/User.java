@@ -26,6 +26,8 @@ public class User {
    
     private String email;
     
+    private byte[] image;
+    
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     @JoinTable(
         name = "conv_user", 
@@ -80,12 +82,20 @@ public class User {
 
     public void setEmail(String email) {
       this.email = email;
-    }
+    }   
 
-   @Override
+    public byte[] getImage() {
+		return image;
+	}
+
+	public void setImage(byte[] image) {
+		this.image = image;
+	}
+
+@Override
     public String toString() {
          return String.format(
-                "User[id=%d, username='%s', password='%s', email=%s]",
-               id, username, password, email);
+                "User[id=%d, username='%s', password='%s', email=%s, image=%s]",
+               id, username, password, email, image);
     }
 }

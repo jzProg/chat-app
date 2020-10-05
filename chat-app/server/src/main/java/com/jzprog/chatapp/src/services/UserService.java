@@ -11,4 +11,5 @@ public interface UserService {
 	void createNewUser(UserInfo userInfo, String password);
 	User searchForUserByUserId(Integer userId);
 	List<User> searchForUsersMatchingString(String str);
+	User updateProfileImage(String username, byte[] newImagePath);
 }

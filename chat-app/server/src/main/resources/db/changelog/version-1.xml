@@ -62,4 +62,14 @@
             <dropTable tableName="conv_user"/>
         </rollback>
     </changeSet>
+     <changeSet author="john" id="2">
+        <addColumn tableName="user">
+	        <column name="image" type="varchar(255)">
+	          <constraints nullable="true"/>
+	        </column>  
+        </addColumn>
+    </changeSet>
+     <changeSet author="john" id="3">
+         <modifyDataType tableName="user" columnName="image" newDataType="BLOB"/>
+    </changeSet>
 </databaseChangeLog>
