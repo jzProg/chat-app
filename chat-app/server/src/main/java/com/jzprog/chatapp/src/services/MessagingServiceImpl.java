@@ -10,6 +10,8 @@ import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.jzprog.chatapp.src.advices.LogMethodInfo;
 import com.jzprog.chatapp.src.database.ConversationsRepository;
 import com.jzprog.chatapp.src.database.MessagesRepository;
 import com.jzprog.chatapp.src.database.UsersRepository;
@@ -33,6 +35,7 @@ public class MessagingServiceImpl implements MessagingService {
 	@Autowired
 	ConversationsRepository conversationsRepo;
 	
+	@LogMethodInfo
 	@Override
 	@Transactional 
 	public Set<Conversation> fetchUsersConversations(String username) {
@@ -43,12 +46,10 @@ public class MessagingServiceImpl implements MessagingService {
 	@Override
 	@Transactional 
 	public Conversation createNewConversation(Integer userId, String title, Date date, List<String> members) {
-		log.info(members.toString());
 		Conversation newConversation = new Conversation(title.isEmpty() ? SystemMessages.DEFAULT_CONVERSATION_NAME : title, date);      
         User currentUser = (User) userRepo.findUserById(userId);
         for (String memberName : members) {
             User member = (User) userRepo.findUserByUsername(memberName);
-    		log.info(member.toString());
             newConversation.getUsers().add(member);
             member.getConversations().add(newConversation); 
         }
@@ -77,7 +78,6 @@ public class MessagingServiceImpl implements MessagingService {
 	@Transactional 
 	public void deleteConversation(Integer convId) {
 		Conversation existingConversation = conversationsRepo.findById(convId);
-        log.info("existing conv: "  + existingConversation);
         conversationsRepo.delete(existingConversation);
         for (User user : existingConversation.getUsers()) {
             user.getConversations().remove(existingConversation);

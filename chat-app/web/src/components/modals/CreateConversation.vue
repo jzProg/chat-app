@@ -18,13 +18,14 @@
           </li>
         </ul>
         <div v-for="(member, index) in members"
-             style="backgroundColor: green; color: white; width: 50%; border-radius: 15px; margin-top:2%; margin: 0 auto">
+             class="member">
           {{ member }}
         </div>
     </div>
     <div slot = "footer" class = "text-center">
       <button type = "button"
               class = "btn btn-primary"
+              :disabled="showConfirm()"
               @click.prevent = "create()">
               Confirm
       </button>
@@ -63,9 +64,22 @@
       create() {
         this.$emit('create', this.inputMessage, this.members);
       },
+      showConfirm() {
+        return !this.members.length;
+      },
       close() {
         this.$emit('close');
       }
     },
   }
 </script>
+
+<style scoped>
+ .member {
+   background-color: green;
+   color: white;
+   width: 50%;
+   border-radius: 15px;
+   margin: 0 auto 2%;
+ }
+</style>
