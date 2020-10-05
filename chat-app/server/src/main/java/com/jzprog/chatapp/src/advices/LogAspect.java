@@ -1,8 +1,11 @@
 package com.jzprog.chatapp.src.advices;
 
+import java.util.Arrays;
 import java.util.logging.Logger;
 
+import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
@@ -17,10 +20,14 @@ public class LogAspect {
 	
 	@Around("@annotation(LogMethodInfo)")
 	public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
-		log.info("Inside method: " + joinPoint.getSignature().getName());
 		Object[] arguments = joinPoint.getArgs();
-		for (Object argument : arguments) log.info(argument.toString());
+		log.info("Inside: " + joinPoint.getSignature().getName() +"()" + " params: " + Arrays.toString(arguments));
 	    return joinPoint.proceed();
+	}
+	
+	@AfterReturning(pointcut = "@annotation(LogMethodInfo)", returning = "result")
+	public void logAfterReturning(JoinPoint joinPoint, Object result) {
+	    log.info("Returned: " + result.toString());
 	}
 	
 }

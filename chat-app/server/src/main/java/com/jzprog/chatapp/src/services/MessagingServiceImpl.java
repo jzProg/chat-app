@@ -43,6 +43,7 @@ public class MessagingServiceImpl implements MessagingService {
 	     return user.getConversations();
 	}
 	
+	@LogMethodInfo
 	@Override
 	@Transactional 
 	public Conversation createNewConversation(Integer userId, String title, Date date, List<String> members) {
@@ -65,6 +66,7 @@ public class MessagingServiceImpl implements MessagingService {
         return newConversation;
 	}
 	
+	@LogMethodInfo
 	@Override
 	@Transactional 
 	public void addNewMessageToConversation(Integer convId, String text, Date date, Integer author) {
@@ -74,6 +76,7 @@ public class MessagingServiceImpl implements MessagingService {
 		messagesRepo.save(newMessage); 
 	}
 	
+	@LogMethodInfo
 	@Override
 	@Transactional 
 	public void deleteConversation(Integer convId) {
@@ -84,6 +87,7 @@ public class MessagingServiceImpl implements MessagingService {
        }
 	}
 	
+	@LogMethodInfo
 	@Override
 	@Transactional 
 	public List<Message> fetchConversationMessages(Integer convId) {
