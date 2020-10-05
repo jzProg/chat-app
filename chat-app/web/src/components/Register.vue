@@ -62,21 +62,25 @@
           'setRegisterErrorMessage',
       ]),
       ...mapActions([
-        'userAuth',
-        'userLogin',
         'createUserProfile',
         'getUserLoginInfo',
         'storeUsername',
       ]),
       register() {
+        if (!this.validateFields()) return;
         const newUserEntry = {
           email: this.enteredMail,
           password: this.enteredPass,
           username: this.enteredName
         };
-        this.createUserProfile(newUserEntry).then(() => {
-          this.userLogin(newUserEntry);
-        });
+        this.createUserProfile(newUserEntry);
+      },
+      validateFields() {
+        if (!this.enteredMail || !this.enteredPass || !this.enteredName) {
+          this.setRegisterErrorMessage({ value: 'No field should be empty!' });
+          return false;
+        }
+        return true;
       },
       removeErrorMessage() {
         this.setRegisterErrorMessage({ value: '' });

@@ -68,11 +68,15 @@ export default new Vuex.Store({
                     commit({ type: 'setLoginErrorMessage', value: 'Oops! Seems that you provide wrong credentials...' });
                   });
     },
-    createUserProfile({ commit }, payload) {
+    createUserProfile({ commit, dispatch }, payload) {
       return axios.post('/api/user/registerUser', { username: payload.username, password: payload.password, email: payload.email })
+                  .then((response) => {
+                    dispatch('userLogin', payload);
+                  })
                   .catch((error) => {
                     console.log('register error: ', error);
-                    commit({ type: 'setRegisterErrorMessage', value: 'Failed to create an account...Please try again later' });
+                    if (error.response.status === 302) commit({ type: 'setRegisterErrorMessage', value: 'User exists...' });
+                    else commit({ type: 'setRegisterErrorMessage', value: 'Failed to create an account...Please try again later' });
                   });
     },
     userLogout({ commit }) {

@@ -55,7 +55,15 @@
         'userLogin',
       ]),
       login() {
+        if (!this.validateFields()) return;
         this.userLogin({ username: this.enteredName, password: this.enteredPass });
+      },
+      validateFields() {
+        if (!this.enteredPass || !this.enteredName) {
+          this.setLoginErrorMessage({ value: 'No field should be empty!' });
+          return false;
+        }
+        return true;
       },
       removeErrorMessage() {
         this.setLoginErrorMessage({ value: '' });
