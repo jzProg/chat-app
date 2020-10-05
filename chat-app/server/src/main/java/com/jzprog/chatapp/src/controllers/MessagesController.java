@@ -1,5 +1,6 @@
 package com.jzprog.chatapp.src.controllers;
 
+import com.jzprog.chatapp.src.advices.ControllerAdvice;
 import com.jzprog.chatapp.src.model.Conversation;
 import com.jzprog.chatapp.src.model.ConversationDTO;
 import com.jzprog.chatapp.src.model.Message;
@@ -46,6 +47,7 @@ public class MessagesController {
     @Autowired
     JwtUtil jwtUtil;
 
+    @ControllerAdvice
     @GetMapping(value = "/getConversationMessages")
     public ResponseEntity<?> getMessages(@RequestParam("id") String id, @RequestHeader(value="Authorization") String authHeader) {
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
@@ -59,6 +61,7 @@ public class MessagesController {
         return new ResponseEntity<>(messages, HttpStatus.OK); 
     }
     
+    @ControllerAdvice
     @RequestMapping("/getConversations")
     public ResponseEntity<?> getConversations(@RequestHeader(value="Authorization") String authHeader) {      
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
@@ -69,6 +72,7 @@ public class MessagesController {
         return new ResponseEntity<>(conversationDTOs, HttpStatus.OK);
     }
 
+    @ControllerAdvice
     @MessageMapping("/messages/{convId}")
     @SendTo("/topic/conversation/{convId}")
     public MessageDTO addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
@@ -77,6 +81,7 @@ public class MessagesController {
         return new MessageDTO(message.getText(), message.getAuthorId(), userService.searchForUserByUserId(message.getAuthorId()).getUsername(), createdDate);
     }
     
+    @ControllerAdvice
     @MessageMapping("/src/{userId}")
     @SendTo("/topic/conversations")
     public ConversationDTO createConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
@@ -86,6 +91,7 @@ public class MessagesController {
         return newConversationDTO;
     }
     
+    @ControllerAdvice
     @MessageMapping("/src/delete/{userId}") 
     @SendTo("/topic/conversations")
     public ConversationDTO deleteConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {

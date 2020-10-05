@@ -1,5 +1,6 @@
 package com.jzprog.chatapp.src.controllers;
 
+import com.jzprog.chatapp.src.advices.ControllerAdvice;
 import com.jzprog.chatapp.src.model.User;
 import com.jzprog.chatapp.src.model.UserDTO;
 import com.jzprog.chatapp.src.model.UserInfo;
@@ -49,6 +50,7 @@ public class UserController {
 	@Autowired
 	private JwtUtil jwtTokenUtil;
 
+	@ControllerAdvice
     @RequestMapping(value = "/auth", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> userAuth(@RequestBody UserInfo userInfo) throws Exception {   
        String hashedPassword = AuthenticationUtils.getHashedPassword(userInfo.getPassword());
@@ -61,6 +63,7 @@ public class UserController {
        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
+    @ControllerAdvice
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> register(@RequestBody UserInfo userInfo) throws Exception {
     	String hashedPassword = AuthenticationUtils.getHashedPassword(userInfo.getPassword());
@@ -73,6 +76,7 @@ public class UserController {
         return new ResponseEntity<>(SystemMessages.USER_ALREADY_REGISTERED, HttpStatus.FOUND);
     }
     
+    @ControllerAdvice
     @GetMapping("/getUsers") 
     public ResponseEntity<?> getUsersMatchingInput(@RequestParam("name") String inputName, 
     		                                       @RequestHeader(value="Authorization") String authHeader) {
@@ -86,6 +90,7 @@ public class UserController {
         return new ResponseEntity<>(listOfUsers, HttpStatus.OK);
     }
     
+    @ControllerAdvice
     @RequestMapping(value = "/updateProfileImage", method = RequestMethod.POST)
     public ResponseEntity<?> updateProfileImage(@RequestParam("imageFile") MultipartFile file, 
     		                                    @RequestParam("username") String username) {

@@ -30,5 +30,12 @@ public class LogAspect {
 	    log.info("Returned: " + (result != null ? result.toString() : "void"));
 	}
 	
+	@Around("@annotation(ControllerAdvice)")
+	public Object logControllerInfo(ProceedingJoinPoint joinPoint) throws Throwable {
+		Object[] arguments = joinPoint.getArgs();
+		log.info("Incoming request to: " + joinPoint.getSignature().getName() +"()" + " params: " + Arrays.toString(arguments));
+	    return joinPoint.proceed();
+	}
+	
 }
 
