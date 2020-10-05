@@ -17,6 +17,7 @@
                          :id="conv.id"
                          :title="conv.title"
                          :date="conv.date"
+                         :members="conv.members"
                          @delete="deleteConversation(conv.id)"
                          :get-messages="goToConversationMessages">
            </Conversation>

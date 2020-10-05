@@ -1,8 +1,9 @@
 <template>
  <div id="conversationDiv">
    <div @click.prevent="openConversation()">
-     <h4 style="font-weight: bold;">{{ title }}</h4>
-     <div> created: {{ new Date(date).toLocaleString() }}</div>
+     <h3 style="font-weight: bold;">{{ title }}</h3>
+     <span v-for="(member, index) in members"> {{ member }}</span>
+     <div><i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i></div>
    </div>
    <button @click.prevent="deleteConv()"
           class="btn btn-danger">
@@ -17,7 +18,7 @@ import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'Conversation',
-  props: ['id', 'title', 'date', 'getMessages'],
+  props: ['id', 'title', 'date', 'getMessages', 'members'],
   methods: {
     deleteConv() {
       console.log('deleting conversation...');

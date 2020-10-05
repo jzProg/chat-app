@@ -67,7 +67,10 @@ public class MessagesController {
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
         List<ConversationDTO> conversationDTOs = new ArrayList<>();
         for (Conversation conv : messagingService.fetchUsersConversations(username)) {
-           conversationDTOs.add(new ConversationDTO(conv.getId(), conv.getTitle(), conv.getCreatedDate()));
+           ConversationDTO conversationDTO = new ConversationDTO(conv.getId(), conv.getTitle(), conv.getCreatedDate());
+           conversationDTO.setMembers(conv.getUsers().stream().map(User::getUsername).collect(Collectors.toList()));
+           log.info(String.valueOf(conversationDTO.getMembers().size()));
+           conversationDTOs.add(conversationDTO);
         }
         return new ResponseEntity<>(conversationDTOs, HttpStatus.OK);
     }
