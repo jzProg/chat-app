@@ -21,20 +21,30 @@
             v-model="newMessage"
             placeholder="New Message"
             @keyup.enter="sendNewMessage(newMessage); newMessage = '';">
+            <span @click.prevent="showEmojis()">
+              😀
+            </span>
    </div>
+   <EmojiSelection v-if="displayEmojis"
+                  @close="displayEmojis = false;"
+                  @select="onEmojiSelect">
+   </EmojiSelection>
  </div>
 </template>
 
 
 <script>
+import EmojiSelection from '@/components/modals/EmojiSelection';
 
 export default {
   name: 'Messages',
+  components: { EmojiSelection },
   props: ['messages', 'sendNewMessage'],
   data () {
     return {
       newMessage: '',
       userColors: {},
+      displayEmojis: false,
     }
   },
   methods: {
@@ -45,6 +55,13 @@ export default {
     },
     getColor(id) {
       return  this.userColors[id] || this.assignRandomColor(id);
+    },
+    onEmojiSelect(emoji) {
+      this.newMessage += String.fromCodePoint(emoji);
+      this.displayEmojis = false;
+    },
+    showEmojis() {
+      this.displayEmojis = true;
     },
     assignRandomColor(id){
       var letters = '0123456789ABCDEF';

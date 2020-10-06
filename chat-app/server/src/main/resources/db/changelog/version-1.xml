@@ -5,6 +5,20 @@
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
     <changeSet author="john" id="1">
+        <preConditions onFail="MARK_RAN">
+		    <not>
+		        <tableExists tableName="user"/>
+		    </not>
+		     <not>
+		        <tableExists tableName="conversation"/>
+		    </not>
+		     <not>
+		        <tableExists tableName="message"/>
+		    </not>
+		     <not>
+		        <tableExists tableName="conv_user"/>
+		    </not>
+        </preConditions>
         <createTable tableName="user">
             <column autoIncrement="true" name="id" type="INT">
                 <constraints primaryKey="true"/>
@@ -23,7 +37,7 @@
             <column autoIncrement="true" name="id" type="INT">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="title" type="VARCHAR(50)">
+            <column name="title" type="VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
                 <constraints nullable="false"/>
             </column>
             <column name="created_date" type="datetime">
@@ -34,7 +48,7 @@
             <column autoIncrement="true" name="id" type="INT">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="text" type="VARCHAR(700)">
+            <column name="text" type="VARCHAR(700) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
                 <constraints nullable="false"/>
             </column>
             <column name="posted_by" type="INT">
@@ -71,5 +85,10 @@
     </changeSet>
      <changeSet author="john" id="3">
          <modifyDataType tableName="user" columnName="image" newDataType="BLOB"/>
+    </changeSet>
+    <changeSet author="john" id="4">
+	    <modifySql dbms="mysql">
+	      <append value="ENGINE=INNODB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci"/>
+        </modifySql>
     </changeSet>
 </databaseChangeLog>
