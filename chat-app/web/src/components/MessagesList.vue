@@ -49,13 +49,9 @@ export default {
   },
   methods: {
     getMessageContent(message) {
-      if (this.isUrl(message)) {
-        return `<a href='${message}' target='_blank'>${message}</a>`;
-      }
-      return message;
-    },
-    isUrl(text) {
-      return text.match(/^(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)?$/g);
+      return message.replace(/(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r\s]*)?#?([^\n\r\s]*)?/gi, (match) => {
+        return `<a href='${match}' target='_blank'>${match}</a>`;
+      });
     },
     getColorStyle(id) {
       return {
