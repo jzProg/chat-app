@@ -7,7 +7,7 @@
         <div style="text-align: left;"
              class="col-md-9">
           <span :style="getColorStyle(mes.authorId)">{{ mes.authorUsername }}: </span>
-          {{ mes.text }}
+          <span v-html="getMessageContent(mes.text)"></span>
         </div>
         <div style="color:lightgrey;"
              class="col-md-3">
@@ -48,6 +48,15 @@ export default {
     }
   },
   methods: {
+    getMessageContent(message) {
+      if (this.isUrl(message)) {
+        return `<a href='${message}' target='_blank'>${message}</a>`;
+      }
+      return message;
+    },
+    isUrl(text) {
+      return text.match(/^(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r]*)?#?([^\n\r]*)?$/g);
+    },
     getColorStyle(id) {
       return {
         color: this.getColor(id)
