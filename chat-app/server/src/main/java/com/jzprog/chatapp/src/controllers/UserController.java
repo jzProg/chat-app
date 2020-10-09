@@ -67,7 +67,7 @@ public class UserController {
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> register(@RequestBody UserInfo userInfo) throws Exception {
     	String hashedPassword = AuthenticationUtils.getHashedPassword(userInfo.getPassword());
-        User user = userService.searchForUserByUsernameAndPassword(userInfo.getUsername(), hashedPassword);
+        User user = userService.searchForUserByUsername(userInfo.getUsername());
         if (user == null) {
           log.info(SystemMessages.USER_NOT_EXIST);
           userService.createNewUser(userInfo, hashedPassword);
