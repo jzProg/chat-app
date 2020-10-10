@@ -18,11 +18,13 @@
 
 <script>
 import EditProfile from '@/components/modals/EditProfile';
+import ImageMixin from '@/common/utils';
 import { mapGetters, mapMutations } from 'vuex';
 
 export default {
   name: 'Home',
   components: { EditProfile },
+  mixins: [ImageMixin],
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       vm.registerPushNotificationSW();
@@ -110,20 +112,9 @@ export default {
     },
     getImage() {
       this.setUserImage({ value: this.getUserLoginInfo()[2] });
-      if (this.getUserImage) {
-        const byteCharacters = atob(this.getUserImage);
-        const byteArrays = [];
-        for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-          const slice = byteCharacters.slice(offset, offset + 512);
-          const byteNumbers = new Array(slice.length);
-          for (let i = 0; i < slice.length; i++) {
-            byteNumbers[i] = slice.charCodeAt(i);
-          }
-          const byteArray = new Uint8Array(byteNumbers);
-          byteArrays.push(byteArray);
-        }
-        const blob = new Blob(byteArrays, {type: 'image/png'});
-        this.imageNew = window.URL.createObjectURL(blob);
+      const userImage = this.getUserImage;
+      if (userImage) {
+        this.imageNew = this.readBlobImage(userImage);
       } else {
         this.imageNew = require('@/assets/profile_default.png');
       }

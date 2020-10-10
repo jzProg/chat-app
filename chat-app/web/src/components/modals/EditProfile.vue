@@ -48,11 +48,13 @@
 
 <script>
   import Modal from '@/components/modals/GenericModal';
+  import ImageMixin from '@/common/utils';
   import { mapActions, mapMutations, mapGetters } from 'vuex';
 
   export default {
       name: 'EditProfile',
       components: { Modal },
+      mixins: [ImageMixin],
       data() {
         return {
           showUpload: false,
@@ -88,20 +90,9 @@
           this.userLogout();
         },
         getImage() {
-          if (this.getUserImage) {
-            const byteCharacters = atob(this.getUserImage);
-            const byteArrays = [];
-            for (let offset = 0; offset < byteCharacters.length; offset += 512) {
-              const slice = byteCharacters.slice(offset, offset + 512);
-              const byteNumbers = new Array(slice.length);
-              for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
-              }
-              const byteArray = new Uint8Array(byteNumbers);
-              byteArrays.push(byteArray);
-            }
-            const blob = new Blob(byteArrays, {type: 'image/png'});
-            return window.URL.createObjectURL(blob);
+          const userImage = this.getUserImage
+          if (userImage) {
+            return this.readBlobImage(userImage);
           } else {
             return require('@/assets/profile_default.png');
           }
