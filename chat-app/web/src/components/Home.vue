@@ -19,7 +19,7 @@
 <script>
 import EditProfile from '@/components/modals/EditProfile';
 import ImageMixin from '@/common/utils';
-import { mapGetters, mapMutations } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 
 export default {
   name: 'Home',
@@ -42,6 +42,9 @@ export default {
     if (!this.getLoginUsername) this.setLoginUsername({ value: this.getUserLoginInfo()[1] });
   },
   methods: {
+    ...mapActions([
+      'sendPushSubscriptionInfoToServer',
+    ]),
     ...mapMutations([
       'setLoginUsername',
       'setUserImage',
@@ -84,31 +87,6 @@ export default {
                        .catch((err) => {
                          console.log('Failed to subscribe user for notifications: ' + err);
                        });
-    },
-    sendPushSubscriptionInfoToServer(sub) {
-      const token = localStorage.getItem('token');
-      this.axios({
-        url: 'api/notifications/sendPushSubInfo',
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        data: {
-          pushSubInfo: JSON.stringify(sub),
-        },
-      }).then((response) => {
-        localStorage.setItem('subId', response.data);
-      });
-    },
-    urlB64ToUint8Array(base64String) {
-      const padding = '='.repeat((4 - base64String.length % 4) % 4);
-      const base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/');
-      const rawData = window.atob(base64);
-      const outputArray = new Uint8Array(rawData.length);
-      for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-      }
-      return outputArray;
     },
     getImage() {
       this.setUserImage({ value: this.getUserLoginInfo()[2] });

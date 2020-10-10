@@ -68,6 +68,21 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    sendPushSubscriptionInfoToServer({ commit }, sub) {
+      const token = localStorage.getItem('token');
+      return axios({
+        url: 'api/notifications/sendPushSubInfo',
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          pushSubInfo: JSON.stringify(sub),
+        },
+      }).then((response) => {
+        localStorage.setItem('subId', response.data);
+      });
+    },
     removePushNotificationSubscriptionFromServer({ commit }, sub) {
       const token = localStorage.getItem('token');
       return axios({
@@ -97,7 +112,7 @@ export default new Vuex.Store({
             }
           });
         });
-      }      
+      }
     },
     fetchPushNotificationKey({ commit }) {
       return axios({
