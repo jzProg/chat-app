@@ -5,9 +5,22 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex';
+import bus from '@/common/eventBus';
 
 export default {
-  name: 'App'
+  name: 'App',
+  created() {
+    bus.$on('logout', () => {
+      this.$router.push('/');
+    });
+    this.fetchPushNotificationKey();
+  },
+  methods: {
+    ...mapActions([
+      'fetchPushNotificationKey',
+    ]),
+  },
 }
 </script>
 

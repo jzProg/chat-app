@@ -76,13 +76,13 @@
             <dropTable tableName="conv_user"/>
         </rollback>
     </changeSet>
-     <changeSet author="john" id="2">
-        <addColumn tableName="user">
-	        <column name="image" type="varchar(255)">
-	          <constraints nullable="true"/>
-	        </column>  
-        </addColumn>
-    </changeSet>
+    <changeSet author="john" id="2">
+       <addColumn tableName="user">
+        <column name="image" type="varchar(255)">
+          <constraints nullable="true"/>
+        </column>  
+       </addColumn>
+     </changeSet>
      <changeSet author="john" id="3">
          <modifyDataType tableName="user" columnName="image" newDataType="BLOB"/>
     </changeSet>
@@ -90,5 +90,32 @@
 	    <modifySql dbms="mysql">
 	      <append value="ENGINE=INNODB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci"/>
         </modifySql>
+    </changeSet>
+    <changeSet author="john" id="5">
+	    <preConditions onFail="MARK_RAN">
+		    <not>
+		        <tableExists tableName="push_notification"/>
+		    </not>	   
+        </preConditions>
+          <createTable tableName="push_notification">
+            <column autoIncrement="true" name="id" type="INT">
+                <constraints primaryKey="true"/>
+            </column>
+             <column name="user_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+              <column name="endpoint" type="VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+                <constraints nullable="false"/>
+            </column>
+              <column name="p256dh" type="VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+                <constraints nullable="false"/>
+            </column>
+              <column name="auth" type="VARCHAR(70) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+          <rollback>
+            <dropTable tableName="push_notification"/>
+        </rollback>
     </changeSet>
 </databaseChangeLog>

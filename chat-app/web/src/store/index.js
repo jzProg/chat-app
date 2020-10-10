@@ -14,10 +14,14 @@ export default new Vuex.Store({
       notifications: [],
       messages: [],
     },
+    pushNotificationPublicKey: '',
     errorLoginMessage: '',
     errorRegisterMessage: '',
   },
   getters: {
+    getPushNotificationPublicKey(state) {
+      return state.pushNotificationPublicKey;
+    },
     getUserImage(state) {
       return state.userInfo.image;
     },
@@ -41,6 +45,9 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    setPushNotificationPublicKey(state, payload) {
+      state.pushNotificationPublicKey = payload.value;
+    },
     setUserImage(state, payload) {
       state.userInfo.image = payload.value;
     },
@@ -61,13 +68,60 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    removePushNotificationSubscriptionFromServer({ commit }, sub) {
+      const token = localStorage.getItem('token');
+      return axios({
+        url: 'api/notifications/removePushSubInfo',
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          subId: sub,
+        },
+      }).then((response) => {
+        console.log('Push Notification Subscription removed!');
+        localStorage.setItem('subId', '');
+      });
+    },
+    removePushNotificationSubscription({ commit, dispatch }) {
+      navigator.serviceWorker.getRegistrations().then((registrations) => {
+        const pushRegistration = registrations.filter(item => item.active.scriptURL.includes('push'))[0];
+        pushRegistration.pushManager.getSubscription()
+        .then((subscription) => {
+          if (subscription) {
+            subscription.unsubscribe().then(() => {
+              dispatch('removePushNotificationSubscriptionFromServer', localStorage.getItem('subId'));
+            });
+          }
+        });
+      });
+    },
+    fetchPushNotificationKey({ commit }) {
+      return axios({
+        url: 'api/notifications/getPublicKey',
+        method: 'GET',
+      }).then((response) => {
+        commit({ type: 'setPushNotificationPublicKey', value: response.data });
+      });
+    },
+    broadcastLogin({ commit }) {
+      const token = localStorage.getItem('token');
+      return axios.post('/api/notifications/sendLoginEvent',  {}, { headers: { 'Authorization': `Bearer ${token}` }})
+                  .then((response) => {
+                    console.log('sendLoginEvent sent!');
+                  })
+                  .catch((error) => {
+                    console.log('sendLoginEvent error: ', error);
+                  });
+    },
     uploadImage({ commit, state }, image) {
       const formData = new FormData();
       formData.append("imageFile", image);
       formData.append("username", state.userInfo.loginUsername);
       return axios.post('/api/user/updateProfileImage', formData);
     },
-    userLogin({ commit }, payload) {
+    userLogin({ commit, dispatch }, payload) {
       return axios.post('/api/user/auth', { username: payload.username, password: payload.password })
                   .then((response) => {
                     localStorage.setItem('token', response.data.token);
@@ -75,6 +129,7 @@ export default new Vuex.Store({
                     commit({ type: 'setUserId', value: response.data.userId });
                     commit({ type: 'setUserImage', value: response.data.image });
                     localStorage.setItem('userInfo', JSON.stringify({ id: response.data.userId, username: response.data.username, image: response.data.image  }));
+                    dispatch('broadcastLogin');
                     bus.$emit('login', payload.username);
                   })
                   .catch((error) => {
@@ -93,10 +148,11 @@ export default new Vuex.Store({
                     else commit({ type: 'setRegisterErrorMessage', value: 'Failed to create an account...Please try again later' });
                   });
     },
-    userLogout({ commit }) {
+    userLogout({ commit, dispatch }) {
       localStorage.setItem('token', '');
       commit({ type: 'setLoginUsername', value: '' });
       commit({ type: 'setUserId', value: '' });
+      dispatch('removePushNotificationSubscription');
       bus.$emit('logout');
     }
   }
