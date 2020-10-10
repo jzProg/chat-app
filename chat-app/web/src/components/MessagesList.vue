@@ -47,6 +47,13 @@ export default {
       displayEmojis: false,
     }
   },
+  updated() {
+    // scroll to latest messages
+    this.$nextTick(() => {
+      const content = document.getElementById('contentDiv');
+      content.scrollTop = content.scrollHeight;
+    });
+  },
   methods: {
     getMessageContent(message) {
       return message.replace(/(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r\s]*)?#?([^\n\r\s]*)?/gi, (match) => {
