@@ -6,22 +6,23 @@
     </span>
     <br>
     <h3 slot="header">Create New Conversation</h3>
-    <div slot="body">
+    <div slot="body" style="text-align: left">
        <input type="text"
              v-model="inputMessage"
+             style="margin:5%"
              placeholder="Conversation Title"><br>
        <input type="text"
              v-model="user"
+             style="margin:5%"
              @keyup.enter="search"
-             placeholder="Search Members">
-        <ul>
-          <li v-for="(cand, index) in candidates"
-              class="candidate"
-              @click.prevent="addMember(cand, index)">
-              {{ cand.username }}
-          </li>
-        </ul>
+             placeholder="Search Members"><i class="fas fa-search" style="cursor: pointer" @click.prevent="search"></i>
+        <div v-for="(cand, index) in candidates" @click.prevent="addMember(cand, index)" class="candidate">
+           <input type="checkbox"
+                  :id="cand.username">
+            <label :for="cand.username">{{ cand.username }}</label>
+        </div>
         <div v-for="(member, index) in members"
+             style="text-align: center"
              class="member">
           {{ member }}
         </div>

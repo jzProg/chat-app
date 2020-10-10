@@ -4,11 +4,11 @@
      <h3 style="font-weight: bold;">{{ title }}</h3>
      <span v-for="(member, index) in members"> {{ member }}</span>
      <div><i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i></div>
+     <button @click.prevent="deleteConv()"
+             class="btn btn-danger">
+            <i class="far fa-trash-alt"></i>
+    </button>
    </div>
-   <button @click.prevent="deleteConv()"
-          class="btn btn-danger">
-          delete
-  </button>
  </div>
 </template>
 

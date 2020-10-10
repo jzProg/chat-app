@@ -1,11 +1,9 @@
 <template>
   <div>
-    <button type='button'
-            class='btn btn-success'
-            @click.prevent='showModal = true;'>Create New Conversation</button>
-    <button type='button'
-            class='btn btn-danger'
-            @click.prevent='logout()'>Logout</button>
+    <div id="addConversationDiv"
+         @click.prevent='showModal = true;'>
+         <i class="fas fa-plus fa-2x"></i>
+   </div>
     <div class="container"
          style="margin-top:2%;width:100%" >
       <div class="row">
@@ -147,3 +145,15 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  #addConversationDiv {
+    background-color: green; 
+    color: white;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    margin-left: 5%;
+    border-radius: 30px
+  }
+</style>

@@ -1,7 +1,7 @@
 <template>
  <div id="messagesDiv">
    <div id="contentDiv"
-        class="container">
+        class="container scrollable">
      <div v-for="mes in messages"
           class="inner-message row">
         <div style="text-align: left;"
@@ -109,5 +109,14 @@ export default {
     width: 60%;
     border-radius: 50px;
     padding: 1%;
+    outline: none;
   }
+
+  .scrollable {
+    height: 300px;
+    overflow-y:auto;
+    max-width: 100%;
+    overflow-x: hidden;
+    word-wrap:break-word;
+}
 </style>
