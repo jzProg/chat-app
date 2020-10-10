@@ -37,7 +37,7 @@
 </template>
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 import Conversation from '@/components/Conversation';
 import MessagesOfActiveConversation from '@/components/MessagesList';
 import CreateConversationModal from '@/components/modals/CreateConversation';
@@ -130,12 +130,6 @@ export default {
     sendNewMessage(newMessage) {
         this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({'text': newMessage, 'authorId': this.authorId }));
     },
-    logout() {
-      this.userLogout();
-    },
-    ...mapActions([
-        'userLogout',
-    ]),
   },
   computed: {
     ...mapGetters([
@@ -148,7 +142,7 @@ export default {
 
 <style scoped>
   #addConversationDiv {
-    background-color: green; 
+    background-color: green;
     color: white;
     width: 30px;
     height: 30px;

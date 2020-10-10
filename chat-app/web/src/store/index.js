@@ -85,17 +85,19 @@ export default new Vuex.Store({
       });
     },
     removePushNotificationSubscription({ commit, dispatch }) {
-      navigator.serviceWorker.getRegistrations().then((registrations) => {
-        const pushRegistration = registrations.filter(item => item.active.scriptURL.includes('push'))[0];
-        pushRegistration.pushManager.getSubscription()
-        .then((subscription) => {
-          if (subscription) {
-            subscription.unsubscribe().then(() => {
-              dispatch('removePushNotificationSubscriptionFromServer', localStorage.getItem('subId'));
-            });
-          }
+      if ('serviceWorker' in navigator && 'PushManager' in window) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          const pushRegistration = registrations.filter(item => item.active.scriptURL.includes('push'))[0];
+          pushRegistration.pushManager.getSubscription()
+          .then((subscription) => {
+            if (subscription) {
+              subscription.unsubscribe().then(() => {
+                dispatch('removePushNotificationSubscriptionFromServer', localStorage.getItem('subId'));
+              });
+            }
+          });
         });
-      });
+      }      
     },
     fetchPushNotificationKey({ commit }) {
       return axios({

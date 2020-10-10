@@ -66,6 +66,7 @@
         ]),
         ...mapActions([
           'uploadImage',
+          'userLogout',
         ]),
         onImageSelected(event) {
           this.selectedImage = event.target.files[0];
@@ -82,6 +83,9 @@
             this.selectedImage = '';
             this.$emit('confirm');
           });
+        },
+        logout() {
+          this.userLogout();
         },
         getImage() {
           if (this.getUserImage) {

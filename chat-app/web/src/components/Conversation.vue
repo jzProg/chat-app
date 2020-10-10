@@ -14,7 +14,7 @@
 
 
 <script>
-import { mapActions, mapGetters } from 'vuex';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'Conversation',
@@ -28,9 +28,6 @@ export default {
       console.log('opening conversation...' + this.id);
       this.getMessages(this.id);
     },
-    ...mapActions([
-        'userLogout',
-    ]),
   },
   computed: {
     ...mapGetters([
@@ -51,6 +48,7 @@ export default {
     width: 100%;
     margin-bottom: 1%;
     border-radius: 5px;
+    background-color: white;
   }
 
   #conversationDiv:hover{

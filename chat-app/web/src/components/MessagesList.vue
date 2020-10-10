@@ -51,7 +51,7 @@ export default {
     // scroll to latest messages
     this.$nextTick(() => {
       const content = document.getElementById('contentDiv');
-      content.scrollTop = content.scrollHeight;
+      if (content) content.scrollTop = content.scrollHeight;
     });
   },
   methods: {
@@ -96,6 +96,7 @@ export default {
     padding: 1%;
     margin-left: 2%;
     border-radius: 5px;
+    background-color: white;
   }
 
   .inner-message {
