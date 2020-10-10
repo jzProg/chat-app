@@ -93,7 +93,9 @@ public class MessagingServiceImpl implements MessagingService {
 	public List<Message> fetchConversationMessages(Integer convId) {
 		Conversation existingConversation = conversationsRepo.findById(convId);  
 		if (existingConversation != null) {
-			return existingConversation.getMessages();
+			List<Message> listOfMessages = existingConversation.getMessages();
+			int listSize = listOfMessages.size();
+			return listSize > 20 ? listOfMessages.subList(listSize - 20, listSize) : listOfMessages;
 		}
 		return new ArrayList<>();
 	}
