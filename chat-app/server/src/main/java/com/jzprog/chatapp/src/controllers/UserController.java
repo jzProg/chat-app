@@ -4,10 +4,13 @@ import com.jzprog.chatapp.src.advices.ControllerAdvice;
 import com.jzprog.chatapp.src.model.User;
 import com.jzprog.chatapp.src.model.UserDTO;
 import com.jzprog.chatapp.src.model.UserInfo;
+import com.jzprog.chatapp.src.model.ValidationResponse;
 import com.jzprog.chatapp.src.services.UserService;
+import com.jzprog.chatapp.src.services.validation.ValidationStrategy;
 import com.jzprog.chatapp.src.utils.AuthenticationUtils;
 import com.jzprog.chatapp.src.utils.JwtUtil;
 import com.jzprog.chatapp.src.utils.SystemMessages;
+import com.jzprog.chatapp.src.utils.SystemMessages.ValidationTypes;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -23,10 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.DisabledException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.http.HttpStatus;
@@ -37,24 +36,28 @@ import org.springframework.http.HttpStatus;
 public class UserController {
 
     Logger log = Logger.getLogger(UserController.class.getName());
-    
-    @Autowired
-	private AuthenticationManager authenticationManager;
 
     @Autowired
-    UserService userService;
+    private UserService userService;
     
     @Autowired
-    UserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 	
 	@Autowired
 	private JwtUtil jwtTokenUtil;
+	
+	@Autowired
+    private ValidationStrategy validationStrategy;
 
 	@ControllerAdvice
     @RequestMapping(value = "/auth", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> userAuth(@RequestBody UserInfo userInfo) throws Exception {   
+       ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.USER_EXISTENCE, userInfo);
+       if (!validationResponse.isSuccess()) {
+           return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
+       }
        String hashedPassword = AuthenticationUtils.getHashedPassword(userInfo.getPassword());
-       authenticate(userInfo.getUsername(), hashedPassword);
+       jwtTokenUtil.authenticate(userInfo.getUsername(), hashedPassword);
        final UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
 	   final String token = jwtTokenUtil.generateToken(userDetails);
 	   User user = userService.searchForUserByUsername(userInfo.getUsername());
@@ -67,13 +70,13 @@ public class UserController {
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> register(@RequestBody UserInfo userInfo) throws Exception {
     	String hashedPassword = AuthenticationUtils.getHashedPassword(userInfo.getPassword());
-        User user = userService.searchForUserByUsername(userInfo.getUsername());
-        if (user == null) {
+        ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.REGISTRATION_CHECK, userInfo);
+        if (validationResponse.isSuccess()) {
           log.info(SystemMessages.USER_NOT_EXIST);
           userService.createNewUser(userInfo, hashedPassword);
           return new ResponseEntity<>(SystemMessages.USER_CREATED, HttpStatus.OK);
         }
-        return new ResponseEntity<>(SystemMessages.USER_ALREADY_REGISTERED, HttpStatus.FOUND);
+        return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.FOUND);
     }
     
     @ControllerAdvice
@@ -94,6 +97,10 @@ public class UserController {
     @RequestMapping(value = "/updateProfileImage", method = RequestMethod.POST)
     public ResponseEntity<?> updateProfileImage(@RequestParam("imageFile") MultipartFile file, 
     		                                    @RequestParam("username") String username) {
+      ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.USER_EXISTENCE, null, username);
+      if (!validationResponse.isSuccess()) {
+    	  return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+      }
       if (file.isEmpty()) {
     	  return new ResponseEntity<>(SystemMessages.IMAGE_FILE_UPLOAD_ERROR, HttpStatus.NO_CONTENT);
       }
@@ -107,14 +114,5 @@ public class UserController {
           return new ResponseEntity<>(SystemMessages.IMAGE_FILE_UPLOAD_EXCEPTION, HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
-    
-    private void authenticate(String username, String password) throws Exception {
-		try {
-		  authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		} catch (DisabledException e) {
-		   throw new Exception("USER_DISABLED", e);
-		} catch (BadCredentialsException e) {
-		   throw new Exception("INVALID_CREDENTIALS", e);
-		}
-	}
+
 }

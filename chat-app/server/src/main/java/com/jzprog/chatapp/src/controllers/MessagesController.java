@@ -6,11 +6,12 @@ import com.jzprog.chatapp.src.model.ConversationDTO;
 import com.jzprog.chatapp.src.model.Message;
 import com.jzprog.chatapp.src.model.MessageDTO;
 import com.jzprog.chatapp.src.model.User;
+import com.jzprog.chatapp.src.model.ValidationResponse;
 import com.jzprog.chatapp.src.services.MessagingService;
 import com.jzprog.chatapp.src.services.UserService;
+import com.jzprog.chatapp.src.services.validation.ValidationStrategy;
 import com.jzprog.chatapp.src.utils.JwtUtil;
-import com.jzprog.chatapp.src.utils.SystemMessages;
-
+import com.jzprog.chatapp.src.utils.SystemMessages.ValidationTypes;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,7 +24,6 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import java.util.List;
@@ -39,21 +39,25 @@ public class MessagesController {
     Logger log = Logger.getLogger(MessagesController.class.getName());
     
     @Autowired
-    MessagingService messagingService;
+    private MessagingService messagingService;
     
     @Autowired
-    UserService userService;
+    private UserService userService;
     
     @Autowired
-    JwtUtil jwtUtil;
+    private JwtUtil jwtUtil;
+    
+    @Autowired
+    private ValidationStrategy validationStrategy;
 
     @ControllerAdvice
     @GetMapping(value = "/getConversationMessages")
     public ResponseEntity<?> getMessages(@RequestParam("id") String id, @RequestHeader(value="Authorization") String authHeader) {
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
         User user = userService.searchForUserByUsername(username);
-        boolean userHasConversation = !(user.getConversations().stream().filter(c -> c.getId().equals(Integer.parseInt(id))).collect(Collectors.toList()).isEmpty());
-    	if (!userHasConversation) return new ResponseEntity<>(SystemMessages.USER_NO_ACCESS, HttpStatus.UNAUTHORIZED); 
+        ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.CONVERSATION_OWNERSHIP, user, id);
+        if (!validationResponse.isSuccess()) 
+        	return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
         List<MessageDTO> messages = new ArrayList<>();
     	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id))) {
             messages.add(new MessageDTO(mes.getText(), mes.getPostedBy(), userService.searchForUserByUserId(mes.getPostedBy()).getUsername(), mes.getCreatedDate()));
@@ -64,7 +68,10 @@ public class MessagesController {
     @ControllerAdvice
     @RequestMapping("/getConversations")
     public ResponseEntity<?> getConversations(@RequestHeader(value="Authorization") String authHeader) {      
-        String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
+        String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));  
+        ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.USER_EXISTENCE, null, username);
+        if (!validationResponse.isSuccess()) 
+        	return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
         List<ConversationDTO> conversationDTOs = new ArrayList<>();
         for (Conversation conv : messagingService.fetchUsersConversations(username)) {
            ConversationDTO conversationDTO = new ConversationDTO(conv.getId(), conv.getTitle(), conv.getCreatedDate());

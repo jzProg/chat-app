@@ -14,7 +14,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.JoinColumn;
 
 @Entity
-public class User {
+public class User implements Validatable {
 	
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)

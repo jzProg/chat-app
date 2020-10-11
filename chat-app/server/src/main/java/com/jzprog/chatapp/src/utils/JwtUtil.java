@@ -5,7 +5,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
@@ -20,6 +26,9 @@ public class JwtUtil implements Serializable {
 	
 	@Value("${jwt.secret}")
 	private String secret;
+	
+	@Autowired
+    private AuthenticationManager authenticationManager;
 	
 	
 	public String getUsernameFromToken(String token) {
@@ -65,6 +74,16 @@ public class JwtUtil implements Serializable {
 	public Boolean validateToken(String token, UserDetails userDetails) {
 	  final String username = getUsernameFromToken(token);
 	  return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+	}
+	
+	public void authenticate(String username, String password) throws Exception {
+		try {
+		  authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		} catch (DisabledException e) {
+		   throw new Exception(SystemMessages.USER_DISABLED, e);
+		} catch (BadCredentialsException e) {
+		   throw new Exception(SystemMessages.INVALID_CREDENTIALS, e);
+		}
 	}
 
 }

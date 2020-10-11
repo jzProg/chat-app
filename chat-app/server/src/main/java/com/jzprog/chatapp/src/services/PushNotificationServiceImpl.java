@@ -55,12 +55,14 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 	@LogMethodInfo
 	@Override
 	public void sendPushNotificationToObservers(User user, NotificationCategories type) throws Exception {
-		Security.addProvider(new BouncyCastleProvider());
-		PushService pushService = new PushService(publicKey, privateKey, SystemMessages.PUSH_NOTIFICATION_SUBJECT);
-		String payload = createPushServicePayload(user, type);
-		List<PushNotification> activeSubscribers = getActiveSubscribers(user);
-		for (PushNotification activeSubscriber : activeSubscribers) {
-			pushService.send(new Notification(activeSubscriber.getEndpoint(), activeSubscriber.getP256dh(),activeSubscriber.getAuth(), payload));
+		if (user != null) {
+			Security.addProvider(new BouncyCastleProvider());
+			PushService pushService = new PushService(publicKey, privateKey, SystemMessages.PUSH_NOTIFICATION_SUBJECT);
+			String payload = createPushServicePayload(user, type);
+			List<PushNotification> activeSubscribers = getActiveSubscribers(user);
+			for (PushNotification activeSubscriber : activeSubscribers) {
+				pushService.send(new Notification(activeSubscriber.getEndpoint(), activeSubscriber.getP256dh(),activeSubscriber.getAuth(), payload));
+			}
 		}
 	}
 

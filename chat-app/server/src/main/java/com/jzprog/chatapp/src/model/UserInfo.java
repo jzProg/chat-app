@@ -1,6 +1,6 @@
 package com.jzprog.chatapp.src.model;
 
-public class UserInfo {
+public class UserInfo implements Validatable {
 
     private String username;
     private String password;
