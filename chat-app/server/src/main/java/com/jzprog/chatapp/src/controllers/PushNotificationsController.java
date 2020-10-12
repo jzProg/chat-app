@@ -3,7 +3,6 @@ package com.jzprog.chatapp.src.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -18,7 +17,6 @@ import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.utils.JwtUtil;
 import com.jzprog.chatapp.src.utils.SystemMessages;
 
-@CrossOrigin(origins = "http://localhost:9090")
 @RestController
 @RequestMapping("/api/notifications")
 public class PushNotificationsController {

@@ -13,8 +13,16 @@ module.exports = {
     proxyTable: {
       '*': {
         target: 'http://localhost:8080',
-        changeOrigin: false
+        changeOrigin: false,
+        logLevel: 'debug'
       },
+      '/ws-messaging': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+        logLevel: 'debug'
+      }
     },
     // Various Dev Server settings
     host: 'localhost', // can be overwritten by process.env.HOST

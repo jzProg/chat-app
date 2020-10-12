@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
@@ -29,8 +28,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
 
-
-@CrossOrigin(origins = "http://localhost:9090")
 @RestController
 @RequestMapping("/api/messages")
 public class MessagesController {

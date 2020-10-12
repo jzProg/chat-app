@@ -67,7 +67,7 @@ export default {
   },
   methods: {
     connectToSocket() {
-      this.socket = new SockJS('http://localhost:8080/gs-guide-websocket');
+      this.socket = new SockJS('/ws-messaging');
       this.stompClient = Stomp.over(this.socket);
       this.stompClient.connect({}, (frame) => {
         console.log('Connected: ' + frame);
