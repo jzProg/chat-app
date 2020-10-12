@@ -7,6 +7,8 @@ public class UserDTO {
 	private Integer userId;
 	private byte[] image;
 	
+	public UserDTO() {}
+	
 	public UserDTO(UserBuilder builder) {
 		this.setUsername(builder.username);
 		this.setToken(builder.token);

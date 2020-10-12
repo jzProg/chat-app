@@ -78,6 +78,16 @@
            <artifactId>web-push</artifactId>
            <version>3.1.0</version>
 	    </dependency>
+	    <dependency>
+	       <groupId>org.tuxdude.logback.extensions</groupId>
+           <artifactId>logback-colorizer</artifactId>
+           <version>1.0.1</version>
+           <type>jar</type>
+	    </dependency>
+	    <dependency>
+	       <groupId>org.json</groupId>
+           <artifactId>json</artifactId>
+	    </dependency>
     </dependencies>
 
     <properties>

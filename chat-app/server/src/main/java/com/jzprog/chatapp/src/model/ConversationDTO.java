@@ -11,6 +11,8 @@ public class ConversationDTO {
 	private Date date;
 	private List<String> members;
 	private boolean deleted;
+	
+	public ConversationDTO() {}
 
     public ConversationDTO(ConversationBuilder builder) {
     	this.id = builder.id;

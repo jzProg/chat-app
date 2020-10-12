@@ -8,6 +8,8 @@ public class MessageDTO {
     private Integer authorId;
     private String authorUsername;
     private Date createdDate;
+    
+    public MessageDTO() {}
 
     public MessageDTO(MessageBuilder builder) {
     	 this.text = builder.text;

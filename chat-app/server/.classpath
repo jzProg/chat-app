@@ -29,5 +29,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/Giannis/Downloads/java-json.jar/java-json.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Giannis/Downloads/logback-colorizer-1.0.1.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
