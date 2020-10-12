@@ -27,10 +27,10 @@ public class PushNotificationsController {
 	private JwtUtil jwtTokenUtil;
 	
     @Autowired
-	UserService userService;
+	private UserService userService;
     
     @Autowired
-	PushNotificationService pushNotificationService;
+	private PushNotificationService pushNotificationService;
 	
 	@ControllerAdvice
     @RequestMapping(value = "/sendLoginEvent", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")

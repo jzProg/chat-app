@@ -61,8 +61,12 @@ public class UserController {
        final UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
 	   final String token = jwtTokenUtil.generateToken(userDetails);
 	   User user = userService.searchForUserByUsername(userInfo.getUsername());
-	   UserDTO userDTO = new UserDTO(user.getId(), userInfo.getUsername(), token);
-	   userDTO.setImage(user.getImage());
+	   UserDTO userDTO = new UserDTO.UserBuilder()
+		             .withUserId(user.getId())
+		             .withUsername(userInfo.getUsername())
+		             .withToken(token)
+		             .withImage(user.getImage())
+		             .build();
        return new ResponseEntity<>(userDTO, HttpStatus.OK);
     }
 
@@ -87,7 +91,7 @@ public class UserController {
         String username = jwtTokenUtil.getUsernameFromToken(authHeader.substring(7));      
     	if (!inputName.isEmpty()) {
     		for (User user : userService.searchForUsersMatchingString(inputName)) {
-        		if (!user.getUsername().equals(username)) listOfUsers.add(new UserDTO(user.getId(), user.getUsername(), null));
+        		if (!user.getUsername().equals(username)) listOfUsers.add(new UserDTO.UserBuilder().withUserId(user.getId()).withUsername(user.getUsername()).build());
              }	
     	}
         return new ResponseEntity<>(listOfUsers, HttpStatus.OK);
@@ -106,13 +110,15 @@ public class UserController {
       }
       try {
     	  User user = userService.updateProfileImage(username, file.getBytes());
-    	  UserDTO userDTO = new UserDTO(user.getId(), user.getUsername(), null);
-    	  userDTO.setImage(user.getImage());
+    	  UserDTO userDTO = new UserDTO.UserBuilder()
+		    			  .withUserId(user.getId())
+		    			  .withUsername(user.getUsername())
+		    			  .withImage(user.getImage())
+		    			  .build();
           return new ResponseEntity<>(userDTO, HttpStatus.OK);
       } catch (IOException e) {
           log.warning(e.getMessage());
           return new ResponseEntity<>(SystemMessages.IMAGE_FILE_UPLOAD_EXCEPTION, HttpStatus.INTERNAL_SERVER_ERROR);
       }
     }
-
 }

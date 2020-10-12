@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -35,8 +34,6 @@ import java.util.Date;
 @RestController
 @RequestMapping("/api/messages")
 public class MessagesController {
-
-    Logger log = Logger.getLogger(MessagesController.class.getName());
     
     @Autowired
     private MessagingService messagingService;
@@ -60,7 +57,12 @@ public class MessagesController {
         	return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
         List<MessageDTO> messages = new ArrayList<>();
     	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id))) {
-            messages.add(new MessageDTO(mes.getText(), mes.getPostedBy(), userService.searchForUserByUserId(mes.getPostedBy()).getUsername(), mes.getCreatedDate()));
+            messages.add(new MessageDTO.MessageBuilder()
+            		.withText(mes.getText())
+            		.withAuthorId(mes.getPostedBy())
+            		.withAuthorUsername(userService.searchForUserByUserId(mes.getPostedBy()).getUsername())
+            		.withCreatedDate(mes.getCreatedDate())
+            		.build());
         }
         return new ResponseEntity<>(messages, HttpStatus.OK); 
     }
@@ -74,9 +76,13 @@ public class MessagesController {
         	return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
         List<ConversationDTO> conversationDTOs = new ArrayList<>();
         for (Conversation conv : messagingService.fetchUsersConversations(username)) {
-           ConversationDTO conversationDTO = new ConversationDTO(conv.getId(), conv.getTitle(), conv.getCreatedDate());
-           conversationDTO.setMembers(conv.getUsers().stream().map(User::getUsername).collect(Collectors.toList()));
-           log.info(String.valueOf(conversationDTO.getMembers().size()));
+           ConversationDTO conversationDTO = new ConversationDTO.ConversationBuilder()
+        		    .withId(conv.getId())
+        		    .withTitle(conv.getTitle())
+        		    .withDate(conv.getCreatedDate())
+        		    .withMembers(conv.getUsers().stream().map(User::getUsername).collect(Collectors.toList()))
+        		    .withDeleted(false)
+        		    .build();
            conversationDTOs.add(conversationDTO);
         }
         return new ResponseEntity<>(conversationDTOs, HttpStatus.OK);
@@ -88,7 +94,12 @@ public class MessagesController {
     public MessageDTO addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
         Date createdDate = new Date(System.currentTimeMillis());
         messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());     
-        return new MessageDTO(message.getText(), message.getAuthorId(), userService.searchForUserByUserId(message.getAuthorId()).getUsername(), createdDate);
+        return new MessageDTO.MessageBuilder()
+        		.withText(message.getText())
+        		.withAuthorId(message.getAuthorId())
+        		.withAuthorUsername(userService.searchForUserByUserId(message.getAuthorId()).getUsername())
+        		.withCreatedDate(createdDate)
+        		.build();
     }
     
     @ControllerAdvice
@@ -96,8 +107,13 @@ public class MessagesController {
     @SendTo("/topic/conversations")
     public ConversationDTO createConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
         Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date(System.currentTimeMillis()), conv.getMembers());
-        ConversationDTO newConversationDTO = new ConversationDTO(newConversation.getId(), newConversation.getTitle(), newConversation.getCreatedDate());
-        newConversationDTO.setMembers(conv.getMembers());
+        ConversationDTO newConversationDTO = new ConversationDTO.ConversationBuilder()
+        		.withId(newConversation.getId())
+    		    .withTitle(newConversation.getTitle())
+    		    .withDate(newConversation.getCreatedDate())
+    		    .withMembers(conv.getMembers())
+    		    .withDeleted(false)
+    		    .build();
         return newConversationDTO;
     }
     
@@ -106,7 +122,11 @@ public class MessagesController {
     @SendTo("/topic/conversations")
     public ConversationDTO deleteConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
         messagingService.deleteConversation(Integer.valueOf(conv.getId()));
-        ConversationDTO deleted_conversation = new ConversationDTO(conv.getId(), conv.getTitle(), null);
+        ConversationDTO deleted_conversation = new ConversationDTO.ConversationBuilder()
+        		.withId(conv.getId())
+        		.withTitle( conv.getTitle())
+      		    .withDeleted(true)
+      		    .build();
         deleted_conversation.setDeleted(true);
         return deleted_conversation; 
     }
