@@ -1,3 +1,4 @@
 language: java
-install:
+pre_install:
   - mvn clean install -f chat-app/pom.xml
+install:  
