@@ -1,4 +1,4 @@
-# chat-app
+# Chat App
 
 [![Build Status](https://travis-ci.org/jzProg/chat-app.svg?branch=master)](https://travis-ci.org/jzProg/chat-app/)
 
