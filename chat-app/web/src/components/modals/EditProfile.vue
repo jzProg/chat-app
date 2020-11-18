@@ -82,12 +82,17 @@
             this.showUpload = false;
             this.uploadSuccess = true;
             this.setUserImage({ value: res.data.image });
+            this.updateUserImageForSession(res.data.image);
             this.selectedImage = '';
             this.$emit('confirm');
           });
         },
         logout() {
           this.userLogout();
+        },
+        updateUserImageForSession(image) {
+          const { id, username } = JSON.parse(localStorage.getItem('userInfo'));
+          localStorage.setItem('userInfo', JSON.stringify({ id, username, image }));
         },
         getImage() {
           const userImage = this.getUserImage
