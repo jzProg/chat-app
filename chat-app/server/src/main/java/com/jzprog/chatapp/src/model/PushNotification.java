@@ -4,8 +4,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
-@Entity(name = "push_notification", schema="public")
+@Entity
+@Table(name="push_notification", schema="public")
 public class PushNotification {
 
 	    @Id
