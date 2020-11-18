@@ -5,19 +5,19 @@ import javax.persistence.GenerationType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-@Entity(name = "push_notification")
+@Entity(name = "push_notification", schema="public")
 public class PushNotification {
-	
+
 	    @Id
 	    @GeneratedValue(strategy=GenerationType.AUTO)
 	    private Integer id;
-	 
+
 	    private Integer userId;
-	    
+
 	    private String endpoint;
-	    
+
 	    private String p256dh;
-	    
+
 	    private String auth;
 
 	    protected PushNotification() {}
@@ -73,5 +73,5 @@ public class PushNotification {
 		public String toString() {
 			return "PushNotification [id=" + id + ", userId=" + userId + ", endpoint=" + endpoint + ", p256dh=" + p256dh
 					+ ", auth=" + auth + "]";
-		}	    	    
+		}
 }

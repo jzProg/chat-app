@@ -11,19 +11,20 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 @Entity
+@Table(name="message", schema="public")
 public class Message {
 
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
-    
+
     private String text;
-    
+
     private Integer postedBy;
-    
+
     @Column(name = "created_date", columnDefinition="DATETIME")
     private Date createdDate;
-    
+
     @ManyToOne
     @JoinColumn(name = "conversation_id")
     private Conversation conversation;
@@ -70,15 +71,15 @@ public class Message {
 	public Conversation getConversation() {
 		return conversation;
 	}
-	
+
 	public void setConversation(Conversation conversation) {
 		this.conversation = conversation;
 	}
-	
+
 	public Date getCreatedDate() {
 		return createdDate;
 	}
-	
+
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
 	}

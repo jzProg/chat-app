@@ -14,24 +14,25 @@ import javax.persistence.ManyToMany;
 import javax.persistence.JoinColumn;
 
 @Entity
+@Table(name="user", schema="public")
 public class User implements Validatable {
-	
+
 	@Id
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Integer id;
-	
+
     private String username;
-    
+
     private String password;
-   
+
     private String email;
-    
+
     private byte[] image;
-    
+
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
     @JoinTable(
-        name = "conv_user", 
-        joinColumns = { @JoinColumn(name = "user_id") }, 
+        name = "conv_user",
+        joinColumns = { @JoinColumn(name = "user_id") },
         inverseJoinColumns = { @JoinColumn(name = "conversation_id") }
     )
     Set<Conversation> conversations = new HashSet<>();
@@ -43,7 +44,7 @@ public class User implements Validatable {
         this.password= password;
         this.email = email;
     }
-    
+
     public Set<Conversation> getConversations() {
         return conversations;
     }
@@ -63,7 +64,7 @@ public class User implements Validatable {
     public String getUsername() {
       return username;
     }
-    
+
     public void setConversations(Set<Conversation> conversations) {
         this.conversations = conversations;
       }
@@ -82,7 +83,7 @@ public class User implements Validatable {
 
     public void setEmail(String email) {
       this.email = email;
-    }   
+    }
 
     public byte[] getImage() {
 		return image;
