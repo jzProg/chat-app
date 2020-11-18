@@ -30,6 +30,7 @@ public class User implements Validatable {
     private String email;
 
     @Lob
+		@Type(type = "org.hibernate.type.ImageType")
     private byte[] image;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
