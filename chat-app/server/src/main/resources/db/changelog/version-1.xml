@@ -20,24 +20,24 @@
 		    </not>
         </preConditions>
         <createTable tableName="user">
-            <column autoIncrement="true" name="id" type="INT">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="username" type="VARCHAR(50)">
+            <column name="username" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
-            <column name="email" type="VARCHAR(50)">
+            <column name="email" type="varchar(50)">
              <constraints nullable="false"/>
             </column>
-            <column name="password" type="VARCHAR(100)">
+            <column name="password" type="varchar(100)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
          <createTable tableName="conversation">
-            <column autoIncrement="true" name="id" type="INT">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="title" type="VARCHAR(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+            <column name="title" type="varchar(50) character set utf8mb4 collate utf8mb4_unicode_ci">
                 <constraints nullable="false"/>
             </column>
             <column name="created_date" type="datetime">
@@ -45,27 +45,27 @@
             </column>
         </createTable>
          <createTable tableName="message">
-            <column autoIncrement="true" name="id" type="INT">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="text" type="VARCHAR(700) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+            <column name="text" type="VARCHAR(700) character set utf8mb4 collate utf8mb4_unicode_ci">
                 <constraints nullable="false"/>
             </column>
-            <column name="posted_by" type="INT">
+            <column name="posted_by" type="int">
              <constraints nullable="false"/>
             </column>
             <column name="created_date" type="datetime">
                 <constraints nullable="false"/>
             </column>
-            <column name="conversation_id" type="INT">
-              <constraints nullable="false" foreignKeyName="fk_conversation_id" references="conversation(id)"/>            
+            <column name="conversation_id" type="int">
+              <constraints nullable="false" foreignKeyName="fk_conversation_id" references="conversation(id)"/>
             </column>
         </createTable>
          <createTable tableName="conv_user">
-            <column name="conversation_id" type="INT">
+            <column name="conversation_id" type="int">
                 <constraints primaryKey="true"/>
             </column>
-             <column name="user_id" type="INT">
+             <column name="user_id" type="int">
                 <constraints primaryKey="true"/>
             </column>
         </createTable>
@@ -80,37 +80,37 @@
        <addColumn tableName="user">
         <column name="image" type="varchar(255)">
           <constraints nullable="true"/>
-        </column>  
+        </column>
        </addColumn>
      </changeSet>
      <changeSet author="john" id="3">
-         <modifyDataType tableName="user" columnName="image" newDataType="BLOB"/>
+         <modifyDataType tableName="user" columnName="image" newDataType="blob"/>
     </changeSet>
     <changeSet author="john" id="4">
 	    <modifySql dbms="mysql">
-	      <append value="ENGINE=INNODB CHARSET=utf8mb4 COLLATE utf8mb4_unicode_ci"/>
+	      <append value="ENGINE=INNODB CHARSET=utf8mb4 collate utf8mb4_unicode_ci"/>
         </modifySql>
     </changeSet>
     <changeSet author="john" id="5">
 	    <preConditions onFail="MARK_RAN">
 		    <not>
 		        <tableExists tableName="push_notification"/>
-		    </not>	   
+		    </not>
         </preConditions>
           <createTable tableName="push_notification">
-            <column autoIncrement="true" name="id" type="INT">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints primaryKey="true"/>
             </column>
-             <column name="user_id" type="INT">
+             <column name="user_id" type="int">
                 <constraints nullable="false"/>
             </column>
-              <column name="endpoint" type="VARCHAR(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+              <column name="endpoint" type="varchar(512) character set utf8mb4 collate utf8mb4_unicode_ci">
                 <constraints nullable="false"/>
             </column>
-              <column name="p256dh" type="VARCHAR(500) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+              <column name="p256dh" type="varchar(500) character set utf8mb4 collate utf8mb4_unicode_ci">
                 <constraints nullable="false"/>
             </column>
-              <column name="auth" type="VARCHAR(70) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci">
+              <column name="auth" type="varchar(70) character set utf8mb4 collate utf8mb4_unicode_ci">
                 <constraints nullable="false"/>
             </column>
         </createTable>
