@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-@Entity
+@Entity(name="push_notification")
 @Table(name="push_notification", schema="public")
 public class PushNotification {
 
