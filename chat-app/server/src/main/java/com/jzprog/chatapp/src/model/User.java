@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import org.hibernate.annotations.Type;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 
@@ -31,7 +30,6 @@ public class User implements Validatable {
     private String email;
 
     @Lob
-		@Type(type = "org.hibernate.type.ImageType")
     private byte[] image;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })

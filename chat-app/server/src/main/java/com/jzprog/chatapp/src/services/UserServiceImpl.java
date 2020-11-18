@@ -13,48 +13,49 @@ import com.jzprog.chatapp.src.model.UserInfo;
 
 @Service
 public class UserServiceImpl implements UserService {
-	
+
 	@Autowired
     UsersRepository userRepo;
-	
+
 	@LogMethodInfo
 	@Override
-	@Transactional 
+	@Transactional
 	public User searchForUserByUsername(String username) {
 		return (User) userRepo.findUserByUsername(username);
 	}
-	
+
 	@LogMethodInfo
 	@Override
-	@Transactional 
+	@Transactional
 	public User searchForUserByUsernameAndPassword(String username, String password) {
 		return (User) userRepo.findUserByUsernameAndPassword(username, password);
 	}
-	
+
 	@LogMethodInfo
 	@Override
-	@Transactional 
+	@Transactional
 	public void createNewUser(UserInfo userInfo, String password) {
 		User user = new User(userInfo.getUsername(), password, userInfo.getEmail());
         userRepo.save(user);
 	}
-	
+
 	@LogMethodInfo
 	@Override
-	@Transactional 
+	@Transactional
 	public User searchForUserByUserId(Integer userId) {
 		return (User) userRepo.findUserById(userId);
 	}
 
 	@LogMethodInfo
 	@Override
+	@Transactional 
 	public List<User> searchForUsersMatchingString(String str) {
 		return (List<User>) userRepo.findUsersMachingString(str);
 	}
 
 	@LogMethodInfo
 	@Override
-	@Transactional 
+	@Transactional
 	public User updateProfileImage(String username, byte[] newImagePath) {
 		User user = searchForUserByUsername(username);
 		if (user != null) {
