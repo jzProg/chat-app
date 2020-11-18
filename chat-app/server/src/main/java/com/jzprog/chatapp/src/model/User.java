@@ -13,12 +13,13 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 
 @Entity
 @Table(name="user", schema="public")
 public class User implements Validatable {
 
-	@Id
+	  @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
@@ -28,6 +29,7 @@ public class User implements Validatable {
 
     private String email;
 
+    @Lob
     private byte[] image;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = { CascadeType.ALL })
