@@ -56,6 +56,10 @@
           <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+        </dependency>
+        <dependency>
           <groupId>io.jsonwebtoken</groupId>
           <artifactId>jjwt</artifactId>
           <version>0.9.1</version>
@@ -149,7 +153,7 @@
                             <overwrite>true</overwrite>
                             <resources>
                                 <resource>
-                                    <directory>./src/main/db</directory>                               
+                                    <directory>./src/main/db</directory>
                                 </resource>
                             </resources>
                         </configuration>
