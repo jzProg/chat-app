@@ -19,7 +19,7 @@ import javax.persistence.JoinColumn;
 public class User implements Validatable {
 
 	@Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
     private String username;
