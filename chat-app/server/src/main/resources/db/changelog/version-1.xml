@@ -37,7 +37,7 @@
             <column autoIncrement="true" name="id" type="int">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="title" type="varchar(50) character set utf8mb4 collate utf8mb4_unicode_ci">
+            <column name="title" type="varchar(50)">
                 <constraints nullable="false"/>
             </column>
             <column name="created_date" type="datetime">
@@ -48,7 +48,7 @@
             <column autoIncrement="true" name="id" type="int">
                 <constraints primaryKey="true"/>
             </column>
-            <column name="text" type="VARCHAR(700) character set utf8mb4 collate utf8mb4_unicode_ci">
+            <column name="text" type="VARCHAR(700)">
                 <constraints nullable="false"/>
             </column>
             <column name="posted_by" type="int">
@@ -86,11 +86,6 @@
      <changeSet author="john" id="3">
          <modifyDataType tableName="user" columnName="image" newDataType="blob"/>
     </changeSet>
-    <changeSet author="john" id="4">
-	    <modifySql dbms="mysql">
-	      <append value="ENGINE=INNODB CHARSET=utf8mb4 collate utf8mb4_unicode_ci"/>
-        </modifySql>
-    </changeSet>
     <changeSet author="john" id="5">
 	    <preConditions onFail="MARK_RAN">
 		    <not>
@@ -104,13 +99,13 @@
              <column name="user_id" type="int">
                 <constraints nullable="false"/>
             </column>
-              <column name="endpoint" type="varchar(512) character set utf8mb4 collate utf8mb4_unicode_ci">
+              <column name="endpoint" type="varchar(512)">
                 <constraints nullable="false"/>
             </column>
-              <column name="p256dh" type="varchar(500) character set utf8mb4 collate utf8mb4_unicode_ci">
+              <column name="p256dh" type="varchar(500)">
                 <constraints nullable="false"/>
             </column>
-              <column name="auth" type="varchar(70) character set utf8mb4 collate utf8mb4_unicode_ci">
+              <column name="auth" type="varchar(70)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
