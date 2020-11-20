@@ -1,6 +1,7 @@
 # Chat App
 
 [![Build Status](https://travis-ci.org/jzProg/chat-app.svg?branch=master)](https://travis-ci.org/jzProg/chat-app/)
+[![Demo](https://img.shields.io/badge/demo-online-green.svg)](https://jz-chat-app.herokuapp.com/)
 
  A messenger app written in Vue js/Spring Boot. The real time communication and event broadcast are implemented using web sockets (https://github.com/sockjs/sockjs-client & https://github.com/stomp-js/stompjs). The aim of this project was to apply and be familiar with some web technologies and features (e.g push messaging, jwt authentication). Best practices were, also, applied by implementing object creation and validation using the Builder and Strategy Design patterns.
 
