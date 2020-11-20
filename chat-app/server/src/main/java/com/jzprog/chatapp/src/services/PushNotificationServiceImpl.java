@@ -21,13 +21,13 @@ import nl.martijndwars.webpush.PushService;
 
 @Service
 public class PushNotificationServiceImpl implements PushNotificationService {
-	
+
 	@Value("${push.notifications.public.key}")
 	private String publicKey;
-	
+
 	@Value("${push.notifications.private.key}")
 	private String privateKey;
-	
+
 	@Autowired
 	PushNotificationsRepository pushRepo;
 
@@ -55,7 +55,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 	@LogMethodInfo
 	@Override
 	public void sendPushNotificationToObservers(User user, NotificationCategories type) throws Exception {
-		if (user != null) {
+		if (user != null && !publicKey.equals("") && !privateKey.equals("")) {
 			Security.addProvider(new BouncyCastleProvider());
 			PushService pushService = new PushService(publicKey, privateKey, SystemMessages.PUSH_NOTIFICATION_SUBJECT);
 			String payload = createPushServicePayload(user, type);
@@ -71,13 +71,13 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 	public String providePublicKey() {
 		return publicKey;
 	}
-	
+
 	@LogMethodInfo
 	@Transactional
 	private List<PushNotification> getActiveSubscribers(User user) {
 		return (List<PushNotification>) pushRepo.findActiveSubscribers(user.getId());
 	}
-	
+
 	@LogMethodInfo
 	private String createPushServicePayload(User user, NotificationCategories type) throws JSONException {
 		return new JSONObject()
