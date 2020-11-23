@@ -1,43 +1,52 @@
 <template>
- <div id = 'container'>
-  <h1 class = 'text-center'>Be A Member!</h1>
-    <form style = "margin-top: 4%">
-        <div class = 'form-group'>
-          <label for = "username">Username: </label>
-          <input id = 'username'
-                 type = 'text'
-                 class = 'form-control'
-                 @focus = 'removeErrorMessage()'
-                 placeholder = 'enter username here'
-                 v-model = "enteredName">
+ <div id='container' class="container">
+   <div id="rowDiv" class="row">
+     <h1 class='text-center' style="margin-top: 20%">Be A Member!</h1>
+     <form style="margin-top: 7%">
+        <div class="formContainer">
+         <div class='form-group'>
+           <label for="username">Username</label>
+           <input id='username'
+                  type ='text'
+                  class='form-control'
+                  @focus='removeErrorMessage()'
+                  placeholder= 'enter username here'
+                  v-model="enteredName">
+         </div>
+         <div class='form-group'>
+           <label for="mail">Email</label>
+           <input id='mail'
+                  type='email'
+                  class='form-control'
+                  @focus='removeErrorMessage()'
+                  placeholder='enter mail here'
+                  v-model="enteredMail">
+         </div>
+         <div class='form-group'>
+           <label for="pass">Password</label>
+           <input id='pass'
+                  type='password'
+                  class='form-control'
+                  @focus='removeErrorMessage()'
+                  placeholder='enter password here'
+                  v-model="enteredPass">
+         </div>
         </div>
-        <div class = 'form-group'>
-          <label for = "mail">Email: </label>
-          <input id = 'mail'
-                 type = 'email'
-                 class = 'form-control'
-                 @focus = 'removeErrorMessage()'
-                 placeholder = 'enter mail here'
-                 v-model = "enteredMail">
+        <span v-if="getErrorRegisterMessage" id="errorRegisterSpan">
+          {{ getErrorRegisterMessage }}
+        </span>
+        <button id='submitBtn'
+                type='submit'
+                class='btn btn-primary'
+                @click.prevent="register">
+                Sign Up
+        </button>
+        <div id="alreadyAccount">
+          <i>Already an account? </i>
+          <router-link :to = "{ path:'/' }">Sign in here</router-link>
         </div>
-        <div class = 'form-group'>
-          <label for = "pass">Password: </label>
-          <input id = 'pass'
-                 type = 'password'
-                 class = 'form-control'
-                 @focus = 'removeErrorMessage()'
-                 placeholder = 'enter password here'
-                 v-model = "enteredPass">
-        </div>
-        <span v-if = "getErrorRegisterMessage" id = "errorRegisterSpan"> {{ getErrorRegisterMessage }}</span>
-        <div id = 'buttonDiv'>
-         <button id = 'submitBtn'
-                 type = 'submit'
-                 class = 'btn btn-primary'
-                 @click.prevent = "register">Sign Up</button>
-         <router-link :to = "{ path:'/' }"> Already an account? Sign in here</router-link>
-       </div>
-    </form>
+       </form>
+   </div>
  </div>
 </template>
 
@@ -95,18 +104,21 @@
 </script>
 
 <style scoped>
-  #container{
-    padding-left:30%;
-    padding-right:30%;
-    margin-top:5%;
+  .formContainer {
+    text-align: left;
   }
 
-  #submitBtn{
-    margin-right:2%;
+  #container {
+    margin: 0 auto;
+    width: 20%;
   }
 
-  #buttonDiv{
-    margin-top:4%;
+  #submitBtn {
+    margin-right: 2%;
+  }
+
+  #alreadyAccount {
+    margin-top: 2%;
   }
 
   #errorRegisterSpan {

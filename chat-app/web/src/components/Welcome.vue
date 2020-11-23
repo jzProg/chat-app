@@ -1,9 +1,9 @@
 <template>
   <div>
     <i class="fas fa-comment-dots fa-10x"
-       style="color:crimson">
+       style="color:#337ab7">
     </i>
-    <h1>{{ msg }}</h1>
+    <h1><b>{{ msg }}</b></h1>
     <router-view></router-view>
   </div>
 </template>
@@ -23,7 +23,7 @@ export default {
    },
   data () {
     return {
-      msg: 'Welcome to JZ Chat App'
+      msg: 'JZ Chat App'
     }
   },
   methods: {
