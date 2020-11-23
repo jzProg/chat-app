@@ -1,5 +1,5 @@
 <template>
-  <Modal :width="'500px'">
+  <Modal :width="'400px'">
     <span slot="close"
           id='closeSymbol'
           @click.prevent="close">x

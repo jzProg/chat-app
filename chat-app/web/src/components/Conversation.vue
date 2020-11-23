@@ -48,10 +48,9 @@ export default {
     width: 100%;
     margin-bottom: 1%;
     border-radius: 5px;
-    background-color: white;
   }
 
   #conversationDiv:hover{
-    border-color: red;
+    border-color:  #337ab7;
   }
 </style>

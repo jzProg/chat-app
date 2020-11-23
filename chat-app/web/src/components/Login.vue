@@ -24,7 +24,7 @@
           </div>
           <span id='errorMessageSpan' v-if="getErrorLoginMessage">
             {{ getErrorLoginMessage }}
-          </span>
+          </span><br/>
           <button id='submitBtn'
                  type='submit'
                  class='btn btn-primary'

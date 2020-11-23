@@ -107,6 +107,7 @@ export default {
   #contentDiv{
     min-height: 450px;
     width: 100%;
+    color: black;
   }
 
   #createMessageDiv{
@@ -118,6 +119,7 @@ export default {
     border-radius: 50px;
     padding: 1%;
     outline: none;
+    color: black;
   }
 
   .scrollable {

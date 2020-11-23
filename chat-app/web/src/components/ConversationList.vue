@@ -86,7 +86,7 @@ export default {
       });
     },
     getConvStyle(id) {
-      return id === this.activeConversationId ? { backgroundColor: 'yellow' } : {};
+      return id === this.activeConversationId ? { backgroundColor: '#337ab7' } : {};
     },
     findConversationPositionById(id) {
       return this.conversations.findIndex(x => x.id === id);
@@ -142,7 +142,7 @@ export default {
 
 <style scoped>
   #addConversationDiv {
-    background-color: green;
+    background-color: #337ab7;
     color: white;
     width: 30px;
     height: 30px;

@@ -34,7 +34,7 @@
         </div>
         <span v-if="getErrorRegisterMessage" id="errorRegisterSpan">
           {{ getErrorRegisterMessage }}
-        </span>
+        </span><br/>
         <button id='submitBtn'
                 type='submit'
                 class='btn btn-primary'

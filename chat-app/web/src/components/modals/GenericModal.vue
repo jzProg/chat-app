@@ -28,11 +28,13 @@
 
 <style>
   #closeSymbol {
-    float:right;
-    display:inline-block;
-    padding:2px 5px;
-    cursor:pointer;
+    float: right;
+    color: red;
+    display: inline-block;
+    padding: 2px 5px;
+    cursor: pointer;
   }
+
   .modal-mask {
     position: fixed;
     z-index: 9998;
@@ -54,16 +56,17 @@
     width: 300px;
     margin: 0px auto;
     padding: 20px 30px;
-    background-color: #fff;
+    background-color: lightgray;
     border-radius: 2px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
     transition: all .3s ease;
     font-family: Helvetica, Arial, sans-serif;
+    color: black;
   }
 
   .modal-header h3 {
     margin-top: 0;
-    color: #42b983;
+    color: #337ab7;
   }
 
   .modal-body {

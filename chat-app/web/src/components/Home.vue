@@ -1,7 +1,7 @@
 <template>
   <div>
     <h4 style='font-weight:bold'>
-      User {{ getUserId || getUserLoginInfo()[0] }} - {{ getLoginUsername || getUserLoginInfo()[1] }}
+      {{ getLoginUsername || getUserLoginInfo()[1] }}
     </h4>
     <img :src="imageNew"
          @click.prevent="editProfile()"
