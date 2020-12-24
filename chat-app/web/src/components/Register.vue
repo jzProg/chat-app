@@ -124,4 +124,9 @@
   #errorRegisterSpan {
     color: red;
   }
+
+  @media only screen and (max-width: 750px) {
+    #container {
+      width: 40%;
+    }
 </style>
