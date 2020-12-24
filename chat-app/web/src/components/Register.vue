@@ -129,4 +129,5 @@
     #container {
       width: 40%;
     }
+  }
 </style>
