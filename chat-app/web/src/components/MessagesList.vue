@@ -3,16 +3,12 @@
    <div id="contentDiv"
         class="container scrollable">
      <div v-for="mes in messages"
-          class="inner-message row">
-        <div style="text-align: left;"
-             class="col-md-9">
-          <span :style="getColorStyle(mes.authorId)">{{ mes.authorUsername }}: </span>
-          <span v-html="getMessageContent(mes.text)"></span>
-        </div>
-        <div style="color:lightgrey;"
-             class="col-md-3">
-             {{ new Date(mes.createdDate).toLocaleString() }}
-        </div>
+          class="inner-message">
+          <Message :content="getMessageContent(mes.text)"
+                   :author="mes.authorUsername"
+                   :date="mes.createdDate"
+                   :right-direction="isHomeUser(mes.authorUsername)"
+                   :color="getColor(mes.authorId)" />
      </div>
    </div>
    <div id="createMessageDiv">
@@ -35,11 +31,12 @@
 
 <script>
 import EmojiSelection from '@/components/modals/EmojiSelection';
+import Message from '@/components/Message';
 
 export default {
   name: 'Messages',
-  components: { EmojiSelection },
-  props: ['messages', 'sendNewMessage'],
+  components: { EmojiSelection, Message },
+  props: ['messages', 'sendNewMessage', 'isHomeUser'],
   data () {
     return {
       newMessage: '',
@@ -59,11 +56,6 @@ export default {
       return message.replace(/(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r\s]*)?#?([^\n\r\s]*)?/gi, (match) => {
         return `<a href='${match}' target='_blank'>${match}</a>`;
       });
-    },
-    getColorStyle(id) {
-      return {
-        color: this.getColor(id)
-      }
     },
     getColor(id) {
       return  this.userColors[id] || this.assignRandomColor(id);
@@ -92,7 +84,7 @@ export default {
   #messagesDiv{
     cursor: pointer;
     border-style: solid;
-    min-height: 500px;
+    min-height: 570px;
     padding: 1%;
     margin-left: 2%;
     border-radius: 5px;
@@ -105,7 +97,7 @@ export default {
   }
 
   #contentDiv{
-    min-height: 450px;
+    min-height: 520px;
     width: 100%;
     color: black;
   }

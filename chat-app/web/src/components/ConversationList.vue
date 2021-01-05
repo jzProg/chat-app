@@ -23,6 +23,7 @@
         <div id = "messDiv"
              class = "col-md-7">
           <Messages-of-Active-conversation v-if="activeConversationId"
+                                           :isHomeUser="isHomeUser"
                                            :send-new-message="sendNewMessage"
                                            :messages="activeConvMessages">
           </Messages-of-Active-conversation>
@@ -129,6 +130,9 @@ export default {
     },
     sendNewMessage(newMessage) {
         this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({'text': newMessage, 'authorId': this.authorId }));
+    },
+    isHomeUser(username) {
+      return username === this.getLoginUsername;
     },
   },
   computed: {
