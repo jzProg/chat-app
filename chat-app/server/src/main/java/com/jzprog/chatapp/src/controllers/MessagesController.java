@@ -104,14 +104,13 @@ public class MessagesController {
     @SendTo("/topic/conversations")
     public ConversationDTO createConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
         Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date(System.currentTimeMillis()), conv.getMembers());
-        ConversationDTO newConversationDTO = new ConversationDTO.ConversationBuilder()
+        return new ConversationDTO.ConversationBuilder()
         		.withId(newConversation.getId())
     		    .withTitle(newConversation.getTitle())
     		    .withDate(newConversation.getCreatedDate())
     		    .withMembers(conv.getMembers())
     		    .withDeleted(false)
     		    .build();
-        return newConversationDTO;
     }
     
     @ControllerAdvice
@@ -126,6 +125,17 @@ public class MessagesController {
       		    .build();
         deleted_conversation.setDeleted(true);
         return deleted_conversation; 
+    }
+
+    @ControllerAdvice
+    @MessageMapping("/messages/typing/{convId}")
+    @SendTo("/topic/conversation/{convId}")
+    public MessageDTO getTyping(@DestinationVariable String convId, MessageDTO message) throws Exception {
+        return new MessageDTO.MessageBuilder()
+                .withAuthorId(message.getAuthorId())
+                .withAuthorUsername(userService.searchForUserByUserId(message.getAuthorId()).getUsername())
+                .withTyping(true)
+                .build();
     }
 
 }

@@ -25,6 +25,8 @@
           <Messages-of-Active-conversation v-if="activeConversationId"
                                            :isHomeUser="isHomeUser"
                                            :send-new-message="sendNewMessage"
+                                           :typer="typer"
+                                           :send-typing="sendTyping"
                                            :messages="activeConvMessages">
           </Messages-of-Active-conversation>
         </div>
@@ -64,6 +66,7 @@ export default {
       authorId: '',
       showModal: false,
       activeSubscription: null,
+      typer: ''
     }
   },
   created () {
@@ -111,7 +114,13 @@ export default {
         this.activeConvMessages = response.data;
       });
       this.activeSubscription = this.stompClient.subscribe(`/topic/conversation/${convId}`, (message) => {
-        this.activeConvMessages.push(JSON.parse(message.body));
+        const messageObj = JSON.parse(message.body);
+        if (messageObj.typer) {
+          if (this.authorId !== messageObj.authorId) this.setTyper(messageObj.authorUsername);
+        } else {
+          this.clearTyping();
+          this.activeConvMessages.push(messageObj);
+        }
       });
     },
     getUserLoginInfo() {
@@ -137,7 +146,16 @@ export default {
       }
     },
     sendNewMessage(newMessage) {
-        this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({'text': newMessage, 'authorId': this.authorId }));
+      this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({ 'text': newMessage, 'authorId': this.authorId }));
+    },
+    sendTyping() {
+      this.stompClient.send(`/app/messages/typing/${this.activeConversationId}`, {}, JSON.stringify({ 'authorId': this.authorId }));
+    },
+    clearTyping() {
+      this.typer = '';
+    },
+    setTyper(typer) {
+      this.typer = typer;
     },
     isHomeUser(username) {
       return username === this.getLoginUsername;

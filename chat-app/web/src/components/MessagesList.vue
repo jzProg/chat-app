@@ -12,10 +12,19 @@
      </div>
    </div>
    <div id="createMessageDiv">
+     <div v-if="typer">
+       <span style="color: black; text-align: left">{{ typer }} is typing</span><br>
+       <div class="typing">
+        <div class="typing__dot"></div>
+        <div class="typing__dot"></div>
+        <div class="typing__dot"></div>
+       </div>
+     </div>
      <input type="text"
             id="inputMessage"
             v-model="newMessage"
             placeholder="New Message"
+            @input="sendTyping"
             @keyup.enter="sendNewMessage(newMessage); newMessage = '';">
             <span @click.prevent="showEmojis()">
               😀
@@ -36,7 +45,7 @@ import Message from '@/components/Message';
 export default {
   name: 'Messages',
   components: { EmojiSelection, Message },
-  props: ['messages', 'sendNewMessage', 'isHomeUser'],
+  props: ['messages', 'sendNewMessage', 'isHomeUser', 'sendTyping', 'typer'],
   data () {
     return {
       newMessage: '',
@@ -120,5 +129,50 @@ export default {
     max-width: 100%;
     overflow-x: hidden;
     word-wrap:break-word;
+   }
+
+  .typing {
+    width: 4em;
+    height: 2em;
+    padding: 10px;
+    margin: 0 auto;
+    margin-bottom: 1%;
+    background: #e6e6e6;
+    border-radius: 20px;
+ }
+
+.typing__dot {
+  float: left;
+  width: 4px;
+  height: 4px;
+  margin: 0 4px;
+  background: #8d8c91;
+  border-radius: 50%;
+  opacity: 0;
+  animation: loadingFade 1s infinite;
+}
+
+.typing__dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes loadingFade {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 </style>

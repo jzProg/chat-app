@@ -75,7 +75,7 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 	@LogMethodInfo
 	@Transactional
 	private List<PushNotification> getActiveSubscribers(User user) {
-		return (List<PushNotification>) pushRepo.findActiveSubscribers(user.getId());
+		return pushRepo.findActiveSubscribers(user.getId());
 	}
 
 	@LogMethodInfo
