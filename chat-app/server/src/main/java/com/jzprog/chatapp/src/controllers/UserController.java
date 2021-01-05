@@ -106,6 +106,9 @@ public class UserController {
       if (file.isEmpty()) {
     	  return new ResponseEntity<>(SystemMessages.IMAGE_FILE_UPLOAD_ERROR, HttpStatus.NO_CONTENT);
       }
+      if (file.getSize() > 64000) {
+         return new ResponseEntity<>(SystemMessages.IMAGE_FILE_UPLOAD_SIZE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
+      }
       try {
     	  User user = userService.updateProfileImage(username, file.getBytes());
     	  UserDTO userDTO = new UserDTO.UserBuilder()

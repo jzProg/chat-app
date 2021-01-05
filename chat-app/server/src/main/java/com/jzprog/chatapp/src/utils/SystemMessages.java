@@ -11,7 +11,8 @@ public class SystemMessages {
 	
 	public static final String IMAGE_FILE_UPLOAD_ERROR = "File Upload Failure: no image sent!";
 	public static final String IMAGE_FILE_UPLOAD_EXCEPTION = "File Upload Failure: exception on file save!";
-	
+	public static final String IMAGE_FILE_UPLOAD_SIZE_ERROR = "File Too large! Please choose a smaller image";
+
 	public static final String PUSH_NOTIFICATION_DELETED = "Push Notification Sub Info successfully deleted!";
 	public static final String PUSH_NOTIFICATION_SAVE_ERROR = "Push Notification Sub Info failed to be saved...User doesn't exist...";
 	public static final String PUSH_NOTIFICATION_SENT = "Push Notification broadcast just sent!";
