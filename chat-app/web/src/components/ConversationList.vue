@@ -104,6 +104,7 @@ export default {
       return this.conversations.findIndex(x => x.id === id);
     },
     closePreviousConversation() {
+      this.clearTyping();
       if (this.activeSubscription) this.activeSubscription.unsubscribe();
     },
     goToConversationMessages(convId) {

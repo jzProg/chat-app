@@ -12,13 +12,15 @@
      </div>
    </div>
    <div id="createMessageDiv">
-     <div v-if="typer">
-       <span style="color: black; text-align: left">{{ typer }} is typing</span><br>
-       <div class="typing">
-        <div class="typing__dot"></div>
-        <div class="typing__dot"></div>
-        <div class="typing__dot"></div>
-       </div>
+     <div class="typerContainer">
+       <template v-if="typer">
+         <span style="text-align: left">{{ typer }} is typing</span><br>
+         <div class="typing">
+          <div class="typing__dot"></div>
+          <div class="typing__dot"></div>
+          <div class="typing__dot"></div>
+         </div>
+       </template>  
      </div>
      <input type="text"
             id="inputMessage"
@@ -112,6 +114,9 @@ export default {
   }
 
   #createMessageDiv{
+    background-color: #282c34;
+    padding-bottom: 1%;
+    min-height: 100px;
     margin-top: 0%;
   }
 
@@ -150,6 +155,10 @@ export default {
   border-radius: 50%;
   opacity: 0;
   animation: loadingFade 1s infinite;
+}
+
+.typerContainer {
+  min-height: 48px;
 }
 
 .typing__dot:nth-child(1) {
