@@ -1,14 +1,14 @@
 <template>
   <div>
     <div id="addConversationDiv"
-         @click.prevent='showModal = true;'>
+         v-if="conversations.length"
+         @click.prevent="showModal = true">
          <i class="fas fa-plus fa-2x"></i>
    </div>
     <div class="container"
          style="margin-top:2%;width:100%" >
-      <div class="row">
-        <div id = "convDiv"
-             class = "col-md-5">
+      <div class="row" v-if="conversations.length">
+        <div id="convDiv" class="col-md-5">
           <Conversation  v-for="(conv, index) in conversations"
                          :style="getConvStyle(conv.id)"
                          :key="index"
@@ -20,14 +20,22 @@
                          :get-messages="goToConversationMessages">
            </Conversation>
         </div>
-        <div id = "messDiv"
-             class = "col-md-7">
+        <div id="messDiv"
+             class="col-md-7">
           <Messages-of-Active-conversation v-if="activeConversationId"
                                            :isHomeUser="isHomeUser"
                                            :send-new-message="sendNewMessage"
                                            :messages="activeConvMessages">
           </Messages-of-Active-conversation>
         </div>
+      </div>
+      <div v-else>
+       <h3><i>You don't have any conversation yet...</i></h3>
+       <button type="button"
+              class="btn btn-primary"
+              @click.prevent="showModal = true">
+              Create Conversation
+       </button>
       </div>
       </div>
       <CreateConversationModal v-if="showModal"

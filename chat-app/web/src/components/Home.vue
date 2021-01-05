@@ -32,7 +32,7 @@ export default {
   components: { EditProfile },
   mixins: [ImageMixin],
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
+    next(vm => {
       vm.registerPushNotificationSW();
     });
   },
