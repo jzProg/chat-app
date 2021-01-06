@@ -10,10 +10,11 @@
     </h3>
     <div slot="body">
       <h4><i class="fas fa-user"></i> <b>{{ getLoginUsername }}</b></h4>
+      <h4><i class="far fa-envelope"></i> {{ getUserEmail }}</h4>
       <img :src="getImage()"
            alt="profile image"
-           width="150px"
-           height="150px"
+           width="100px"
+           height="100px"
            style="border-radius:150px; margin:2%;"><br>
       <span v-if="showUpload">
         <input type="file" @change="onImageSelected($event)" @focus="clearErrors()">
@@ -119,7 +120,8 @@
       computed: {
         ...mapGetters([
             'getUserImage',
-            'getLoginUsername'
+            'getLoginUsername',
+            'getUserEmail'
         ])
       }
   }

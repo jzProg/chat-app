@@ -63,6 +63,7 @@ public class UserController {
 		             .withUserId(user.getId())
 		             .withUsername(userInfo.getUsername())
 		             .withToken(token)
+                     .withEmail(user.getEmail())
 		             .withImage(user.getImage())
 		             .build();
        return new ResponseEntity<>(userDTO, HttpStatus.OK);
