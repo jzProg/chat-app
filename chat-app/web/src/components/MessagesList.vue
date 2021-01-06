@@ -20,7 +20,7 @@
           <div class="typing__dot"></div>
           <div class="typing__dot"></div>
          </div>
-       </template>  
+       </template>
      </div>
      <input type="text"
             id="inputMessage"

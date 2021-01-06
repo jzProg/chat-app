@@ -17,18 +17,15 @@
                          :date="conv.date"
                          :members="conv.members"
                          @delete="deleteConversation(conv.id)"
-                         :get-messages="goToConversationMessages">
-           </Conversation>
+                         :get-messages="goToConversationMessages"/>
         </div>
-        <div id="messDiv"
-             class="col-md-7">
+        <div id="messDiv" class="col-md-7">
           <Messages-of-Active-conversation v-if="activeConversationId"
                                            :isHomeUser="isHomeUser"
                                            :send-new-message="sendNewMessage"
                                            :typer="typer"
                                            :send-typing="sendTyping"
-                                           :messages="activeConvMessages">
-          </Messages-of-Active-conversation>
+                                           :messages="activeConvMessages"/>
         </div>
       </div>
       <div v-else>
@@ -42,8 +39,7 @@
       </div>
       <CreateConversationModal v-if="showModal"
                               @create="addNewConversation"
-                              @close="showModal = false;">
-      </CreateConversationModal>
+                              @close="showModal = false"/>
    </div>
 </template>
 
@@ -66,7 +62,8 @@ export default {
       authorId: '',
       showModal: false,
       activeSubscription: null,
-      typer: ''
+      typer: '',
+      typingTimeout: null
     }
   },
   created () {
@@ -117,7 +114,10 @@ export default {
       this.activeSubscription = this.stompClient.subscribe(`/topic/conversation/${convId}`, (message) => {
         const messageObj = JSON.parse(message.body);
         if (messageObj.typer) {
-          if (this.authorId !== messageObj.authorId) this.setTyper(messageObj.authorUsername);
+          if (this.authorId !== messageObj.authorId) {
+            this.setTyper(messageObj.authorUsername);
+            this.checkForStopTyping();
+          }
         } else {
           this.clearTyping();
           this.activeConvMessages.push(messageObj);
@@ -147,7 +147,7 @@ export default {
       }
     },
     sendNewMessage(newMessage) {
-      this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({ 'text': newMessage, 'authorId': this.authorId }));
+      if (newMessage) this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({ 'text': newMessage, 'authorId': this.authorId }));
     },
     sendTyping() {
       this.stompClient.send(`/app/messages/typing/${this.activeConversationId}`, {}, JSON.stringify({ 'authorId': this.authorId }));
@@ -161,11 +161,17 @@ export default {
     isHomeUser(username) {
       return username === this.getLoginUsername;
     },
+    checkForStopTyping() {
+      clearTimeout(this.typingTimeout);
+      this.timeout = setTimeout(() => {
+       this.clearTyping();
+      }, 1000);
+    }
   },
   computed: {
     ...mapGetters([
-        'getLoginUsername',
-        'getUserId'
+      'getLoginUsername',
+      'getUserId'
     ])
   }
 }
