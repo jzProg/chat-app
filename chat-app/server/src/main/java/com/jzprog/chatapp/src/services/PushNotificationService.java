@@ -8,6 +8,6 @@ public interface PushNotificationService {
 	
 	Integer storePushNotificationSubInfo(String jsonString, Integer userId) throws JSONException;
     void deletePushNotificationSubInfo(Integer subId);
-    void sendPushNotificationToObservers(User user, NotificationCategories type) throws Exception;
+    void sendPushNotificationToObservers(User user, NotificationCategories type,Integer convId) throws Exception;
     String providePublicKey();
 }

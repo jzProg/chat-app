@@ -1,13 +1,19 @@
 'use strict';
+importScripts("localforage.min.js");
 
 self.addEventListener('push', function(event) {
-  const title = event.data.json().title;
+  const { title, message, icon, badge, convId } = event.data.json();
   const options = {
-    body: event.data.json().message,
-    icon: event.data.json().icon,
-    badge: event.data.json().badge,
+    body: message,
+    icon,
+    badge,
   };
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    localforage.getItem('activeConv', function (err, value) {
+      if (!convId || !value || parseInt(value) !== parseInt(convId, 10))
+        return self.registration.showNotification(title, options);
+    })
+  );
 });
 
 self.addEventListener('notificationclick', function(event) {

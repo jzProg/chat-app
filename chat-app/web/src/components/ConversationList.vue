@@ -44,10 +44,11 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 import Conversation from '@/components/Conversation';
 import MessagesOfActiveConversation from '@/components/MessagesList';
 import CreateConversationModal from '@/components/modals/CreateConversation';
+import localForage from '../../static/localforage.min.js';
 
 export default {
   name: 'Conversations',
@@ -66,7 +67,13 @@ export default {
       typingTimeout: null
     }
   },
+  watch: {
+    activeConversationId(value) {
+      localForage.setItem('activeConv', value);
+    }
+  },
   created () {
+    localForage.setItem('activeConv', null);
     const token = localStorage.getItem('token');
     this.authorId = this.getUserLoginInfo()[0];
     this.axios('/api/messages/getConversations', { headers: { Authorization: `Bearer ${token}` } }).then(response => {
@@ -75,6 +82,9 @@ export default {
     this.connectToSocket();
   },
   methods: {
+    ...mapActions([
+      'broadcastMessage'
+    ]),
     connectToSocket() {
       this.socket = new SockJS('/ws-messaging');
       this.stompClient = Stomp.over(this.socket);
@@ -147,7 +157,10 @@ export default {
       }
     },
     sendNewMessage(newMessage) {
-      if (newMessage) this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({ 'text': newMessage, 'authorId': this.authorId }));
+      if (newMessage) {
+        this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({ 'text': newMessage, 'authorId': this.authorId }));
+        this.broadcastMessage({ id: this.activeConversationId });
+      }
     },
     sendTyping() {
       this.stompClient.send(`/app/messages/typing/${this.activeConversationId}`, {}, JSON.stringify({ 'authorId': this.authorId }));

@@ -139,6 +139,16 @@ export default new Vuex.Store({
                     console.log('sendLoginEvent error: ', error);
                   });
     },
+    broadcastMessage({ commit }, { id }) { 
+      const token = localStorage.getItem('token');
+      return axios.post('/api/notifications/sendMessageEvent',  { id }, { headers: { 'Authorization': `Bearer ${token}` }})
+                  .then((response) => {
+                    console.log('sendMessageEvent sent!');
+                  })
+                  .catch((error) => {
+                    console.log('sendMessageEvent error: ', error);
+                  });
+    },
     uploadImage({ commit, state }, image) {
       const formData = new FormData();
       formData.append("imageFile", image);

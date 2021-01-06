@@ -54,11 +54,11 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 
 	@LogMethodInfo
 	@Override
-	public void sendPushNotificationToObservers(User user, NotificationCategories type) throws Exception {
+	public void sendPushNotificationToObservers(User user, NotificationCategories type, Integer convId) throws Exception {
 		if (user != null && !publicKey.equals("") && !privateKey.equals("")) {
 			Security.addProvider(new BouncyCastleProvider());
 			PushService pushService = new PushService(publicKey, privateKey, SystemMessages.PUSH_NOTIFICATION_SUBJECT);
-			String payload = createPushServicePayload(user, type);
+			String payload = createPushServicePayload(user, type, convId);
 			List<PushNotification> activeSubscribers = getActiveSubscribers(user);
 			for (PushNotification activeSubscriber : activeSubscribers) {
 				pushService.send(new Notification(activeSubscriber.getEndpoint(), activeSubscriber.getP256dh(),activeSubscriber.getAuth(), payload));
@@ -79,12 +79,13 @@ public class PushNotificationServiceImpl implements PushNotificationService {
 	}
 
 	@LogMethodInfo
-	private String createPushServicePayload(User user, NotificationCategories type) throws JSONException {
+	private String createPushServicePayload(User user, NotificationCategories type, Integer convId) throws JSONException {
 		return new JSONObject()
 				.put("title", type.getTitle())
 				.put("message", String.format(type.getMessage(), user.getUsername()))
 				.put("icon", type.getImage())
 				.put("badge", type.getImage())
+				.put("convId", convId)
 				.toString();
 	}
 

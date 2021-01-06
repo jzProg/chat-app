@@ -1,5 +1,6 @@
 package com.jzprog.chatapp.src.controllers;
 
+import com.jzprog.chatapp.src.model.ConversationDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,8 +36,18 @@ public class PushNotificationsController {
     public ResponseEntity<?> broadcastLogin(@RequestHeader(value="Authorization") String authHeader) throws Exception {  
        String username = jwtTokenUtil.getUsernameFromToken(authHeader.substring(7));  
        User user = userService.searchForUserByUsername(username);
-	   pushNotificationService.sendPushNotificationToObservers(user, SystemMessages.NotificationCategories.USER_LOGGED_IN);
+	   pushNotificationService.sendPushNotificationToObservers(user, SystemMessages.NotificationCategories.USER_LOGGED_IN, null);
        return new ResponseEntity<>(SystemMessages.PUSH_NOTIFICATION_SENT, HttpStatus.OK);
+    }
+
+    @ControllerAdvice
+    @RequestMapping(value = "/sendMessageEvent", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+    public ResponseEntity<?> broadcastMessage(@RequestBody ConversationDTO conversationDTO,
+                                              @RequestHeader(value="Authorization") String authHeader) throws Exception {
+        String username = jwtTokenUtil.getUsernameFromToken(authHeader.substring(7));
+        User user = userService.searchForUserByUsername(username);
+        pushNotificationService.sendPushNotificationToObservers(user, SystemMessages.NotificationCategories.MESSAGE_RECEIVED, conversationDTO.getId());
+        return new ResponseEntity<>(SystemMessages.PUSH_NOTIFICATION_SENT, HttpStatus.OK);
     }
 	
 	@ControllerAdvice
