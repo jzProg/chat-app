@@ -8,7 +8,7 @@
     <div class="container"
          style="margin-top:2%;width:100%" >
       <div class="row" v-if="conversations.length">
-        <div id="convDiv" class="col-md-5">
+        <div id="convDiv" class="col-md-5 scrollable">
           <Conversation  v-for="(conv, index) in conversations"
                          :style="getConvStyle(conv.id)"
                          :key="index"
@@ -216,4 +216,12 @@ export default {
     margin-left: 5%;
     border-radius: 30px
   }
+
+  .scrollable {
+    height: 700px;
+    overflow-y:auto;
+    max-width: 100%;
+    overflow-x: hidden;
+    word-wrap:break-word;
+   }
 </style>
