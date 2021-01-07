@@ -173,7 +173,7 @@ export default {
       if (newMessage) {
         this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({ 'text': newMessage, 'authorId': this.authorId }));
         setTimeout(() => {
-          this.stompClient.send(`/app/src/newMessage`, {}, JSON.stringify({ 'id': this.activeConversationId }));
+          this.stompClient.send(`/app/src/newMessage/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({ 'id': this.activeConversationId }));
         }, 700);
         this.broadcastMessage({ id: this.activeConversationId });
       }

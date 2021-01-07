@@ -120,9 +120,9 @@ public class MessagesController {
     }
 
     @ControllerAdvice
-    @MessageMapping("/src/newMessage")
+    @MessageMapping("/src/newMessage/{userId}")
     @SendTo("/topic/conversations")
-    public ConversationDTO newMessageToConversation(ConversationDTO conv) throws Exception {
+    public ConversationDTO newMessageToConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
         return new ConversationDTO.ConversationBuilder()
                 .withId(conv.getId())
                 .withMembers(messagingService.fetchConversationMembers(conv.getId()))
