@@ -118,17 +118,6 @@ public class MessagesController {
     		    .withDeleted(false)
     		    .build();
     }
-
-    @ControllerAdvice
-    @MessageMapping("/src/newMessage/{userId}")
-    @SendTo("/topic/conversations")
-    public ConversationDTO newMessageToConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
-        return new ConversationDTO.ConversationBuilder()
-                .withId(conv.getId())
-                .withMembers(messagingService.fetchConversationMembers(conv.getId()))
-                .withDeleted(false)
-                .build();
-    }
     
     @ControllerAdvice
     @MessageMapping("/src/delete/{userId}") 
