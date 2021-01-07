@@ -15,7 +15,7 @@
                          :id="conv.id"
                          :title="conv.title"
                          :date="conv.date"
-                         :indicator-count="indicators[conv.id]"
+                         :indicator-count="getIndicator(conv.id)"
                          :members="conv.members.filter(member => member !== getLoginUsername).map(member => `@${member}`)"
                          @delete="deleteConversation(conv.id)"
                          :get-messages="goToConversationMessages"/>
@@ -26,7 +26,7 @@
                                            :send-new-message="sendNewMessage"
                                            :typer="typer"
                                            :send-typing="sendTyping"
-                                           :messages="activeConvMessages"/>
+                                           :messages="activeConvMessages[activeConversationId]"/>
         </div>
       </div>
       <div v-else>
@@ -60,7 +60,7 @@ export default {
       stompClient: null,
       socket: null,
       activeConversationId: '',
-      activeConvMessages: [],
+      activeConvMessages: {},
       authorId: '',
       showModal: false,
       activeSubscription: null,
@@ -87,24 +87,20 @@ export default {
     ...mapActions([
       'broadcastMessage'
     ]),
+    getIndicator(id) {
+      return this.indicators[id];
+    },
     connectToSocket() {
       this.socket = new SockJS('/ws-messaging');
       this.stompClient = Stomp.over(this.socket);
       this.stompClient.connect({}, (frame) => {
         console.log('Connected: ' + frame);
+        this.subscribeToConversations();
         this.stompClient.subscribe(`/topic/conversations`, (message) => {
           const conv = JSON.parse(message.body);
           if (!conv.deleted) {
             if (conv.members.indexOf(this.getUserLoginInfo()[1]) !== -1) {
-              if (this.conversations.findIndex(c => conv.id === c.id) !== -1) {
-                if (conv.id !== this.activeConversationId) {
-                  let indicator = this.indicators[conv.id];
-                  indicator ? indicator = this.$set(this.indicators, conv.id, indicator + 1) : this.$set(this.indicators, conv.id, 1);
-                }
-              } else {
-                this.$set(this.indicators, conv.id, conv.messagesCount);
-                this.conversations.push(conv);
-              }
+              this.conversations.push(conv);
             }
           } else {
             this.clearIfIsActiveConversation(conv.id);
@@ -126,25 +122,32 @@ export default {
       this.clearTyping();
       if (this.activeSubscription) this.activeSubscription.unsubscribe();
     },
+    subscribeToConversations() {
+      this.conversations.forEach((item, i) => {
+        this.stompClient.subscribe(`/topic/conversation/${item.id}`, (message) => {
+          const messageObj = JSON.parse(message.body);
+          if (messageObj.typer) {
+            if (this.authorId !== messageObj.authorId && item.id === this.activeConversationId) {
+              this.setTyper(messageObj.authorUsername);
+              this.checkForStopTyping();
+            }
+          } else {
+            this.clearTyping();
+            if (item.id !== this.activeConversationId) {
+                let indicator = this.indicators[item.id];
+                indicator ? indicator = this.$set(this.indicators, item.id, indicator + 1) : this.$set(this.indicators, item.id, 1);
+            } else this.activeConvMessages[item.id].push(messageObj);
+          }
+        });
+      });
+    },
     goToConversationMessages(convId) {
       this.closePreviousConversation();
       this.indicators[convId] = 0;
       const token = localStorage.getItem('token');
       this.activeConversationId = convId;
       this.axios.get(`/api/messages/getConversationMessages?id=${convId}`, { headers: { Authorization: `Bearer ${token}` } }).then(response => {
-        this.activeConvMessages = response.data;
-      });
-      this.activeSubscription = this.stompClient.subscribe(`/topic/conversation/${convId}`, (message) => {
-        const messageObj = JSON.parse(message.body);
-        if (messageObj.typer) {
-          if (this.authorId !== messageObj.authorId) {
-            this.setTyper(messageObj.authorUsername);
-            this.checkForStopTyping();
-          }
-        } else {
-          this.clearTyping();
-          this.activeConvMessages.push(messageObj);
-        }
+        this.$set(this.activeConvMessages, convId, response.data);
       });
     },
     getUserLoginInfo() {
@@ -165,16 +168,13 @@ export default {
     clearIfIsActiveConversation(id) {
       if (this.activeConversationId === id) {
         this.closePreviousConversation();
-        this.activeConvMessages = [];
+        this.activeConvMessages = {};
         this.activeConversationId = '';
       }
     },
     sendNewMessage(newMessage) {
       if (newMessage) {
         this.stompClient.send(`/app/messages/${this.activeConversationId}`, {}, JSON.stringify({ 'text': newMessage, 'authorId': this.authorId }));
-        setTimeout(() => {
-          this.stompClient.send(`/app/src/newMessage/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({ 'id': this.activeConversationId }));
-        }, 700);
         this.broadcastMessage({ id: this.activeConversationId });
       }
     },
