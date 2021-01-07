@@ -22,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -94,6 +96,14 @@ public class MessagesController {
     public void addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
         Date createdDate = new Date(System.currentTimeMillis());
         messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());
+        CompletableFuture.supplyAsync(() -> {
+            this.template.convertAndSend("/topic/conversations", new ConversationDTO.ConversationBuilder()
+                    .withId(Integer.valueOf(convId))
+                    .withMembers(messagingService.fetchConversationMembers(Integer.valueOf(convId)))
+                    .withDeleted(false)
+                    .build());
+            return "0";
+        });
         this.template.convertAndSend("/topic/conversation/" + convId, new MessageDTO.MessageBuilder()
         		.withText(message.getText())
         		.withAuthorId(message.getAuthorId())
