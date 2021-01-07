@@ -91,8 +91,7 @@ public class MessagesController {
 
     @ControllerAdvice
     @MessageMapping("/messages/{convId}")
-    @SendTo("/topic/conversation/{convId}")
-    public MessageDTO addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
+    public void addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
         Date createdDate = new Date(System.currentTimeMillis());
         messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());
         this.template.convertAndSend("/topic/conversations", new ConversationDTO.ConversationBuilder()
@@ -100,12 +99,12 @@ public class MessagesController {
                 .withMembers(messagingService.fetchConversationMembers(Integer.valueOf(convId)))
                 .withDeleted(false)
                 .build());
-        return new MessageDTO.MessageBuilder()
+        this.template.convertAndSend("/topic/conversation/" + convId, new MessageDTO.MessageBuilder()
         		.withText(message.getText())
         		.withAuthorId(message.getAuthorId())
         		.withAuthorUsername(userService.searchForUserByUserId(message.getAuthorId()).getUsername())
         		.withCreatedDate(createdDate)
-        		.build();
+        		.build());
     }
     
     @ControllerAdvice

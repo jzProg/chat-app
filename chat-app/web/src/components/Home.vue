@@ -60,7 +60,6 @@ export default {
         navigator.serviceWorker.register('static/push-notification-sw.js').then((swReg) => {
           console.log('Push Notification SW is registered! ' + swReg);
           swReg.pushManager.getSubscription().then((subscription) => {
-            console.log(subscription);
             const isSubscribed = subscription !== null;
             if (isSubscribed) {
               console.log('User is already subscribed for notifications!');
