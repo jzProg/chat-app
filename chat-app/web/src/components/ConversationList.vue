@@ -15,7 +15,8 @@
                          :id="conv.id"
                          :title="conv.title"
                          :date="conv.date"
-                         :members="conv.members"
+                         :indicator-count="indicators[conv.id]"
+                         :members="conv.members.filter(member => member !== getLoginUsername).map(member => `@${member}`)"
                          @delete="deleteConversation(conv.id)"
                          :get-messages="goToConversationMessages"/>
         </div>
@@ -64,7 +65,8 @@ export default {
       showModal: false,
       activeSubscription: null,
       typer: '',
-      typingTimeout: null
+      typingTimeout: null,
+      indicators: {}
     }
   },
   watch: {
@@ -93,7 +95,17 @@ export default {
         this.stompClient.subscribe(`/topic/conversations`, (message) => {
           const conv = JSON.parse(message.body);
           if (!conv.deleted) {
-            if (conv.members.indexOf(this.getUserLoginInfo()[1]) != -1) this.conversations.push(conv);
+            if (conv.members.indexOf(this.getUserLoginInfo()[1]) !== -1) {
+              if (this.conversations.findIndex(c => conv.id === c.id) !== -1) {
+                if (conv.id !== this.activeConversationId) {
+                  let indicator = this.indicators[conv.id];
+                  indicator ? indicator = this.$set(this.indicators, conv.id, indicator + 1) : this.$set(this.indicators, conv.id, 1);
+                }
+              } else {
+                this.$set(this.indicators, conv.id, conv.messagesCount);
+                this.conversations.push(conv);
+              }
+            }
           } else {
             this.clearIfIsActiveConversation(conv.id);
             this.conversations.splice(this.conversations.findIndex(c => conv.id === c.id), 1);
@@ -105,7 +117,7 @@ export default {
       });
     },
     getConvStyle(id) {
-      return id === this.activeConversationId ? { backgroundColor: '#337ab7' } : {};
+      return id === this.activeConversationId ? { backgroundColor: '#337ab7', color: 'white',   borderColor: '#337ab7' } : {  color: '#337ab7' };
     },
     findConversationPositionById(id) {
       return this.conversations.findIndex(x => x.id === id);
@@ -116,6 +128,7 @@ export default {
     },
     goToConversationMessages(convId) {
       this.closePreviousConversation();
+      this.indicators[convId] = 0;
       const token = localStorage.getItem('token');
       this.activeConversationId = convId;
       this.axios.get(`/api/messages/getConversationMessages?id=${convId}`, { headers: { Authorization: `Bearer ${token}` } }).then(response => {

@@ -6,8 +6,8 @@
         <b>JZ Chat App</b>
       </div>
     </header>
-    <h4 style='font-weight:bold'>
-      <i class="fas fa-at"></i>{{ getLoginUsername || getUserLoginInfo()[1] }}
+    <h4 style='font-weight: bold'>
+      <i class="fas fa-at"/>{{ getLoginUsername || getUserLoginInfo()[1] }}
     </h4>
     <img :src="imageNew"
          @click.prevent="editProfile()"

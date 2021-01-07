@@ -12,6 +12,7 @@ import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.services.validation.ValidationStrategy;
 import com.jzprog.chatapp.src.utils.JwtUtil;
 import com.jzprog.chatapp.src.utils.SystemMessages.ValidationTypes;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,6 +32,9 @@ import java.util.Date;
 @RestController
 @RequestMapping("/api/messages")
 public class MessagesController {
+
+    @Autowired
+    private SimpMessagingTemplate template;
     
     @Autowired
     private MessagingService messagingService;
@@ -90,7 +94,12 @@ public class MessagesController {
     @SendTo("/topic/conversation/{convId}")
     public MessageDTO addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
         Date createdDate = new Date(System.currentTimeMillis());
-        messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());     
+        messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());
+        this.template.convertAndSend("/topic/conversations", new ConversationDTO.ConversationBuilder()
+                .withId(Integer.valueOf(convId))
+                .withMembers(messagingService.fetchConversationMembers(Integer.valueOf(convId)))
+                .withDeleted(false)
+                .build());
         return new MessageDTO.MessageBuilder()
         		.withText(message.getText())
         		.withAuthorId(message.getAuthorId())
@@ -109,6 +118,7 @@ public class MessagesController {
     		    .withTitle(newConversation.getTitle())
     		    .withDate(newConversation.getCreatedDate())
     		    .withMembers(conv.getMembers())
+                .withMessagesCount(newConversation.getMessages().size())
     		    .withDeleted(false)
     		    .build();
     }

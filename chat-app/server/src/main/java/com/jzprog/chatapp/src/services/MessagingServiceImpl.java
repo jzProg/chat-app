@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -96,6 +97,15 @@ public class MessagingServiceImpl implements MessagingService {
 			List<Message> listOfMessages = existingConversation.getMessages();
 			int listSize = listOfMessages.size();
 			return listSize > 20 ? listOfMessages.subList(listSize - 20, listSize) : listOfMessages;
+		}
+		return new ArrayList<>();
+	}
+
+	@Override
+	public List<String> fetchConversationMembers(Integer convId) {
+		Conversation existingConversation = conversationsRepo.findById(convId);
+		if (existingConversation != null) {
+			return existingConversation.getUsers().stream().map(User::getUsername).collect(Collectors.toList());
 		}
 		return new ArrayList<>();
 	}
