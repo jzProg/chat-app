@@ -1,7 +1,13 @@
 <template>
   <div>
-    <h4 style='font-weight:bold'>
-      {{ getLoginUsername || getUserLoginInfo()[1] }}
+    <header style="background-color: lightgray; width: 100%; text-align: left; color: black">
+      <div class="logo">
+        <i class="fas fa-comment-dots fa-1x" style="color:#337ab7"/>
+        <b>JZ Chat App</b>
+      </div>
+    </header>
+    <h4 style='font-weight: bold'>
+      <i class="fas fa-at"/>{{ getLoginUsername || getUserLoginInfo()[1] }}
     </h4>
     <img :src="imageNew"
          @click.prevent="editProfile()"
@@ -26,7 +32,7 @@ export default {
   components: { EditProfile },
   mixins: [ImageMixin],
   beforeRouteEnter(to, from, next) {
-    next((vm) => {
+    next(vm => {
       vm.registerPushNotificationSW();
     });
   },
@@ -120,9 +126,13 @@ export default {
 </script>
 
 <style>
-.profileImg {
-  border-radius: 50px;
-  margin-bottom: 1%;
-  cursor: pointer;
-}
+  .profileImg {
+    border-radius: 50px;
+    cursor: pointer;
+  }
+
+  .logo {
+    padding: 10px;
+    font-size: 150%;
+  }
 </style>

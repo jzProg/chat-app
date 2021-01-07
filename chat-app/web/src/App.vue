@@ -32,7 +32,6 @@ export default {
     text-align: center;
     background-color: #282c34;
     color: white;
-    margin-top: 60px;
   }
 
   body {

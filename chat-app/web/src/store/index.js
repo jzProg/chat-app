@@ -11,6 +11,7 @@ export default new Vuex.Store({
       id: '',
       image: '',
       loginUsername: '',
+      email: '',
       notifications: [],
       messages: [],
     },
@@ -24,6 +25,9 @@ export default new Vuex.Store({
     },
     getUserImage(state) {
       return state.userInfo.image;
+    },
+    getUserEmail(state) {
+      return state.userInfo.email;
     },
     getMessages(state) {
       return state.userInfo.messages;
@@ -65,6 +69,9 @@ export default new Vuex.Store({
     },
     setUserId(state, payload) {
       state.userInfo.id = payload.value;
+    },
+    setUserEmail(state, payload) {
+      state.userInfo.email = payload.value;
     },
   },
   actions: {
@@ -132,6 +139,16 @@ export default new Vuex.Store({
                     console.log('sendLoginEvent error: ', error);
                   });
     },
+    broadcastMessage({ commit }, { id }) { 
+      const token = localStorage.getItem('token');
+      return axios.post('/api/notifications/sendMessageEvent',  { id }, { headers: { 'Authorization': `Bearer ${token}` }})
+                  .then((response) => {
+                    console.log('sendMessageEvent sent!');
+                  })
+                  .catch((error) => {
+                    console.log('sendMessageEvent error: ', error);
+                  });
+    },
     uploadImage({ commit, state }, image) {
       const formData = new FormData();
       formData.append("imageFile", image);
@@ -145,6 +162,7 @@ export default new Vuex.Store({
                     commit({ type: 'setLoginUsername', value: response.data.username });
                     commit({ type: 'setUserId', value: response.data.userId });
                     commit({ type: 'setUserImage', value: response.data.image });
+                    commit({ type: 'setUserEmail', value: response.data.email });
                     localStorage.setItem('userInfo', JSON.stringify({ id: response.data.userId, username: response.data.username, image: response.data.image  }));
                     dispatch('broadcastLogin');
                     bus.$emit('login', payload.username);

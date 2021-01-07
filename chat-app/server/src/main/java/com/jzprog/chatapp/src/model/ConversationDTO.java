@@ -10,6 +10,7 @@ public class ConversationDTO {
 	private String title;
 	private Date date;
 	private List<String> members;
+	private int messagesCount;
 	private boolean deleted;
 	
 	public ConversationDTO() {}
@@ -20,6 +21,7 @@ public class ConversationDTO {
         this.setDate(builder.date);
         this.setDeleted(builder.deleted);
         this.members = builder.members;
+        this.messagesCount = builder.messagesCount;
     }
 
     public ConversationDTO(Integer id, String title, Date date) {
@@ -69,13 +71,22 @@ public class ConversationDTO {
 	public void setMembers(List<String> members) {
 		this.members = members;
 	}
-	
+
+	public int getMessagesCount() {
+		return messagesCount;
+	}
+
+	public void setMessagesCount(int messagesCount) {
+		this.messagesCount = messagesCount;
+	}
+
 	public static class ConversationBuilder {
 		
 		private Integer id;
 		private String title;
 		private Date date;
 		private List<String> members;
+		private int messagesCount;
 		private boolean deleted;
 
 		
@@ -101,6 +112,11 @@ public class ConversationDTO {
 		
 		public ConversationBuilder withDeleted(boolean deleted) {
 			this.deleted = deleted;
+			return this;
+		}
+
+		public ConversationBuilder withMessagesCount(int count) {
+			this.messagesCount = count;
 			return this;
 		}
 		

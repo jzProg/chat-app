@@ -10,13 +10,14 @@
     </h3>
     <div slot="body">
       <h4><i class="fas fa-user"></i> <b>{{ getLoginUsername }}</b></h4>
+      <h4><i class="far fa-envelope"></i> {{ getUserEmail }}</h4>
       <img :src="getImage()"
            alt="profile image"
-           width="150px"
-           height="150px"
+           width="100px"
+           height="100px"
            style="border-radius:150px; margin:2%;"><br>
       <span v-if="showUpload">
-        <input type="file" @change="onImageSelected($event)">
+        <input type="file" @change="onImageSelected($event)" @focus="clearErrors()">
       </span>
       <button class="btn btn-primary"
               type="button"
@@ -28,6 +29,10 @@
         <i class = "fas fa-check" style="color:green"></i>
          Photo Profile updated!
       </span>
+      <div v-if="uploadError">
+        <i class = "fas fa-exclamation-triangle" style="color:red"></i>
+        {{ uploadError }}
+      </div>
     </div>
     <div slot="footer"
          class="text-center">
@@ -60,6 +65,7 @@
           showUpload: false,
           selectedImage: '',
           uploadSuccess: false,
+          uploadError: ''
         }
       },
       methods: {
@@ -70,6 +76,9 @@
           'uploadImage',
           'userLogout',
         ]),
+        clearErrors() {
+          this.uploadError = '';
+        },
         onImageSelected(event) {
           this.selectedImage = event.target.files[0];
         },
@@ -78,13 +87,15 @@
           this.showUpload = true;
         },
         uploadImg() {
-          this.uploadImage(this.selectedImage).then((res) => {
+          this.uploadImage(this.selectedImage).then(res => {
             this.showUpload = false;
             this.uploadSuccess = true;
             this.setUserImage({ value: res.data.image });
             this.updateUserImageForSession(res.data.image);
             this.selectedImage = '';
             this.$emit('confirm');
+          }).catch(error => {
+            this.uploadError = error.response.data;
           });
         },
         logout() {
@@ -109,7 +120,8 @@
       computed: {
         ...mapGetters([
             'getUserImage',
-            'getLoginUsername'
+            'getLoginUsername',
+            'getUserEmail'
         ])
       }
   }

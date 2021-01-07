@@ -5,6 +5,7 @@ public class UserDTO {
 	private String username;
 	private String token;
 	private Integer userId;
+	private String email;
 	private byte[] image;
 	
 	public UserDTO() {}
@@ -14,6 +15,7 @@ public class UserDTO {
 		this.setToken(builder.token);
 		this.setUserId(builder.userId);
 		this.setImage(builder.image);
+		this.setEmail(builder.email);
 	}
 	
 	public UserDTO(Integer userId, String username, String token, byte[] image) {
@@ -54,13 +56,22 @@ public class UserDTO {
 	public void setImage(byte[] image) {
 		this.image = image;
 	}
-	
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	public static class UserBuilder {
 		
 		private String username;
 		private String token;
 		private Integer userId;
 		private byte[] image;
+		private String email;
 		
 		public UserBuilder withUsername(String username) {
 			this.username = username;
@@ -79,6 +90,11 @@ public class UserDTO {
 		
 		public UserBuilder withImage(byte[] image) {
 			this.image = image;
+			return this;
+		}
+
+		public UserBuilder withEmail(String email) {
+			this.email = email;
 			return this;
 		}
 		

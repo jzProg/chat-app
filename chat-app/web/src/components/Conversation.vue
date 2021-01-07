@@ -1,8 +1,11 @@
 <template>
  <div id="conversationDiv">
+   <div id='indicatorSpan' v-show="indicatorCount">
+      {{ indicatorCount }}
+   </div>
    <div @click.prevent="openConversation()">
-     <h3 style="font-weight: bold;">{{ title }}</h3>
-     <span v-for="(member, index) in members"> {{ member }}</span>
+     <h3 style="font-weight: bold; color: white">{{ title }}</h3>
+     <span> {{ members.join(', ') }}</span>
      <div><i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i></div>
      <button @click.prevent="deleteConv()"
              class="btn btn-danger">
@@ -18,7 +21,7 @@ import { mapGetters } from 'vuex';
 
 export default {
   name: 'Conversation',
-  props: ['id', 'title', 'date', 'getMessages', 'members'],
+  props: ['id', 'title', 'date', 'getMessages', 'members', 'indicatorCount'],
   methods: {
     deleteConv() {
       console.log('deleting conversation...');
@@ -42,6 +45,7 @@ export default {
   #conversationDiv{
     cursor: pointer;
     border-style: solid;
+    border-color: white;
     min-height: 50px;
     padding: 2%;
     margin-left: 2%;
@@ -52,5 +56,15 @@ export default {
 
   #conversationDiv:hover{
     border-color:  #337ab7;
+  }
+
+  #indicatorSpan {
+    background-color: #337ab7;
+    color: white;
+    width: 30px;
+    height: 30px;
+    float: left;
+    padding: 1%;
+    border-radius: 50%;
   }
 </style>

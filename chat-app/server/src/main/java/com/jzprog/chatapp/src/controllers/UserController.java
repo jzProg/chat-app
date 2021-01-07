@@ -63,6 +63,7 @@ public class UserController {
 		             .withUserId(user.getId())
 		             .withUsername(userInfo.getUsername())
 		             .withToken(token)
+                     .withEmail(user.getEmail())
 		             .withImage(user.getImage())
 		             .build();
        return new ResponseEntity<>(userDTO, HttpStatus.OK);
@@ -105,6 +106,9 @@ public class UserController {
       }
       if (file.isEmpty()) {
     	  return new ResponseEntity<>(SystemMessages.IMAGE_FILE_UPLOAD_ERROR, HttpStatus.NO_CONTENT);
+      }
+      if (file.getSize() > 64000) {
+         return new ResponseEntity<>(SystemMessages.IMAGE_FILE_UPLOAD_SIZE_ERROR, HttpStatus.INTERNAL_SERVER_ERROR);
       }
       try {
     	  User user = userService.updateProfileImage(username, file.getBytes());

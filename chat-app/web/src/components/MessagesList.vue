@@ -3,23 +3,30 @@
    <div id="contentDiv"
         class="container scrollable">
      <div v-for="mes in messages"
-          class="inner-message row">
-        <div style="text-align: left;"
-             class="col-md-9">
-          <span :style="getColorStyle(mes.authorId)">{{ mes.authorUsername }}: </span>
-          <span v-html="getMessageContent(mes.text)"></span>
-        </div>
-        <div style="color:lightgrey;"
-             class="col-md-3">
-             {{ new Date(mes.createdDate).toLocaleString() }}
-        </div>
+          class="inner-message">
+          <Message :content="getMessageContent(mes.text)"
+                   :author="mes.authorUsername"
+                   :date="mes.createdDate"
+                   :right-direction="isHomeUser(mes.authorUsername)"
+                   :color="getColor(mes.authorId)" />
      </div>
    </div>
    <div id="createMessageDiv">
+     <div class="typerContainer">
+       <template v-if="typer">
+         <span style="text-align: left">{{ typer }} is typing</span><br>
+         <div class="typing">
+          <div class="typing__dot"></div>
+          <div class="typing__dot"></div>
+          <div class="typing__dot"></div>
+         </div>
+       </template>
+     </div>
      <input type="text"
             id="inputMessage"
             v-model="newMessage"
             placeholder="New Message"
+            @input="sendTyping"
             @keyup.enter="sendNewMessage(newMessage); newMessage = '';">
             <span @click.prevent="showEmojis()">
               😀
@@ -35,11 +42,12 @@
 
 <script>
 import EmojiSelection from '@/components/modals/EmojiSelection';
+import Message from '@/components/Message';
 
 export default {
   name: 'Messages',
-  components: { EmojiSelection },
-  props: ['messages', 'sendNewMessage'],
+  components: { EmojiSelection, Message },
+  props: ['messages', 'sendNewMessage', 'isHomeUser', 'sendTyping', 'typer'],
   data () {
     return {
       newMessage: '',
@@ -59,11 +67,6 @@ export default {
       return message.replace(/(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r\s]*)?#?([^\n\r\s]*)?/gi, (match) => {
         return `<a href='${match}' target='_blank'>${match}</a>`;
       });
-    },
-    getColorStyle(id) {
-      return {
-        color: this.getColor(id)
-      }
     },
     getColor(id) {
       return  this.userColors[id] || this.assignRandomColor(id);
@@ -92,7 +95,7 @@ export default {
   #messagesDiv{
     cursor: pointer;
     border-style: solid;
-    min-height: 500px;
+    min-height: 570px;
     padding: 1%;
     margin-left: 2%;
     border-radius: 5px;
@@ -105,12 +108,15 @@ export default {
   }
 
   #contentDiv{
-    min-height: 450px;
+    min-height: 520px;
     width: 100%;
     color: black;
   }
 
   #createMessageDiv{
+    background-color: #282c34;
+    padding-bottom: 1%;
+    min-height: 100px;
     margin-top: 0%;
   }
 
@@ -128,5 +134,54 @@ export default {
     max-width: 100%;
     overflow-x: hidden;
     word-wrap:break-word;
+   }
+
+  .typing {
+    width: 4em;
+    height: 2em;
+    padding: 10px;
+    margin: 0 auto;
+    margin-bottom: 1%;
+    background: #e6e6e6;
+    border-radius: 20px;
+ }
+
+.typing__dot {
+  float: left;
+  width: 4px;
+  height: 4px;
+  margin: 0 4px;
+  background: #8d8c91;
+  border-radius: 50%;
+  opacity: 0;
+  animation: loadingFade 1s infinite;
+}
+
+.typerContainer {
+  min-height: 48px;
+}
+
+.typing__dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.typing__dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing__dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes loadingFade {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 </style>
