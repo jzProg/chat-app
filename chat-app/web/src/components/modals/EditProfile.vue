@@ -17,7 +17,11 @@
            height="100px"
            style="border-radius:150px; margin:2%;"><br>
       <span v-if="showUpload">
-        <input type="file" @change="onImageSelected($event)" @focus="clearErrors()" accept="image/png,image/gif,image/jpeg">
+        <input type="file"
+               @change="onImageSelected($event)"
+               @focus="clearErrors()"
+               accept="image/png,image/gif,image/jpeg"
+               style="width: 340px">
       </span>
       <button class="btn btn-primary"
               type="button"
