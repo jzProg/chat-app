@@ -94,11 +94,6 @@ public class MessagesController {
     public void addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
         Date createdDate = new Date(System.currentTimeMillis());
         messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());
-        this.template.convertAndSend("/topic/conversations", new ConversationDTO.ConversationBuilder()
-                .withId(Integer.valueOf(convId))
-                .withMembers(messagingService.fetchConversationMembers(Integer.valueOf(convId)))
-                .withDeleted(false)
-                .build());
         this.template.convertAndSend("/topic/conversation/" + convId, new MessageDTO.MessageBuilder()
         		.withText(message.getText())
         		.withAuthorId(message.getAuthorId())
