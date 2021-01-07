@@ -1,7 +1,7 @@
 <template>
  <div :class="['messageContainer', { reversed: rightDirection }]">
    <div :class="['contentDiv', { reversed: rightDirection }]">
-        <div :style="{ backgroundColor: color }" class="messageDiv">
+        <div :style="{ backgroundColor: getColorStyle() }" class="messageDiv">
           <h4><b>{{ author }}</b></h4>
           <h4 v-html="content"/>
         </div>
@@ -18,6 +18,12 @@
 export default {
   name: 'Message',
   props: ['content', 'author', 'color', 'date', 'rightDirection'],
+  methods: {
+    getColorStyle() {
+      const { r, g, b } = this.color;
+      return `rgba(${r}, ${g}, ${b}, 0.5)`;
+    }
+  }
 }
 </script>
 
