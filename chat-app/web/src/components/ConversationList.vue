@@ -100,6 +100,7 @@ export default {
           const conv = JSON.parse(message.body);
           if (!conv.deleted) {
             if (conv.members.indexOf(this.getUserLoginInfo()[1]) !== -1) {
+              this.subscribeToConversation(conv);
               this.conversations.push(conv);
             }
           } else {
@@ -124,21 +125,24 @@ export default {
     },
     subscribeToConversations() {
       this.conversations.forEach((item, i) => {
-        this.stompClient.subscribe(`/topic/conversation/${item.id}`, (message) => {
-          const messageObj = JSON.parse(message.body);
-          if (messageObj.typer) {
-            if (this.authorId !== messageObj.authorId && item.id === this.activeConversationId) {
-              this.setTyper(messageObj.authorUsername);
-              this.checkForStopTyping();
-            }
-          } else {
-            this.clearTyping();
-            if (item.id !== this.activeConversationId) {
-                let indicator = this.indicators[item.id];
-                indicator ? indicator = this.$set(this.indicators, item.id, indicator + 1) : this.$set(this.indicators, item.id, 1);
-            } else this.activeConvMessages[item.id].push(messageObj);
+        this.subscribeToConversation(item);
+      });
+    },
+    subscribeToConversation(conv) {
+      this.stompClient.subscribe(`/topic/conversation/${conv.id}`, (message) => {
+        const messageObj = JSON.parse(message.body);
+        if (messageObj.typer) {
+          if (this.authorId !== messageObj.authorId && conv.id === this.activeConversationId) {
+            this.setTyper(messageObj.authorUsername);
+            this.checkForStopTyping();
           }
-        });
+        } else {
+          this.clearTyping();
+          if (conv.id !== this.activeConversationId) {
+              let indicator = this.indicators[conv.id];
+              indicator ? indicator = this.$set(this.indicators, conv.id, indicator + 1) : this.$set(this.indicators, conv.id, 1);
+          } else this.activeConvMessages[conv.id].push(messageObj);
+        }
       });
     },
     goToConversationMessages(convId) {
