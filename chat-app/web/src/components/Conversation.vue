@@ -7,7 +7,7 @@
      <h3 style="font-weight: bold; color: white">{{ title }}</h3>
      <span> {{ members.join(', ') }}</span>
      <div><i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i></div>
-     <button @click.prevent="deleteConv()"
+     <button @click.stop="deleteConv()"
              class="btn btn-danger">
             <i class="far fa-trash-alt"></i>
     </button>
