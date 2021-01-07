@@ -96,14 +96,6 @@ public class MessagesController {
     public void addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
         Date createdDate = new Date(System.currentTimeMillis());
         messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());
-        CompletableFuture.supplyAsync(() -> {
-            this.template.convertAndSend("/topic/conversations", new ConversationDTO.ConversationBuilder()
-                    .withId(Integer.valueOf(convId))
-                    .withMembers(messagingService.fetchConversationMembers(Integer.valueOf(convId)))
-                    .withDeleted(false)
-                    .build());
-            return "0";
-        });
         this.template.convertAndSend("/topic/conversation/" + convId, new MessageDTO.MessageBuilder()
         		.withText(message.getText())
         		.withAuthorId(message.getAuthorId())
@@ -125,6 +117,17 @@ public class MessagesController {
                 .withMessagesCount(newConversation.getMessages().size())
     		    .withDeleted(false)
     		    .build();
+    }
+
+    @ControllerAdvice
+    @MessageMapping("/src/newMessage")
+    @SendTo("/topic/conversations")
+    public ConversationDTO newMessageToConversation(ConversationDTO conv) throws Exception {
+        return new ConversationDTO.ConversationBuilder()
+                .withId(conv.getId())
+                .withMembers(messagingService.fetchConversationMembers(conv.getId()))
+                .withDeleted(false)
+                .build();
     }
     
     @ControllerAdvice
