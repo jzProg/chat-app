@@ -10,14 +10,14 @@
     </h3>
     <div slot="body">
       <h4><i class="fas fa-user"></i> <b>{{ getLoginUsername }}</b></h4>
-      <h4><i class="far fa-envelope"></i> {{ getUserEmail }}</h4>
+      <h4><i class="far fa-envelope"></i> {{ getMail() }}</h4>
       <img :src="getImage()"
            alt="profile image"
            width="100px"
            height="100px"
            style="border-radius:150px; margin:2%;"><br>
       <span v-if="showUpload">
-        <input type="file" @change="onImageSelected($event)" @focus="clearErrors()">
+        <input type="file" @change="onImageSelected($event)" @focus="clearErrors()" accept="image/png,image/gif,image/jpeg">
       </span>
       <button class="btn btn-primary"
               type="button"
@@ -85,6 +85,10 @@
         changeImage() {
           this.uploadSuccess = false;
           this.showUpload = true;
+        },
+        getMail() {
+          const storageInfo = JSON.parse(localStorage.getItem('userInfo'));
+          return storageInfo ? storageInfo.email : this.getUserEmail;
         },
         uploadImg() {
           this.uploadImage(this.selectedImage).then(res => {

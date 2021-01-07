@@ -139,7 +139,7 @@ export default new Vuex.Store({
                     console.log('sendLoginEvent error: ', error);
                   });
     },
-    broadcastMessage({ commit }, { id }) { 
+    broadcastMessage({ commit }, { id }) {
       const token = localStorage.getItem('token');
       return axios.post('/api/notifications/sendMessageEvent',  { id }, { headers: { 'Authorization': `Bearer ${token}` }})
                   .then((response) => {
@@ -158,12 +158,13 @@ export default new Vuex.Store({
     userLogin({ commit, dispatch }, payload) {
       return axios.post('/api/user/auth', { username: payload.username, password: payload.password })
                   .then((response) => {
-                    localStorage.setItem('token', response.data.token);
-                    commit({ type: 'setLoginUsername', value: response.data.username });
-                    commit({ type: 'setUserId', value: response.data.userId });
-                    commit({ type: 'setUserImage', value: response.data.image });
-                    commit({ type: 'setUserEmail', value: response.data.email });
-                    localStorage.setItem('userInfo', JSON.stringify({ id: response.data.userId, username: response.data.username, image: response.data.image  }));
+                    const { token, username, userId, image, email } = response.data;
+                    localStorage.setItem('token', token);
+                    commit({ type: 'setLoginUsername', value: username });
+                    commit({ type: 'setUserId', value: userId });
+                    commit({ type: 'setUserImage', value: image });
+                    commit({ type: 'setUserEmail', value: email });
+                    localStorage.setItem('userInfo', JSON.stringify({ id: userId, username, image, email  }));
                     dispatch('broadcastLogin');
                     bus.$emit('login', payload.username);
                   })
