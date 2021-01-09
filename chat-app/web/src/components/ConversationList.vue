@@ -16,7 +16,7 @@
                          :title="conv.title"
                          :date="conv.date"
                          :indicator-count="getIndicator(conv.id)"
-                         :members="conv.members.filter(member => member !== getLoginUsername).map(member => `@${member}`)"
+                         :members="conv.members.filter(member => member !== getUserPersonalInfo.loginUsername).map(member => `@${member}`)"
                          @delete="deleteConversation(conv.id)"
                          :get-messages="goToConversationMessages"/>
         </div>
@@ -77,7 +77,7 @@ export default {
   created () {
     localForage.setItem('activeConv', null);
     const token = localStorage.getItem('token');
-    this.authorId = this.getUserLoginInfo()[0];
+    this.authorId = this.getUserPersonalInfo.id;
     this.axios('/api/messages/getConversations', { headers: { Authorization: `Bearer ${token}` } }).then(response => {
       this.conversations = response.data.sort((item1, item2) => item1.date - item2.date);
     });
@@ -99,7 +99,7 @@ export default {
         this.stompClient.subscribe(`/topic/conversations`, (message) => {
           const conv = JSON.parse(message.body);
           if (!conv.deleted) {
-            if (conv.members.indexOf(this.getUserLoginInfo()[1]) !== -1) {
+            if (conv.members.indexOf(this.getUserPersonalInfo.loginUsername) !== -1) {
               this.subscribeToConversation(conv);
               this.conversations.push(conv);
             }
@@ -154,20 +154,15 @@ export default {
         this.$set(this.activeConvMessages, convId, response.data);
       });
     },
-    getUserLoginInfo() {
-      const storageInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const storageId = storageInfo ? storageInfo.id : '';
-      const storageUsername = storageInfo ? storageInfo.username : '';
-      return [ this.getUserId || storageId, this.getLoginUsername || storageUsername ];
-    },
     addNewConversation(name, members) {
-      members.push(this.getUserLoginInfo()[1]);
-      this.stompClient.send(`/app/src/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({ 'title': name || '', 'members' : members }));
+      const { id, loginUsername } = this.getUserPersonalInfo;
+      members.push(loginUsername);
+      this.stompClient.send(`/app/src/${id}`, {}, JSON.stringify({ 'title': name || '', 'members' : members }));
       this.showModal = false;
     },
     deleteConversation(id) {
       this.clearIfIsActiveConversation(id);
-      this.stompClient.send(`/app/src/delete/${this.getUserLoginInfo()[0]}`, {}, JSON.stringify({ 'id': id }));
+      this.stompClient.send(`/app/src/delete/${this.getUserPersonalInfo.id}`, {}, JSON.stringify({ 'id': id }));
     },
     clearIfIsActiveConversation(id) {
       if (this.activeConversationId === id) {
@@ -192,19 +187,18 @@ export default {
       this.typer = typer;
     },
     isHomeUser(username) {
-      return username === this.getLoginUsername;
+      return username === this.getUserPersonalInfo.loginUsername;
     },
     checkForStopTyping() {
       clearTimeout(this.typingTimeout);
-      this.timeout = setTimeout(() => {
+      this.typingTimeout = setTimeout(() => {
        this.clearTyping();
       }, 1000);
     }
   },
   computed: {
     ...mapGetters([
-      'getLoginUsername',
-      'getUserId'
+      'getUserPersonalInfo'
     ])
   }
 }

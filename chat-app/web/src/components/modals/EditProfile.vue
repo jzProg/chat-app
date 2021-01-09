@@ -9,7 +9,7 @@
       Edit Profile Info
     </h3>
     <div slot="body">
-      <h4><i class="fas fa-user"></i> <b>{{ getLoginUsername }}</b></h4>
+      <h4><i class="fas fa-user"></i> <b>{{ getUserPersonalInfo.loginUsername }}</b></h4>
       <h4><i class="far fa-envelope"></i> {{ getMail() }}</h4>
       <img :src="getImage()"
            alt="profile image"
@@ -61,77 +61,69 @@
   import { mapActions, mapMutations, mapGetters } from 'vuex';
 
   export default {
-      name: 'EditProfile',
-      components: { Modal },
-      mixins: [ImageMixin],
-      data() {
-        return {
-          showUpload: false,
-          selectedImage: '',
-          uploadSuccess: false,
-          uploadError: ''
+    name: 'EditProfile',
+    components: { Modal },
+    mixins: [ImageMixin],
+    data() {
+      return {
+        showUpload: false,
+        selectedImage: '',
+        uploadSuccess: false,
+        uploadError: ''
+      }
+    },
+    methods: {
+      ...mapMutations([
+        'setUserImage',
+      ]),
+      ...mapActions([
+        'uploadImage',
+        'userLogout',
+      ]),
+      clearErrors() {
+        this.uploadError = '';
+      },
+      onImageSelected(event) {
+        this.selectedImage = event.target.files[0];
+      },
+      changeImage() {
+        this.uploadSuccess = false;
+        this.showUpload = true;
+      },
+      getMail() {
+        return this.getUserPersonalInfo.email;
+      },
+      uploadImg() {
+        this.uploadImage(this.selectedImage).then(res => {
+          this.showUpload = false;
+          this.uploadSuccess = true;
+          this.setUserImage({ value: res.data.image });
+          this.selectedImage = '';
+          this.$emit('confirm');
+        }).catch(error => {
+          this.uploadError = error.response.data;
+        });
+      },
+      logout() {
+        this.userLogout();
+      },
+      getImage() {
+        const userImage = this.getUserPersonalInfo.image;
+        if (userImage) {
+          return this.readBlobImage(userImage);
+        } else {
+          return require('@/assets/profile_default.png');
         }
       },
-      methods: {
-        ...mapMutations([
-          'setUserImage',
-        ]),
-        ...mapActions([
-          'uploadImage',
-          'userLogout',
-        ]),
-        clearErrors() {
-          this.uploadError = '';
-        },
-        onImageSelected(event) {
-          this.selectedImage = event.target.files[0];
-        },
-        changeImage() {
-          this.uploadSuccess = false;
-          this.showUpload = true;
-        },
-        getMail() {
-          const storageInfo = JSON.parse(localStorage.getItem('userInfo'));
-          return storageInfo ? storageInfo.email : this.getUserEmail;
-        },
-        uploadImg() {
-          this.uploadImage(this.selectedImage).then(res => {
-            this.showUpload = false;
-            this.uploadSuccess = true;
-            this.setUserImage({ value: res.data.image });
-            this.updateUserImageForSession(res.data.image);
-            this.selectedImage = '';
-            this.$emit('confirm');
-          }).catch(error => {
-            this.uploadError = error.response.data;
-          });
-        },
-        logout() {
-          this.userLogout();
-        },
-        updateUserImageForSession(image) {
-          const { id, username } = JSON.parse(localStorage.getItem('userInfo'));
-          localStorage.setItem('userInfo', JSON.stringify({ id, username, image }));
-        },
-        getImage() {
-          const userImage = this.getUserImage
-          if (userImage) {
-            return this.readBlobImage(userImage);
-          } else {
-            return require('@/assets/profile_default.png');
-          }
-        },
-        close() {
-          this.$emit('close');
-        },
+      close() {
+        this.$emit('close');
       },
-      computed: {
-        ...mapGetters([
-            'getUserImage',
-            'getLoginUsername',
-            'getUserEmail'
-        ])
-      }
+    },
+    computed: {
+      ...mapGetters([
+        'getUserPersonalInfo'
+      ])
+    }
   }
 </script>
 

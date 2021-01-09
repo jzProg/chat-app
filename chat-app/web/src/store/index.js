@@ -1,18 +1,19 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
-import axios from 'axios'
+import Vue from 'vue';
+import Vuex from 'vuex';
+import axios from 'axios';
 import bus from "@/common/eventBus";
+import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
+  plugins: [createPersistedState()],
   state: {
     userInfo: {
       id: '',
       image: '',
       loginUsername: '',
       email: '',
-      notifications: [],
       messages: [],
     },
     pushNotificationPublicKey: '',
@@ -23,55 +24,35 @@ export default new Vuex.Store({
     getPushNotificationPublicKey(state) {
       return state.pushNotificationPublicKey;
     },
-    getUserImage(state) {
-      return state.userInfo.image;
-    },
-    getUserEmail(state) {
-      return state.userInfo.email;
+    getUserPersonalInfo(state) {
+      const { id, image, loginUsername, email } = state.userInfo;
+      return { id, image, loginUsername, email };
     },
     getMessages(state) {
       return state.userInfo.messages;
-    },
-    getNotifications(state) {
-      return state.userInfo.notifications;
     },
     getErrorRegisterMessage(state) {
       return state.errorRegisterMessage;
     },
     getErrorLoginMessage(state) {
       return state.errorLoginMessage;
-    },
-    getLoginUsername(state) {
-      return state.userInfo.loginUsername;
-    },
-    getUserId(state) {
-      return state.userInfo.id;
     }
   },
   mutations: {
     setPushNotificationPublicKey(state, payload) {
       state.pushNotificationPublicKey = payload.value;
     },
+    setPersonalInfo(state, payload) {
+      state.userInfo = Object.assign(state.userInfo, payload.value);
+    },
     setUserImage(state, payload) {
       state.userInfo.image = payload.value;
-    },
-    setNotifications(state, payload) {
-      state.userInfo.notifications = payload.value;
     },
     setRegisterErrorMessage(state, payload) {
       state.errorRegisterMessage = payload.value;
     },
     setLoginErrorMessage(state, payload) {
       state.errorLoginMessage = payload.value;
-    },
-    setLoginUsername(state, payload) {
-      state.userInfo.loginUsername = payload.value;
-    },
-    setUserId(state, payload) {
-      state.userInfo.id = payload.value;
-    },
-    setUserEmail(state, payload) {
-      state.userInfo.email = payload.value;
     },
   },
   actions: {
@@ -160,11 +141,7 @@ export default new Vuex.Store({
                   .then((response) => {
                     const { token, username, userId, image, email } = response.data;
                     localStorage.setItem('token', token);
-                    commit({ type: 'setLoginUsername', value: username });
-                    commit({ type: 'setUserId', value: userId });
-                    commit({ type: 'setUserImage', value: image });
-                    commit({ type: 'setUserEmail', value: email });
-                    localStorage.setItem('userInfo', JSON.stringify({ id: userId, username, image, email  }));
+                    commit({ type: 'setPersonalInfo', value: { loginUsername: username, id: userId, image, email } });
                     dispatch('broadcastLogin');
                     bus.$emit('login', payload.username);
                   })
@@ -186,8 +163,13 @@ export default new Vuex.Store({
     },
     userLogout({ commit, dispatch }) {
       localStorage.setItem('token', '');
-      commit({ type: 'setLoginUsername', value: '' });
-      commit({ type: 'setUserId', value: '' });
+      commit({ type: 'setPersonalInfo', value: {
+        id: '',
+        image: '',
+        loginUsername: '',
+        email: '',
+        messages: []
+      }});
       dispatch('removePushNotificationSubscription');
       bus.$emit('logout');
     }

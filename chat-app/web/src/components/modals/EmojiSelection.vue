@@ -28,7 +28,6 @@
 
 <script>
 import Modal from '@/components/modals/GenericModal';
-import { mapActions, mapMutations } from 'vuex';
 
 export default {
   name: 'EmojiSelection',

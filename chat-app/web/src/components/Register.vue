@@ -72,8 +72,6 @@
       ]),
       ...mapActions([
         'createUserProfile',
-        'getUserLoginInfo',
-        'storeUsername',
       ]),
       register() {
         if (!this.validateFields()) return;

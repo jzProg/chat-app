@@ -1,8 +1,7 @@
 <template>
   <Modal>
-    <span slot="close"
-          id='closeSymbol'
-          @click.prevent="close">x
+    <span slot="close" id='closeSymbol' @click.prevent="close">
+      x
     </span>
     <br>
     <h3 slot="header">Create New Conversation</h3>
@@ -40,7 +39,6 @@
 </template>
 
 <script>
-  import { mapActions, mapGetters } from 'vuex';
   import Modal from '@/components/modals/GenericModal';
 
   export default {

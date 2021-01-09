@@ -1,13 +1,13 @@
 <template>
   <div>
-    <header style="background-color: lightgray; width: 100%; text-align: left; color: black">
+    <header>
       <div class="logo">
         <i class="fas fa-comment-dots fa-1x" style="color:#337ab7"/>
         <b>JZ Chat App</b>
       </div>
     </header>
     <h4 style='font-weight: bold'>
-      <i class="fas fa-at"/>{{ getLoginUsername || getUserLoginInfo()[1] }}
+      <i class="fas fa-at"/>{{ getUserPersonalInfo.loginUsername }}
     </h4>
     <img :src="imageNew"
          @click.prevent="editProfile()"
@@ -17,7 +17,7 @@
     <router-view></router-view>
     <EditProfile v-if="showEdit"
                 @confirm="getImage()"
-                @close="showEdit = false;">
+                @close="showEdit = false">
     </EditProfile>
   </div>
 </template>
@@ -30,7 +30,7 @@ import { mapGetters, mapMutations, mapActions } from 'vuex';
 export default {
   name: 'Home',
   components: { EditProfile },
-  mixins: [ImageMixin],
+  mixins: [ ImageMixin ],
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.registerPushNotificationSW();
@@ -45,15 +45,10 @@ export default {
   },
   created () {
     this.getImage();
-    if (!this.getLoginUsername) this.setLoginUsername({ value: this.getUserLoginInfo()[1] });
   },
   methods: {
     ...mapActions([
       'sendPushSubscriptionInfoToServer',
-    ]),
-    ...mapMutations([
-      'setLoginUsername',
-      'setUserImage',
     ]),
     registerPushNotificationSW() {
       if ('serviceWorker' in navigator && 'PushManager' in window) {
@@ -94,8 +89,7 @@ export default {
                        });
     },
     getImage() {
-      this.setUserImage({ value: this.getUserLoginInfo()[2] });
-      const userImage = this.getUserImage;
+      const userImage = this.getUserPersonalInfo.image;
       if (userImage) {
         this.imageNew = this.readBlobImage(userImage);
       } else {
@@ -105,19 +99,10 @@ export default {
     editProfile() {
       this.showEdit = true;
     },
-    getUserLoginInfo() {
-      const storageInfo = JSON.parse(localStorage.getItem('userInfo'));
-      const storageId = storageInfo ? storageInfo.id : '';
-      const storageUsername = storageInfo ? storageInfo.username : '';
-      const storageImage = storageInfo ? storageInfo.image : '';
-      return [ this.getUserId || storageId, this.getLoginUsername || storageUsername, this.getUserImage || storageImage];
-    },
   },
   computed: {
     ...mapGetters([
-        'getLoginUsername',
-        'getUserId',
-        'getUserImage',
+        'getUserPersonalInfo',
         'getPushNotificationPublicKey',
     ])
   }
@@ -133,5 +118,12 @@ export default {
   .logo {
     padding: 10px;
     font-size: 150%;
+  }
+
+  header {
+    background-color: lightgray;
+    width: 100%;
+    text-align: left;
+    color: black;
   }
 </style>

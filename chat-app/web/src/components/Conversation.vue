@@ -6,10 +6,11 @@
    <div @click.prevent="openConversation()">
      <h3 style="font-weight: bold; color: white">{{ title }}</h3>
      <span> {{ members.join(', ') }}</span>
-     <div><i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i></div>
-     <button @click.stop="deleteConv()"
-             class="btn btn-danger">
-            <i class="far fa-trash-alt"></i>
+     <div>
+       <i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i>
+     </div>
+     <button @click.stop="deleteConv()"class="btn btn-danger">
+      <i class="far fa-trash-alt"/>
     </button>
    </div>
  </div>
@@ -17,28 +18,20 @@
 
 
 <script>
-import { mapGetters } from 'vuex';
-
-export default {
-  name: 'Conversation',
-  props: ['id', 'title', 'date', 'getMessages', 'members', 'indicatorCount'],
-  methods: {
-    deleteConv() {
-      console.log('deleting conversation...');
-      this.$emit('delete');
-    },
-    openConversation() {
-      console.log('opening conversation...' + this.id);
-      this.getMessages(this.id);
-    },
-  },
-  computed: {
-    ...mapGetters([
-        'getLoginUsername',
-        'getUserId'
-    ])
+  export default {
+    name: 'Conversation',
+    props: ['id', 'title', 'date', 'getMessages', 'members', 'indicatorCount'],
+    methods: {
+      deleteConv() {
+        console.log('deleting conversation...');
+        this.$emit('delete');
+      },
+      openConversation() {
+        console.log('opening conversation...' + this.id);
+        this.getMessages(this.id);
+      },
+    }
   }
-}
 </script>
 
 <style scoped>
