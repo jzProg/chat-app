@@ -1,65 +1,30 @@
 <template>
  <div id='container' class="container">
    <div id="rowDiv" class="row">
-     <h1 class='text-center' style="margin-top: 20%">Be A Member!</h1>
-     <form style="margin-top: 7%">
-        <div class="formContainer">
-         <div class='form-group'>
-           <label for="username">Username</label>
-           <input id='username'
-                  type ='text'
-                  class='form-control'
-                  @focus='removeErrorMessage()'
-                  placeholder= 'enter username here'
-                  v-model="enteredName">
-         </div>
-         <div class='form-group'>
-           <label for="mail">Email</label>
-           <input id='mail'
-                  type='email'
-                  class='form-control'
-                  @focus='removeErrorMessage()'
-                  placeholder='enter mail here'
-                  v-model="enteredMail">
-         </div>
-         <div class='form-group'>
-           <label for="pass">Password</label>
-           <input id='pass'
-                  type='password'
-                  class='form-control'
-                  @focus='removeErrorMessage()'
-                  placeholder='enter password here'
-                  v-model="enteredPass">
-         </div>
-        </div>
-        <span v-if="getErrorRegisterMessage" id="errorRegisterSpan">
-          {{ getErrorRegisterMessage }}
-        </span><br/>
-        <button id='submitBtn'
-                type='submit'
-                class='btn btn-primary'
-                @click.prevent="register">
-                Sign Up
-        </button>
-        <div id="alreadyAccount">
-          <i>Already an account? </i>
-          <router-link :to = "{ path:'/' }">Sign in here</router-link>
-        </div>
-       </form>
+     <h1 class='text-center' style="margin-top: 5%">Be A Member!</h1>
+     <InputForm :fields="formItems" :error-message="getRegisterErrorMessage" :on-focus="removeErrorMessage" :on-submit="register" />
+     <div id="alreadyAccount">
+       <i>Already an account? </i>
+       <router-link :to = "{ path:'/' }">Sign in here</router-link>
+     </div>
    </div>
  </div>
 </template>
 
 <script>
   import { mapActions, mapGetters, mapMutations } from 'vuex';
+  import InputForm from '@/components/InputForm';
 
   export default {
     name: 'Register',
+    components: { InputForm },
     data () {
       return {
-        enteredName: '',
-        enteredMail: '',
-        enteredPass: '',
+        formItems: [
+          { type: 'text', id: 'username', text: 'Username', placeholder: 'enter username here' },
+          { type: 'text', id: 'email', text: 'Email', placeholder: 'enter mail here' },
+          { type: 'password', id: 'pass', text: 'Password', placeholder: 'enter password here' }
+        ],
         showModal: false,
       }
     },
@@ -73,17 +38,17 @@
       ...mapActions([
         'createUserProfile',
       ]),
-      register() {
-        if (!this.validateFields()) return;
+      register(values) {
+        if (!this.validateFields(values)) return;
         const newUserEntry = {
-          email: this.enteredMail,
-          password: this.enteredPass,
-          username: this.enteredName
+          email: values[1],
+          password: values[2],
+          username: values[0]
         };
         this.createUserProfile(newUserEntry);
       },
-      validateFields() {
-        if (!this.enteredMail || !this.enteredPass || !this.enteredName) {
+      validateFields(values) {
+        if (!values[0] || !values[1] || !values[2]) {
           this.setRegisterErrorMessage({ value: 'No field should be empty!' });
           return false;
         }
@@ -108,7 +73,7 @@
 
   #container {
     margin: 0 auto;
-    width: 20%;
+    width: 100%;
   }
 
   #submitBtn {
