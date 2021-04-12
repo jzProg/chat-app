@@ -21,6 +21,8 @@ import com.jzprog.chatapp.src.model.Message;
 import com.jzprog.chatapp.src.model.User;
 import com.jzprog.chatapp.src.utils.SystemMessages;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
 public class MessagingServiceImpl implements MessagingService {
 	
@@ -91,12 +93,14 @@ public class MessagingServiceImpl implements MessagingService {
 	@LogMethodInfo
 	@Override
 	@Transactional 
-	public List<Message> fetchConversationMessages(Integer convId) {
+	public List<Message> fetchConversationMessages(Integer convId, int index, int limit) {
 		Conversation existingConversation = conversationsRepo.findById(convId);  
 		if (existingConversation != null) {
-			List<Message> listOfMessages = existingConversation.getMessages();
-			int listSize = listOfMessages.size();
-			return listSize > 20 ? listOfMessages.subList(listSize - 20, listSize) : listOfMessages;
+			List<Message> listOfMessages = existingConversation.getMessages().stream()
+					.sorted((m1, m2) -> m2.getCreatedDate().compareTo(m1.getCreatedDate()))
+					.skip(index) // skips first n
+					.limit(limit)
+					.collect(toList());
 		}
 		return new ArrayList<>();
 	}
@@ -105,7 +109,7 @@ public class MessagingServiceImpl implements MessagingService {
 	public List<String> fetchConversationMembers(Integer convId) {
 		Conversation existingConversation = conversationsRepo.findById(convId);
 		if (existingConversation != null) {
-			return existingConversation.getUsers().stream().map(User::getUsername).collect(Collectors.toList());
+			return existingConversation.getUsers().stream().map(User::getUsername).collect(toList());
 		}
 		return new ArrayList<>();
 	}

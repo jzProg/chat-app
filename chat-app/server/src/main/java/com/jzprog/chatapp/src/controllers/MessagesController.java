@@ -59,7 +59,7 @@ public class MessagesController {
         if (!validationResponse.isSuccess()) 
         	return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
         List<MessageDTO> messages = new ArrayList<>();
-    	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id))) {
+    	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id), 0, 20)) {
             messages.add(new MessageDTO.MessageBuilder()
             		.withText(mes.getText())
             		.withAuthorId(mes.getPostedBy())
