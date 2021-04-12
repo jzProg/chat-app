@@ -15,12 +15,16 @@ import javax.persistence.Converter;
 @Component
 public class MessageTextConverter implements AttributeConverter<String, String> {
 
-    @Value("${encryption.private.key}")
-    private String MESSAGES_ENCRYPT_KEY;
+    private static String MESSAGES_ENCRYPT_KEY;
 
     private static EncryptionService encryptionService;
 
     private static EncodingHelper encodingHelper;
+
+    @Autowired
+    public void setEncryptionKey(@Value("${encryption.private.key}") String encryptionPrivateKey) {
+        MessageTextConverter.MESSAGES_ENCRYPT_KEY = encryptionPrivateKey;
+    }
 
     @Autowired
     public void initMyRepository(EncodingHelper encodingHelper, EncryptionService encryptionService) {

@@ -2,7 +2,7 @@
  <div id='container' class="container">
    <div id="rowDiv" class="row">
      <h1 class='text-center' style="margin-top: 5%">Be A Member!</h1>
-     <InputForm :fields="formItems" :error-message="getRegisterErrorMessage" :on-focus="removeErrorMessage" :on-submit="register" />
+     <InputForm :fields="formItems" :error-message="getErrorRegisterMessage" :on-focus="removeErrorMessage" :on-submit="register" />
      <div id="alreadyAccount">
        <i>Already an account? </i>
        <router-link :to = "{ path:'/' }">Sign in here</router-link>
