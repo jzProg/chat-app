@@ -10,7 +10,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @SpringBootTest(classes = Application.class)
-@ActiveProfiles("dev")
+@ActiveProfiles("test")
 @RunWith(SpringRunner.class)
 public class ChatAppTests {
 
