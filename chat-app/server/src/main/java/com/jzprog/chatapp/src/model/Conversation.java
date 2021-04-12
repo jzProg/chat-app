@@ -30,10 +30,10 @@ public class Conversation {
     @Column(name = "created_date", columnDefinition="DATETIME")
     private Date createdDate;
 
-    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "conversations")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "conversations")
     private Set<User> users = new HashSet<>();
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy="conversation", cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy="conversation", cascade = CascadeType.ALL)
     List<Message> messages = new ArrayList<>();
 
     protected Conversation() {}

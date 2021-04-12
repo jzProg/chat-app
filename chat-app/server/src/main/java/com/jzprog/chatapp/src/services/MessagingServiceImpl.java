@@ -97,7 +97,7 @@ public class MessagingServiceImpl implements MessagingService {
 		Conversation existingConversation = conversationsRepo.findById(convId);  
 		if (existingConversation != null) {
 			return existingConversation.getMessages().stream()
-					.sorted((m1, m2) -> m2.getCreatedDate().compareTo(m1.getCreatedDate()))
+					.sorted((m1, m2) -> m1.getCreatedDate().compareTo(m2.getCreatedDate()))
 					.skip(index) // skips first n
 					.limit(limit)
 					.collect(toList());
