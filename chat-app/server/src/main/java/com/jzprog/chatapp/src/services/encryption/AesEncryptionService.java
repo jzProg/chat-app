@@ -9,6 +9,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 
 @Service("aes")
 public class AesEncryptionService implements EncryptionService {
@@ -32,7 +33,7 @@ public class AesEncryptionService implements EncryptionService {
         cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(IV));
         final byte[] plainTextBytes = message.getBytes(StandardCharsets.UTF_8);
         final byte[] cipherText = cipher.doFinal(plainTextBytes);
-        String ret = new sun.misc.BASE64Encoder().encode(cipherText);
+        String ret = DatatypeConverter.printBase64Binary(cipherText);
         ret = URLEncoder.encode(ret, "UTF-8");
         return ret;
     }
