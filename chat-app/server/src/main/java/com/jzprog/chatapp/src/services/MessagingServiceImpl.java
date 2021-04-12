@@ -5,13 +5,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.jzprog.chatapp.src.advices.LogMethodInfo;
 import com.jzprog.chatapp.src.database.ConversationsRepository;
 import com.jzprog.chatapp.src.database.MessagesRepository;
@@ -25,9 +21,6 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 public class MessagingServiceImpl implements MessagingService {
-	
-    Logger log = Logger.getLogger(MessagingServiceImpl.class.getName());
-
 	
 	@Autowired
     UsersRepository userRepo;

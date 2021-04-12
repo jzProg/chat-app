@@ -30,7 +30,7 @@ public class Conversation {
     @Column(name = "created_date", columnDefinition="DATETIME")
     private Date createdDate;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "conversations")
+    @ManyToMany(fetch = FetchType.EAGER, mappedBy = "conversations")
     private Set<User> users = new HashSet<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy="conversation", cascade = CascadeType.ALL)
