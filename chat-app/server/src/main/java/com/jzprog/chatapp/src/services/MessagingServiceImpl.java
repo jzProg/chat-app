@@ -96,7 +96,7 @@ public class MessagingServiceImpl implements MessagingService {
 	public List<Message> fetchConversationMessages(Integer convId, int index, int limit) {
 		Conversation existingConversation = conversationsRepo.findById(convId);  
 		if (existingConversation != null) {
-			List<Message> listOfMessages = existingConversation.getMessages().stream()
+			return existingConversation.getMessages().stream()
 					.sorted((m1, m2) -> m2.getCreatedDate().compareTo(m1.getCreatedDate()))
 					.skip(index) // skips first n
 					.limit(limit)
