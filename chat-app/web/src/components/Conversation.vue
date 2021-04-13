@@ -23,11 +23,11 @@
     props: ['id', 'title', 'date', 'getMessages', 'members', 'indicatorCount'],
     methods: {
       deleteConv() {
-        console.log('deleting conversation...');
+        console.log(`deleting conversation with id: ${this.id}...`);
         this.$emit('delete');
       },
       openConversation() {
-        console.log('opening conversation...' + this.id);
+        console.log(`opening conversation with id: ${this.id}...`);
         this.getMessages(this.id);
       },
     }

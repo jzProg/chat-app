@@ -1,10 +1,6 @@
 <template>
   <Modal :width="'400px'">
-    <span slot="close"
-          id='closeSymbol'
-          @click.prevent="close">x
-    </span>
-    <br>
+    <span slot="close" id="closeSymbol" @click.prevent="close">x</span><br>
     <h3 slot="header">
       Edit Profile Info
     </h3>
@@ -15,7 +11,7 @@
            alt="profile image"
            width="100px"
            height="100px"
-           style="border-radius:150px; margin:2%;"><br>
+           style="border-radius:150px; margin:2%"><br>
       <span v-if="showUpload">
         <input type="file"
                @change="onImageSelected($event)"
@@ -126,7 +122,3 @@
     }
   }
 </script>
-
-<style scoped>
-
-</style>

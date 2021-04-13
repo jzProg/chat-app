@@ -1,7 +1,6 @@
 <template>
  <div id="messagesDiv">
-   <div id="contentDiv"
-        class="container scrollable">
+   <div id="contentDiv" class="container scrollable">
      <div v-for="mes in messages"
           class="inner-message">
           <Message :content="getMessageContent(mes.text)"

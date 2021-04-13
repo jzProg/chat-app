@@ -1,10 +1,6 @@
 <template>
   <Modal>
-    <span slot="close"
-          id='closeSymbol'
-          @click.prevent="close">x
-    </span>
-    <br>
+    <span slot="close" id="closeSymbol" @click.prevent="close">x</span><br>
     <h3 slot="header">
       Choose Emoji!
     </h3>

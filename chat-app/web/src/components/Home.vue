@@ -33,7 +33,7 @@ export default {
   mixins: [ ImageMixin ],
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      vm.registerPushNotificationSW();
+      vm.getPushNotificationPublicKey && vm.registerPushNotificationSW();
     });
   },
   data () {

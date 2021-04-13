@@ -2,7 +2,7 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-wrapper">
-        <div class="modal-container" :style="{ width: width ? width: '300px'}">
+        <div class="modal-container" :style="{ width: width || '300px'}">
          <slot name="close"></slot>
           <div class="modal-header">
             <slot name="header"></slot>

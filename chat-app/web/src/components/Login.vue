@@ -1,7 +1,10 @@
 <template>
-  <div id='container' class="container">
+  <div id="container" class="container">
     <div id="rowDiv" class="row">
-      <InputForm :fields="formItems" :error-message="getErrorLoginMessage" :on-focus="removeErrorMessage" :on-submit="login" />
+      <InputForm :fields="formItems"
+                 :error-message="getErrorLoginMessage"
+                 :on-focus="removeErrorMessage"
+                 :on-submit="login"/>
       <div id="notRegistered">
         <i>Not registered? </i>
         <router-link :to = "{ path:'register' }">Sign up here</router-link>

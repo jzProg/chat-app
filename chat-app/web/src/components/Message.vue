@@ -7,7 +7,7 @@
         </div>
    </div>
    <div class="dateDiv">
-        {{ new Date(date).toLocaleString() }}
+     {{ new Date(date).toLocaleString() }}
    </div>
  </div>
 </template>

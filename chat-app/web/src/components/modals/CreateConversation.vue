@@ -1,9 +1,6 @@
 <template>
   <Modal>
-    <span slot="close" id='closeSymbol' @click.prevent="close">
-      x
-    </span>
-    <br>
+    <span slot="close" id="closeSymbol" @click.prevent="close">x</span><br>
     <h3 slot="header">Create New Conversation</h3>
     <div slot="body" style="text-align: left">
        <input type="text"
@@ -14,10 +11,10 @@
              v-model="user"
              style="margin:5%"
              @keyup.enter="search"
-             placeholder="Search Members"><i class="fas fa-search" style="cursor: pointer" @click.prevent="search"></i>
+             placeholder="Search Members">
+        <i class="fas fa-search" style="cursor: pointer" @click.prevent="search"></i>
         <div v-for="(cand, index) in candidates" @click.prevent="addMember(cand, index)" class="candidate">
-           <input type="checkbox"
-                  :id="cand.username">
+           <input type="checkbox" :id="cand.username">
             <label :for="cand.username">{{ cand.username }}</label>
         </div>
         <div v-for="(member, index) in members"
@@ -55,9 +52,7 @@
     methods: {
       addMember(member, index) {
         if (this.members.indexOf(member.username) === -1) {
-          console.log("adding member...");
           this.members.push(member.username);
-          console.log("removing from candidate...");
           this.candidates.splice(index, 1);
         }
       },

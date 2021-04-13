@@ -1,7 +1,6 @@
 <template>
   <form class="formContainer">
-      <div class='form-group'
-           v-for="(field, index) in fields">
+      <div class='form-group' v-for="(field, index) in fields">
           <label :for="field.id">{{ field.text }}</label>
           <input :id="field.id"
                  :type="field.type"
@@ -30,9 +29,9 @@
     data () {
       return {
         form: {
-          values: []
-        }
-      }
+          values: [],
+        },
+      };
     },
   }
 </script>
