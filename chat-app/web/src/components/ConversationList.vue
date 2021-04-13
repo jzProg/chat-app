@@ -80,8 +80,8 @@ export default {
     this.authorId = this.getUserPersonalInfo.id;
     this.axios('/api/messages/getConversations', { headers: { Authorization: `Bearer ${token}` } }).then(response => {
       this.conversations = response.data.sort((item1, item2) => item1.date - item2.date);
+      this.connectToSocket();
     });
-    this.connectToSocket();
   },
   methods: {
     ...mapActions([
@@ -141,7 +141,15 @@ export default {
           if (conv.id !== this.activeConversationId) {
               let indicator = this.indicators[conv.id];
               indicator ? indicator = this.$set(this.indicators, conv.id, indicator + 1) : this.$set(this.indicators, conv.id, 1);
-          } else this.activeConvMessages[conv.id].push(messageObj);
+          } else {
+             this.activeConvMessages = {
+                  ...this.activeConvMessages,
+                  [conv.id]: [
+                      ...this.activeConvMessages[conv.id],
+                      messageObj,
+                  ],
+              };
+          }
         }
       });
     },
