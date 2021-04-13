@@ -56,6 +56,26 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    fetchConversations({ commit }) {
+      const token = localStorage.getItem('token');
+      return axios({
+        url: 'api/messages/getConversations',
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
+    fetchConversationMessages({ commit }, convId) {
+      const token = localStorage.getItem('token');
+      return axios({
+        url: `api/messages/getConversationMessages?id=${convId}`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    },
     sendPushSubscriptionInfoToServer({ commit }, sub) {
       const token = localStorage.getItem('token');
       return axios({

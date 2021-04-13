@@ -2,9 +2,9 @@ package com.jzprog.chatapp.src.utils;
 
 public class SystemMessages {
 	
-	public static final String DEFAULT_CONVERSATION_NAME = "Unamed";
+	public static final String DEFAULT_CONVERSATION_NAME = "Unnamed";
 	
-	public static final String USER_CREATED ="User succesfully created!";
+	public static final String USER_CREATED ="User successfully created!";
 	public static final String USER_ALREADY_REGISTERED = "User is already registered...";
 	public static final String USER_NOT_EXIST = "User doesn't exist!";
 	public static final String USER_NO_ACCESS = "User doesn't have access to this conversation...";
@@ -50,5 +50,12 @@ public class SystemMessages {
 		USER_EXISTENCE,
 		CONVERSATION_OWNERSHIP,
 		REGISTRATION_CHECK
+	}
+
+	public enum eventTypes {
+		RECEIVE_MESSAGE,
+		TYPING,
+		CONVERSATION_CREATED,
+		DELETE_CONVERSATION
 	}
 }

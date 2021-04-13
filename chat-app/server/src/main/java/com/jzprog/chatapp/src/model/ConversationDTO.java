@@ -11,7 +11,7 @@ public class ConversationDTO {
 	private Date date;
 	private List<String> members;
 	private int messagesCount;
-	private boolean deleted;
+	private String eventType;
 	
 	public ConversationDTO() {}
 
@@ -19,7 +19,7 @@ public class ConversationDTO {
     	this.id = builder.id;
         this.title = builder.title;
         this.setDate(builder.date);
-        this.setDeleted(builder.deleted);
+        this.eventType = builder.eventType;
         this.members = builder.members;
         this.messagesCount = builder.messagesCount;
     }
@@ -28,8 +28,8 @@ public class ConversationDTO {
     	this.id = id;
         this.title = title;
         this.setDate(date);
-        this.setDeleted(false);
         this.members = new ArrayList<>();
+        this.eventType = null;
     }
 
     public String getTitle() {
@@ -56,14 +56,6 @@ public class ConversationDTO {
 		this.id = id;
 	}
 
-	public boolean isDeleted() {
-		return deleted;
-	}
-
-	public void setDeleted(boolean deleted) {
-		this.deleted = deleted;
-	}
-
 	public List<String> getMembers() {
 		return members;
 	}
@@ -80,6 +72,14 @@ public class ConversationDTO {
 		this.messagesCount = messagesCount;
 	}
 
+	public String getEventType() {
+		return eventType;
+	}
+
+	public void setEventType(String eventType) {
+		this.eventType = eventType;
+	}
+
 	public static class ConversationBuilder {
 		
 		private Integer id;
@@ -87,8 +87,7 @@ public class ConversationDTO {
 		private Date date;
 		private List<String> members;
 		private int messagesCount;
-		private boolean deleted;
-
+		private String eventType;
 		
 		public ConversationBuilder withId(Integer id) {
 			this.id = id;
@@ -110,8 +109,8 @@ public class ConversationDTO {
 			return this;
 		}
 		
-		public ConversationBuilder withDeleted(boolean deleted) {
-			this.deleted = deleted;
+		public ConversationBuilder withEventType(String eventType) {
+			this.eventType = eventType;
 			return this;
 		}
 

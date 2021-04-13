@@ -7,9 +7,9 @@ public class MessageDTO {
     private String text;
     private Integer authorId;
     private String authorUsername;
+	private String messageType;
     private Date createdDate;
-    private boolean typer;
-    
+
     public MessageDTO() {}
 
     public MessageDTO(MessageBuilder builder) {
@@ -17,7 +17,7 @@ public class MessageDTO {
          this.authorId = builder.authorId;
          this.authorUsername = builder.authorUsername;
          this.createdDate = builder.createdDate;
-		 this.typer = builder.typer;
+		 this.messageType = builder.messageType;
     }
 
     public MessageDTO(String message, Integer authorId, String authorUsername, Date createdDate) {
@@ -25,7 +25,7 @@ public class MessageDTO {
         this.authorId = authorId;
         this.authorUsername = authorUsername;
         this.createdDate = createdDate;
-		this.typer = false;
+		this.messageType = null;
 	}
 
     public String getText() {
@@ -60,12 +60,12 @@ public class MessageDTO {
 		this.createdDate = createdDate;
 	}
 
-	public boolean isTyper() {
-		return typer;
+	public String getMessageType() {
+		return messageType;
 	}
 
-	public void setTyper(boolean typer) {
-		this.typer = typer;
+	public void setMessageType(String messageType) {
+		this.messageType = messageType;
 	}
 
 	public static class MessageBuilder {
@@ -74,7 +74,7 @@ public class MessageDTO {
 	    private Integer authorId;
 	    private String authorUsername;
 	    private Date createdDate;
-		private boolean typer;
+		private String messageType;
 
 		public MessageBuilder withText(String text) {
 			this.text = text;
@@ -96,8 +96,8 @@ public class MessageDTO {
 			return this;
 		}
 
-		public MessageBuilder withTyping(boolean typer) {
-			this.typer = typer;
+		public MessageBuilder withMessageType(String messageType) {
+			this.messageType = messageType;
 			return this;
 		}
 		

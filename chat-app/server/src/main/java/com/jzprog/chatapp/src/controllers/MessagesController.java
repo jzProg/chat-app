@@ -11,6 +11,7 @@ import com.jzprog.chatapp.src.services.MessagingService;
 import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.services.validation.ValidationStrategy;
 import com.jzprog.chatapp.src.utils.JwtUtil;
+import com.jzprog.chatapp.src.utils.SystemMessages;
 import com.jzprog.chatapp.src.utils.SystemMessages.ValidationTypes;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +24,6 @@ import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
@@ -84,7 +84,6 @@ public class MessagesController {
         		    .withTitle(conv.getTitle())
         		    .withDate(conv.getCreatedDate())
         		    .withMembers(conv.getUsers().stream().map(User::getUsername).collect(Collectors.toList()))
-        		    .withDeleted(false)
         		    .build();
            conversationDTOs.add(conversationDTO);
         }
@@ -101,6 +100,7 @@ public class MessagesController {
         		.withAuthorId(message.getAuthorId())
         		.withAuthorUsername(userService.searchForUserByUserId(message.getAuthorId()).getUsername())
         		.withCreatedDate(createdDate)
+                .withMessageType(SystemMessages.eventTypes.RECEIVE_MESSAGE.name())
         		.build());
     }
     
@@ -115,7 +115,7 @@ public class MessagesController {
     		    .withDate(newConversation.getCreatedDate())
     		    .withMembers(conv.getMembers())
                 .withMessagesCount(newConversation.getMessages().size())
-    		    .withDeleted(false)
+    		    .withEventType(SystemMessages.eventTypes.CONVERSATION_CREATED.name())
     		    .build();
     }
     
@@ -123,14 +123,12 @@ public class MessagesController {
     @MessageMapping("/src/delete/{userId}") 
     @SendTo("/topic/conversations")
     public ConversationDTO deleteConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
-        messagingService.deleteConversation(Integer.valueOf(conv.getId()));
-        ConversationDTO deleted_conversation = new ConversationDTO.ConversationBuilder()
+        messagingService.deleteConversation(conv.getId());
+        return new ConversationDTO.ConversationBuilder()
         		.withId(conv.getId())
         		.withTitle( conv.getTitle())
-      		    .withDeleted(true)
+                .withEventType(SystemMessages.eventTypes.DELETE_CONVERSATION.name())
       		    .build();
-        deleted_conversation.setDeleted(true);
-        return deleted_conversation; 
     }
 
     @ControllerAdvice
@@ -140,7 +138,7 @@ public class MessagesController {
         return new MessageDTO.MessageBuilder()
                 .withAuthorId(message.getAuthorId())
                 .withAuthorUsername(userService.searchForUserByUserId(message.getAuthorId()).getUsername())
-                .withTyping(true)
+                .withMessageType(SystemMessages.eventTypes.TYPING.name())
                 .build();
     }
 
