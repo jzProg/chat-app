@@ -75,7 +75,7 @@ export default {
     }
   },
   created () {
-    localForage.setItem('activeConv', null);
+    localForage.setItem('activeConv', null); // reset active conversation
     const token = localStorage.getItem('token');
     this.authorId = this.getUserPersonalInfo.id;
     this.axios('/api/messages/getConversations', { headers: { Authorization: `Bearer ${token}` } }).then(response => {
@@ -94,23 +94,30 @@ export default {
       this.socket = new SockJS('/ws-messaging');
       this.stompClient = Stomp.over(this.socket);
       this.stompClient.connect({}, (frame) => {
-        console.log('Connected: ' + frame);
-        this.subscribeToConversations();
-        this.stompClient.subscribe(`/topic/conversations`, (message) => {
-          const conv = JSON.parse(message.body);
-          if (!conv.deleted) {
-            if (conv.members.indexOf(this.getUserPersonalInfo.loginUsername) !== -1) {
-              this.subscribeToConversation(conv);
-              this.conversations.push(conv);
-            }
-          } else {
-            this.clearIfIsActiveConversation(conv.id);
-            this.conversations.splice(this.conversations.findIndex(c => conv.id === c.id), 1);
-          }
-        });
+        console.log(`Connected: ${frame}`);
+        this.subscribeToAllConversations();
+        this.listenForNewConversations();
       }, (message) => {
         console.log('Disconnect! Retrying connection...');
         this.connectToSocket();
+      });
+    },
+    listenForNewConversations() {
+      this.stompClient.subscribe(`/topic/conversations`, (message) => {
+        const conv = JSON.parse(message.body);
+        const { id, members, deleted } = conv;
+        if (!deleted) { // add new conversation
+          if (members.indexOf(this.getUserPersonalInfo.loginUsername) !== -1) {
+            this.subscribeToConversation(conv);
+            this.conversations = [
+              ...this.conversations,
+              conv,
+            ];
+          }
+        } else { // remove conversation
+          this.clearIfIsActiveConversation(id);
+          this.conversations.splice(this.conversations.findIndex(c => id === c.id), 1);
+        }
       });
     },
     getConvStyle(id) {
@@ -123,7 +130,7 @@ export default {
       this.clearTyping();
       if (this.activeSubscription) this.activeSubscription.unsubscribe();
     },
-    subscribeToConversations() {
+    subscribeToAllConversations() {
       this.conversations.forEach((item, i) => {
         this.subscribeToConversation(item);
       });
@@ -159,7 +166,7 @@ export default {
       const token = localStorage.getItem('token');
       this.activeConversationId = convId;
       this.axios.get(`/api/messages/getConversationMessages?id=${convId}`, { headers: { Authorization: `Bearer ${token}` } }).then(response => {
-        this.$set(this.activeConvMessages, convId, response.data);
+        this.$set(this.activeConvMessages, convId, response.data.sort((mess1, mess2) => mess1.createdDate - mess2.createdDate));
       });
     },
     addNewConversation(name, members) {
