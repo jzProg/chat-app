@@ -63,7 +63,8 @@ export default {
       activeConvMessages: {},
       authorId: '',
       showModal: false,
-      activeSubscription: null,
+      conversationSubscription: null,
+      activeSubscriptions: [],
       typer: '',
       typingTimeout: null,
       indicators: {}
@@ -82,6 +83,11 @@ export default {
       this.conversations = response.data.sort((item1, item2) => item1.date - item2.date);
       this.connectToSocket();
     });
+  },
+  beforeDestroy() {
+    this.unsubscribeFromAllConversations();
+    if (this.conversationSubscription) this.conversationSubscription.unsubscribe();
+    if (this.stompClient) this.stompClient.disconnect();
   },
   methods: {
     ...mapActions([
@@ -103,7 +109,7 @@ export default {
       });
     },
     listenForNewConversations() {
-      this.stompClient.subscribe(`/topic/conversations`, (message) => {
+      this.conversationSubscription = this.stompClient.subscribe(`/topic/conversations`, (message) => {
         const conv = JSON.parse(message.body);
         const { id, members, deleted } = conv;
         if (!deleted) { // add new conversation
@@ -116,7 +122,7 @@ export default {
           }
         } else { // remove conversation
           this.clearIfIsActiveConversation(id);
-          this.conversations.splice(this.conversations.findIndex(c => id === c.id), 1);
+          this.conversations.splice(this.findConversationPositionById(id), 1);
         }
       });
     },
@@ -128,15 +134,19 @@ export default {
     },
     closePreviousConversation() {
       this.clearTyping();
-      if (this.activeSubscription) this.activeSubscription.unsubscribe();
     },
     subscribeToAllConversations() {
       this.conversations.forEach((item, i) => {
         this.subscribeToConversation(item);
       });
     },
+    unsubscribeFromAllConversations() {
+      this.activeSubscriptions.forEach((item, i) => {
+        item.unsubscribe();
+      });
+    },
     subscribeToConversation(conv) {
-      this.stompClient.subscribe(`/topic/conversation/${conv.id}`, (message) => {
+      this.activeSubscriptions.push(this.stompClient.subscribe(`/topic/conversation/${conv.id}`, (message) => {
         const messageObj = JSON.parse(message.body);
         if (messageObj.typer) {
           if (this.authorId !== messageObj.authorId && conv.id === this.activeConversationId) {
@@ -158,7 +168,7 @@ export default {
               };
           }
         }
-      });
+      }));
     },
     goToConversationMessages(convId) {
       this.closePreviousConversation();
