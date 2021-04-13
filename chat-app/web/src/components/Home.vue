@@ -24,16 +24,16 @@
 
 <script>
 import EditProfile from '@/components/modals/EditProfile';
-import ImageMixin from '@/common/utils';
-import { mapGetters, mapMutations, mapActions } from 'vuex';
+import utils from '@/common/utils';
+import { initPushServiceWorker } from '@/common/serviceWorkers';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'Home',
   components: { EditProfile },
-  mixins: [ ImageMixin ],
   beforeRouteEnter(to, from, next) {
     next(vm => {
-      vm.getPushNotificationPublicKey && vm.registerPushNotificationSW();
+      vm.getPushNotificationPublicKey && initPushServiceWorker();
     });
   },
   data () {
@@ -47,51 +47,10 @@ export default {
     this.getImage();
   },
   methods: {
-    ...mapActions([
-      'sendPushSubscriptionInfoToServer',
-    ]),
-    registerPushNotificationSW() {
-      if ('serviceWorker' in navigator && 'PushManager' in window) {
-        navigator.serviceWorker.register('static/push-notification-sw.js').then((swReg) => {
-          console.log('Push Notification SW is registered! ' + swReg);
-          swReg.pushManager.getSubscription().then((subscription) => {
-            const isSubscribed = subscription !== null;
-            if (isSubscribed) {
-              console.log('User is already subscribed for notifications!');
-            } else if (Notification.permission !== 'granted') {
-              Notification.requestPermission().then((permission) => {
-                if (permission === 'granted') {
-                  console.log('User is NOT subscribed for notifications! About to be subscribed...');
-                  this.subscribeUserForPushNotifications(swReg);
-                }
-              });
-            } else {
-              this.subscribeUserForPushNotifications(swReg);
-            }
-          });
-        }).catch((error) => {
-          console.log('Push Notification SW error: ' + error);
-        });
-      } else {
-        console.log('Push Messaging not supported!');
-      }
-    },
-    subscribeUserForPushNotifications(swReg) {
-      const appServerKey = this.urlB64ToUint8Array(this.getPushNotificationPublicKey);
-      swReg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: appServerKey })
-                       .then((sub) => {
-                         console.log('User subscribed successfully for notifications! Sending info to server...');
-                         console.log(JSON.stringify(sub));
-                         this.sendPushSubscriptionInfoToServer(sub);
-                       })
-                       .catch((err) => {
-                         console.log('Failed to subscribe user for notifications: ' + err);
-                       });
-    },
     getImage() {
       const userImage = this.getUserPersonalInfo.image;
       if (userImage) {
-        this.imageNew = this.readBlobImage(userImage);
+        this.imageNew = utils.readBlobImage(userImage);
       } else {
         this.imageNew = require('@/assets/profile_default.png');
       }
@@ -102,8 +61,8 @@ export default {
   },
   computed: {
     ...mapGetters([
-        'getUserPersonalInfo',
-        'getPushNotificationPublicKey',
+      'getUserPersonalInfo',
+      'getPushNotificationPublicKey',
     ])
   }
 }

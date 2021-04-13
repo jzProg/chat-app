@@ -1,6 +1,6 @@
 <template>
  <div id="conversationDiv">
-   <div id='indicatorSpan' v-show="indicatorCount">
+   <div id="indicatorSpan" v-show="indicatorCount">
       {{ indicatorCount }}
    </div>
    <div @click.prevent="openConversation()">
@@ -9,7 +9,7 @@
      <div>
        <i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i>
      </div>
-     <button @click.stop="deleteConv()"class="btn btn-danger">
+     <button @click.stop="deleteConv()" class="btn btn-danger">
       <i class="far fa-trash-alt"/>
     </button>
    </div>
