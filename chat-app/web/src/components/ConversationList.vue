@@ -122,7 +122,7 @@ export default {
         this.handleReceivedConversation(conv);
       });
     },
-    handleReceivedConversation({ id, members, eventType }) {
+    handleReceivedConversation({ id, members, eventType, date, title }) {
       const { CONVERSATION_CREATED, DELETE_CONVERSATION } = this.eventTypes;
 
       switch (eventType) {
@@ -131,7 +131,7 @@ export default {
           this.subscribeToConversation({ id });
           this.conversations = [
             ...this.conversations,
-            { id, members, eventType },
+            { id, date, title, members, eventType },
           ];
         }
         break;
