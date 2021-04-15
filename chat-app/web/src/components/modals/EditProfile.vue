@@ -54,6 +54,7 @@
 
   export default {
     name: 'EditProfile',
+    emits: ['close'],
     components: { Modal, ProfileImage },
     data() {
       return {

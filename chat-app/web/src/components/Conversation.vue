@@ -20,6 +20,7 @@
 <script>
   export default {
     name: 'Conversation',
+    emits: ['delete'],
     props: ['id', 'title', 'date', 'getMessages', 'members', 'indicatorCount'],
     methods: {
       deleteConv() {

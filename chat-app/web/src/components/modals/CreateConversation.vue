@@ -42,6 +42,7 @@
 
   export default {
     name: 'CreateConversation',
+    emits: ['create', 'close'],
     components: { Modal },
     data() {
       return {

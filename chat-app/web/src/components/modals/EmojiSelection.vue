@@ -27,6 +27,7 @@ import Modal from '@/components/modals/GenericModal';
 
 export default {
   name: 'EmojiSelection',
+  emits: ['select', 'close'],
   components: { Modal },
   data() {
     return {
