@@ -2,7 +2,7 @@
  <div :class="['messageContainer', { reversed: rightDirection }]">
    <div :class="['contentDiv', { reversed: rightDirection }]">
         <div :style="{ backgroundColor: getColorStyle() }" class="messageDiv">
-          <h4><b>{{ author || '[user left the conversation...]' }}</b></h4>
+          <h4><b>{{ author || '[user left the conversation]' }}</b></h4>
           <h4 v-html="content"/>
         </div>
    </div>

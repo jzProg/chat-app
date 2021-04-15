@@ -147,6 +147,7 @@ export default {
         break;
       case DELETE_CONVERSATION: // remove conversation
         if (this.authorId !== ownerId) {
+          this.unsubscribeFromConversation(id);
           this.conversations = this.conversations.map(conv => {
             if (conv.id === id) {
               return { ...conv, deleted: true };
@@ -194,16 +195,19 @@ export default {
         this.subscribeToConversation(item);
       });
     },
+    unsubscribeFromConversation(convId) {
+      this.activeSubscriptions.filter(s => s.id === convId)[0].sub.unsubscribe();
+    },
     unsubscribeFromAllConversations() {
       this.activeSubscriptions.forEach((item, i) => {
-        item.unsubscribe();
+        item.sub.unsubscribe();
       });
     },
     subscribeToConversation(conv) {
-      this.activeSubscriptions.push(this.stompClient.subscribe(`/topic/conversation/${conv.id}`, (message) => {
+      this.activeSubscriptions.push({ id: conv.id, sub: this.stompClient.subscribe(`/topic/conversation/${conv.id}`, (message) => {
         const messageObj = JSON.parse(message.body);
         this.handleReceivedMessage(messageObj, conv.id);
-      }));
+      })});
     },
     goToConversationMessages(convId) {
       this.closePreviousConversation();
@@ -261,6 +265,7 @@ export default {
     },
     removeConversation(id) {
       this.clearIfIsActiveConversation(id);
+      this.unsubscribeFromConversation(id);
       this.conversations.splice(this.findConversationPositionById(id), 1); // remove conversation for you
     },
     clearIfIsActiveConversation(id) {
