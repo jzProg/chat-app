@@ -7,11 +7,7 @@
     <div slot="body">
       <h4><i class="fas fa-user"></i> <b>{{ getUserPersonalInfo.loginUsername }}</b></h4>
       <h4><i class="far fa-envelope"></i> {{ getMail() }}</h4>
-      <img :src="getImage()"
-           alt="profile image"
-           width="100px"
-           height="100px"
-           style="border-radius:150px; margin:2%"><br>
+      <profile-image style="border-radius:150px; margin:2%"/><br>
       <span v-if="showUpload">
         <input type="file"
                @change="onImageSelected($event)"
@@ -52,13 +48,13 @@
 </template>
 
 <script>
-  import Modal from '@/components/modals/GenericModal';
-  import utils from '@/common/utils';
   import { mapActions, mapMutations, mapGetters } from 'vuex';
+  import Modal from '@/components/modals/GenericModal';
+  import ProfileImage from '@/components/shared/ProfileImage';
 
   export default {
     name: 'EditProfile',
-    components: { Modal },
+    components: { Modal, ProfileImage },
     data() {
       return {
         showUpload: false,
@@ -94,21 +90,12 @@
           this.uploadSuccess = true;
           this.setUserImage({ value: res.data.image });
           this.selectedImage = '';
-          this.$emit('confirm');
         }).catch(error => {
           this.uploadError = error.response.data;
         });
       },
       logout() {
         this.userLogout();
-      },
-      getImage() {
-        const userImage = this.getUserPersonalInfo.image;
-        if (userImage) {
-          return utils.readBlobImage(userImage);
-        } else {
-          return require('@/assets/profile_default.png');
-        }
       },
       close() {
         this.$emit('close');
@@ -118,6 +105,6 @@
       ...mapGetters([
         'getUserPersonalInfo'
       ])
-    }
+    },
   }
 </script>

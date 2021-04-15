@@ -9,28 +9,24 @@
     <h4 style='font-weight: bold'>
       <i class="fas fa-at"/>{{ getUserPersonalInfo.loginUsername }}
     </h4>
-    <img :src="imageNew"
-         @click.prevent="editProfile()"
-         class="profileImg"
-         height="100px"
-         width="100px">
+    <profile-image class="profileImg"
+                   @clicked="editProfile()"/>
     <router-view></router-view>
     <EditProfile v-if="showEdit"
-                @confirm="getImage()"
                 @close="showEdit = false">
     </EditProfile>
   </div>
 </template>
 
 <script>
-import EditProfile from '@/components/modals/EditProfile';
-import utils from '@/common/utils';
-import { initPushServiceWorker } from '@/common/serviceWorkers';
 import { mapGetters } from 'vuex';
+import ProfileImage from '@/components/shared/ProfileImage';
+import EditProfile from '@/components/modals/EditProfile';
+import { initPushServiceWorker } from '@/common/serviceWorkers';
 
 export default {
   name: 'Home',
-  components: { EditProfile },
+  components: { EditProfile, ProfileImage },
   beforeRouteEnter(to, from, next) {
     next(vm => {
       vm.getPushNotificationPublicKey && initPushServiceWorker();
@@ -40,21 +36,9 @@ export default {
     return {
       conversations: [],
       showEdit: false,
-      imageNew: '',
     }
   },
-  created () {
-    this.getImage();
-  },
   methods: {
-    getImage() {
-      const userImage = this.getUserPersonalInfo.image;
-      if (userImage) {
-        this.imageNew = utils.readBlobImage(userImage);
-      } else {
-        this.imageNew = require('@/assets/profile_default.png');
-      }
-    },
     editProfile() {
       this.showEdit = true;
     },
