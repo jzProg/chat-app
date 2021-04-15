@@ -1,14 +1,17 @@
 <template>
  <div id="messagesDiv">
    <div id="contentDiv" class="container scrollable">
-     <div v-for="mes in messages"
-          class="inner-message">
-          <Message :content="getMessageContent(mes.text)"
-                   :author="mes.authorUsername"
-                   :date="mes.createdDate"
-                   :right-direction="isHomeUser(mes.authorUsername)"
-                   :color="getColor(mes.authorId)" />
-     </div>
+     <deleted-content v-if="isDeleted"/>
+     <template v-else>
+       <div v-for="mes in messages"
+            class="inner-message">
+            <Message :content="getMessageContent(mes.text)"
+                     :author="mes.authorUsername"
+                     :date="mes.createdDate"
+                     :right-direction="isHomeUser(mes.authorUsername)"
+                     :color="getColor(mes.authorId)" />
+       </div>
+     </template>
    </div>
    <div id="createMessageDiv">
      <div class="typerContainer">
@@ -42,11 +45,23 @@
 <script>
 import EmojiSelection from '@/components/modals/EmojiSelection';
 import Message from '@/components/Message';
+import DeletedContent from '@/components/shared/DeletedContent';
 
 export default {
   name: 'Messages',
-  components: { EmojiSelection, Message },
-  props: ['messages', 'sendNewMessage', 'isHomeUser', 'sendTyping', 'typer'],
+  components: {
+    EmojiSelection,
+    Message,
+    DeletedContent,
+  },
+  props: {
+    messages: Array,
+    sendNewMessage: Function,
+    isHomeUser: Function,
+    sendTyping: Function,
+    typer: String,
+    isDeleted: Boolean,
+  },
   data () {
     return {
       newMessage: '',

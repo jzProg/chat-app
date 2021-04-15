@@ -1,6 +1,5 @@
 package com.jzprog.chatapp.src.services.validation;
 
-import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import com.jzprog.chatapp.src.model.User;
 import com.jzprog.chatapp.src.model.Validatable;
@@ -15,7 +14,7 @@ public class ConversationValidator implements ValidationService {
 		if (extraInfo == null) return false;
 		User user = ((User) object);
 		String id = ((String) extraInfo[0]);
-		return !(user.getConversations().stream().filter(c -> c.getId().equals(Integer.parseInt(id))).collect(Collectors.toList()).isEmpty());
+		return user.getConversations().stream().anyMatch(c -> c.getId().equals(Integer.parseInt(id)));
 	}
 
 	@Override
@@ -25,6 +24,6 @@ public class ConversationValidator implements ValidationService {
 
 	@Override
 	public ValidationTypes getType() {
-		return ValidationTypes.CONVERSATION_OWNERSHIP;
+		return ValidationTypes.CONVERSATION_MEMBERSHIP;
 	}
 }

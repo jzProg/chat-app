@@ -5,8 +5,7 @@
          @click.prevent="showModal = true">
          <i class="fas fa-plus fa-2x"></i>
    </div>
-    <div class="container"
-         style="margin-top:2%;width:100%" >
+    <div class="container" style="margin-top:2%; width:100%">
       <div class="row" v-if="conversations.length">
         <div id="convDiv" class="col-md-5 scrollable">
           <Conversation  v-for="(conv, index) in conversations"
@@ -15,32 +14,33 @@
                          :id="conv.id"
                          :title="conv.title"
                          :date="conv.date"
+                         :is-deleted="conv.deleted"
                          :indicator-count="getIndicator(conv.id)"
-                         :members="conv.members.filter(member => member !== getUserPersonalInfo.loginUsername).map(member => `@${member}`)"
+                         :members="getMembers(conv)"
                          @delete="deleteConversation(conv.id)"
+                         @remove="removeConversation(conv.id)"
                          :get-messages="goToConversationMessages"/>
         </div>
         <div id="messDiv" class="col-md-7">
-          <Messages-of-Active-conversation v-if="activeConversationId"
+          <messages-of-active-conversation v-if="activeConversationId"
                                            :isHomeUser="isHomeUser"
                                            :send-new-message="sendNewMessage"
                                            :typer="typer"
+                                           :is-deleted="isConversationDeleted()"
                                            :send-typing="sendTyping"
                                            :messages="activeConvMessages[activeConversationId]"/>
         </div>
       </div>
       <div v-else>
-       <h3><i>You don't have any conversation yet...</i></h3>
-       <button type="button"
+        <h3><i>You don't have any conversation yet...</i></h3>
+        <button type="button"
               class="btn btn-primary"
               @click.prevent="showModal = true">
               Create Conversation
-       </button>
+        </button>
       </div>
-      </div>
-      <CreateConversationModal v-if="showModal"
-                              @create="addNewConversation"
-                              @close="showModal = false"/>
+    </div>
+    <create-conversation-modal v-if="showModal" @create="addNewConversation" @close="showModal = false"/>
    </div>
 </template>
 
@@ -61,6 +61,7 @@ export default {
         RECEIVE_MESSAGE: 'RECEIVE_MESSAGE',
         CONVERSATION_CREATED: 'CONVERSATION_CREATED',
         DELETE_CONVERSATION: 'DELETE_CONVERSATION',
+        LEAVE_CONVERSATION: 'LEAVE_CONVERSATION',
       },
       conversations: [],
       stompClient: null,
@@ -101,6 +102,15 @@ export default {
       'fetchConversationMessages',
       'fetchConversations',
     ]),
+    getMembers(conv) {
+      const members = conv.members;
+      if (!conv.members) return [];
+      return members.filter(member => member !== this.getUserPersonalInfo.loginUsername).map(member => `@${member}`)
+    },
+    isConversationDeleted() {
+      const activeConversation = this.conversations.filter(conv => conv.id === this.activeConversationId)[0];
+      return activeConversation && activeConversation.deleted;
+    },
     getIndicator(id) {
       return this.indicators[id];
     },
@@ -122,8 +132,8 @@ export default {
         this.handleReceivedConversation(conv);
       });
     },
-    handleReceivedConversation({ id, members, eventType, date, title }) {
-      const { CONVERSATION_CREATED, DELETE_CONVERSATION } = this.eventTypes;
+    handleReceivedConversation({ id, members, eventType, date, title, ownerId }) {
+      const { CONVERSATION_CREATED, DELETE_CONVERSATION, LEAVE_CONVERSATION } = this.eventTypes;
 
       switch (eventType) {
       case CONVERSATION_CREATED: // add new conversation
@@ -136,9 +146,37 @@ export default {
         }
         break;
       case DELETE_CONVERSATION: // remove conversation
-        this.clearIfIsActiveConversation(id);
-        this.conversations.splice(this.findConversationPositionById(id), 1);
+        if (this.authorId !== ownerId) {
+          this.conversations = this.conversations.map(conv => {
+            if (conv.id === id) {
+              return { ...conv, deleted: true };
+            }
+            return conv;
+          }); // inform others about deletion
+        }
         break;
+        case LEAVE_CONVERSATION: // member left
+          let missingMember = null;
+          this.conversations = this.conversations.map(conv => {
+            if (conv.id === id) {
+              const oldMembers = conv.members;
+              missingMember = oldMembers.filter(member => !members.includes(member))[0];
+              return { ...conv, members }; // replace members
+            }
+            return conv;
+          });
+          if (id === this.activeConversationId) {
+            this.activeConvMessages = {
+                 ...this.activeConvMessages,
+                 [id]: this.activeConvMessages[id].map(mes => {
+                   if (mes.authorUsername === missingMember) {
+                     return { ...mes, authorUsername: null }
+                   }
+                   return mes;
+                 }),
+             };
+          }
+          break;
       default: break;
       }
     },
@@ -171,8 +209,15 @@ export default {
       this.closePreviousConversation();
       this.indicators[convId] = 0;
       this.activeConversationId = convId;
+      const activeConversation = this.conversations.filter(conv => conv.id === this.activeConversationId)[0];
+
       this.fetchConversationMessages(convId).then(response => {
-        this.$set(this.activeConvMessages, convId, response.data.sort((mess1, mess2) => mess1.createdDate - mess2.createdDate));
+        this.$set(this.activeConvMessages, convId, response.data.sort((mess1, mess2) => mess1.createdDate - mess2.createdDate).map(mes => {
+          if (!activeConversation.members || !activeConversation.members.includes(mes.authorUsername)) {
+            return { ...mes, authorUsername: null };
+          }
+          return mes;
+        }));
       });
     },
     handleReceivedMessage(messageObject, convId) {
@@ -211,8 +256,12 @@ export default {
       this.showModal = false;
     },
     deleteConversation(id) {
-      this.clearIfIsActiveConversation(id);
+      this.removeConversation(id);
       this.stompClient.send(`/app/src/delete/${this.getUserPersonalInfo.id}`, {}, JSON.stringify({ 'id': id }));
+    },
+    removeConversation(id) {
+      this.clearIfIsActiveConversation(id);
+      this.conversations.splice(this.findConversationPositionById(id), 1); // remove conversation for you
     },
     clearIfIsActiveConversation(id) {
       if (this.activeConversationId === id) {
@@ -248,7 +297,7 @@ export default {
   },
   computed: {
     ...mapGetters([
-      'getUserPersonalInfo'
+      'getUserPersonalInfo',
     ])
   }
 }

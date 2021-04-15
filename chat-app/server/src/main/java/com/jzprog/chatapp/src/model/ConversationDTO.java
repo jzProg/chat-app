@@ -12,6 +12,7 @@ public class ConversationDTO {
 	private List<String> members;
 	private int messagesCount;
 	private String eventType;
+	private Integer ownerId;
 	
 	public ConversationDTO() {}
 
@@ -22,6 +23,7 @@ public class ConversationDTO {
         this.eventType = builder.eventType;
         this.members = builder.members;
         this.messagesCount = builder.messagesCount;
+        this.ownerId = builder.ownerId;
     }
 
     public ConversationDTO(Integer id, String title, Date date) {
@@ -80,6 +82,10 @@ public class ConversationDTO {
 		this.eventType = eventType;
 	}
 
+	public Integer getOwnerId() {
+		return ownerId;
+	}
+
 	public static class ConversationBuilder {
 		
 		private Integer id;
@@ -88,6 +94,7 @@ public class ConversationDTO {
 		private List<String> members;
 		private int messagesCount;
 		private String eventType;
+		private Integer ownerId;
 		
 		public ConversationBuilder withId(Integer id) {
 			this.id = id;
@@ -118,7 +125,12 @@ public class ConversationDTO {
 			this.messagesCount = count;
 			return this;
 		}
-		
+
+		public ConversationBuilder withOwnerId(Integer ownerId) {
+			this.ownerId = ownerId;
+			return this;
+		}
+
 		public ConversationDTO build() {
 			return new ConversationDTO(this);
 		}

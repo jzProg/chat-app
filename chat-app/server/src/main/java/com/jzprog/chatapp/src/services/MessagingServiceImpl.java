@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,7 +45,8 @@ public class MessagingServiceImpl implements MessagingService {
 	@Override
 	@Transactional 
 	public Conversation createNewConversation(Integer userId, String title, Date date, List<String> members) {
-		Conversation newConversation = new Conversation(title.isEmpty() ? SystemMessages.DEFAULT_CONVERSATION_NAME : title, date);      
+		Conversation newConversation = new Conversation(title.isEmpty() ? SystemMessages.DEFAULT_CONVERSATION_NAME : title, date);
+		newConversation.setOwnerId(userId);
         User currentUser = (User) userRepo.findUserById(userId);
         for (String memberName : members) {
             User member = (User) userRepo.findUserByUsername(memberName);
@@ -67,7 +70,7 @@ public class MessagingServiceImpl implements MessagingService {
 	@Transactional 
 	public void addNewMessageToConversation(Integer convId, String text, Date date, Integer author) {
 		Message newMessage = new Message(text, author, date);
-		Conversation existingConversation = conversationsRepo.findById(convId);  
+		Conversation existingConversation = getExistingConversation(convId);
 		newMessage.setConversation(existingConversation);
 		messagesRepo.save(newMessage); 
 	}
@@ -76,18 +79,31 @@ public class MessagingServiceImpl implements MessagingService {
 	@Override
 	@Transactional 
 	public void deleteConversation(Integer convId) {
-		Conversation existingConversation = conversationsRepo.findById(convId);
+		Conversation existingConversation = getExistingConversation(convId);
         conversationsRepo.delete(existingConversation);
         for (User user : existingConversation.getUsers()) {
             user.getConversations().remove(existingConversation);
        }
 	}
-	
+
+	@LogMethodInfo
+	@Override
+	@Transactional
+	public Conversation removeConversationMember(Integer id, User user) {
+		Conversation existingConversation = getExistingConversation(id);
+		if (existingConversation != null) {
+			existingConversation.getUsers().removeIf(u -> u.getId().equals(user.getId()));
+			user.getConversations().removeIf(c -> c.getId().equals(id));
+			userRepo.save(user);
+		}
+		return existingConversation;
+	}
+
 	@LogMethodInfo
 	@Override
 	@Transactional 
 	public List<Message> fetchConversationMessages(Integer convId, int index, int limit) {
-		Conversation existingConversation = conversationsRepo.findById(convId);  
+		Conversation existingConversation = getExistingConversation(convId);
 		if (existingConversation != null) {
 			return existingConversation.getMessages().stream()
 					.sorted((m1, m2) -> m2.getCreatedDate().compareTo(m1.getCreatedDate()))
@@ -100,11 +116,16 @@ public class MessagingServiceImpl implements MessagingService {
 
 	@Override
 	public List<String> fetchConversationMembers(Integer convId) {
-		Conversation existingConversation = conversationsRepo.findById(convId);
+		Conversation existingConversation = getExistingConversation(convId);
 		if (existingConversation != null) {
 			return existingConversation.getUsers().stream().map(User::getUsername).collect(toList());
 		}
 		return new ArrayList<>();
+	}
+
+	@Override
+	public Conversation getExistingConversation(Integer convId) {
+		return conversationsRepo.findById(convId);
 	}
 
 }

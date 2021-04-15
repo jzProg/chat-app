@@ -55,7 +55,7 @@ public class MessagesController {
     public ResponseEntity<?> getMessages(@RequestParam("id") String id, @RequestHeader(value="Authorization") String authHeader) {
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
         User user = userService.searchForUserByUsername(username);
-        ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.CONVERSATION_OWNERSHIP, user, id);
+        ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.CONVERSATION_MEMBERSHIP, user, id);
         if (!validationResponse.isSuccess()) 
         	return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
         List<MessageDTO> messages = new ArrayList<>();
@@ -84,6 +84,7 @@ public class MessagesController {
         		    .withTitle(conv.getTitle())
         		    .withDate(conv.getCreatedDate())
         		    .withMembers(conv.getUsers().stream().map(User::getUsername).collect(Collectors.toList()))
+                    .withOwnerId(conv.getOwnerId())
         		    .build();
            conversationDTOs.add(conversationDTO);
         }
@@ -114,6 +115,7 @@ public class MessagesController {
     		    .withTitle(newConversation.getTitle())
     		    .withDate(newConversation.getCreatedDate())
     		    .withMembers(conv.getMembers())
+                .withOwnerId(Integer.valueOf(userId))
                 .withMessagesCount(newConversation.getMessages().size())
     		    .withEventType(SystemMessages.eventTypes.CONVERSATION_CREATED.name())
     		    .build();
@@ -123,12 +125,23 @@ public class MessagesController {
     @MessageMapping("/src/delete/{userId}") 
     @SendTo("/topic/conversations")
     public ConversationDTO deleteConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
-        messagingService.deleteConversation(conv.getId());
+        User user = userService.searchForUserByUserId(Integer.valueOf(userId));
+        String eventType = SystemMessages.eventTypes.DELETE_CONVERSATION.name();
+        Conversation existingConversation = messagingService.getExistingConversation(conv.getId());
+        ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.CONVERSATION_OWNERSHIP, user, existingConversation);
+        if (!validationResponse.isSuccess()) { // if is not the owner
+            existingConversation = messagingService.removeConversationMember(conv.getId(), user); // leave from conversation
+            eventType = SystemMessages.eventTypes.LEAVE_CONVERSATION.name();
+        } else {
+            messagingService.deleteConversation(conv.getId()); // delete entire conversation
+        }
         return new ConversationDTO.ConversationBuilder()
         		.withId(conv.getId())
-        		.withTitle( conv.getTitle())
-                .withEventType(SystemMessages.eventTypes.DELETE_CONVERSATION.name())
-      		    .build();
+        		.withTitle(conv.getTitle())
+                .withOwnerId(Integer.valueOf(userId))
+                .withEventType(eventType)
+                .withMembers(existingConversation.getUsers().stream().map(User::getUsername).collect(Collectors.toList()))
+                .build();
     }
 
     @ControllerAdvice

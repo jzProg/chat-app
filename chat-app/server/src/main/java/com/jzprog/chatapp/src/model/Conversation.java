@@ -27,6 +27,8 @@ public class Conversation {
 
     private String title;
 
+    private Integer ownerId;
+
     @Column(name = "created_date", columnDefinition="DATETIME")
     private Date createdDate;
 
@@ -83,10 +85,18 @@ public class Conversation {
 		this.createdDate = createdDate;
 	}
 
+    public Integer getOwnerId() {
+        return ownerId;
+    }
+
+    public void setOwnerId(Integer ownerId) {
+        this.ownerId = ownerId;
+    }
+
     @Override
     public String toString() {
          return String.format(
-                "Conversation[id=%d, title=%s, date=%s]",
-               id, title, createdDate);
+                "Conversation[id=%d, title=%s, date=%s ownerId=%s]",
+               id, title, createdDate, ownerId);
     }
 }

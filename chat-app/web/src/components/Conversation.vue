@@ -1,28 +1,52 @@
 <template>
  <div id="conversationDiv">
-   <div id="indicatorSpan" v-show="indicatorCount">
-      {{ indicatorCount }}
-   </div>
-   <div @click.prevent="openConversation()">
-     <h3 style="font-weight: bold; color: white">{{ title }}</h3>
-     <span> {{ members.join(', ') }}</span>
-     <div>
-       <i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i>
-     </div>
-     <button @click.stop="deleteConv()" class="btn btn-danger">
+   <template  v-if="isDeleted">
+    <deleted-content/>
+    <button @click.stop="removeConversation()" class="btn btn-danger">
       <i class="far fa-trash-alt"/>
     </button>
-   </div>
+   </template>
+   <template v-else>
+     <div id="indicatorSpan" v-show="indicatorCount">
+        {{ indicatorCount }}
+     </div>
+     <div @click.prevent="openConversation()">
+       <h3 style="font-weight: bold; color: white">{{ title }}</h3>
+       <span> {{ members.join(', ') }}</span>
+       <div>
+         <i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i>
+       </div>
+       <button @click.stop="deleteConv()" class="btn btn-danger">
+        <i class="far fa-trash-alt"/>
+       </button>
+     </div>
+   </template>
  </div>
 </template>
 
-
 <script>
+  import DeletedContent from '@/components/shared/DeletedContent';
+
   export default {
     name: 'Conversation',
-    emits: ['delete'],
-    props: ['id', 'title', 'date', 'getMessages', 'members', 'indicatorCount'],
+    emits: ['delete', 'remove'],
+    components: {
+      DeletedContent,
+    },
+    props: {
+      id: Number,
+      title: String,
+      date: Number,
+      getMessages: Function,
+      members: Array,
+      indicatorCount: Number,
+      isDeleted: Boolean,
+    },
     methods: {
+      removeConversation() {
+        console.log(`removing conversation with id: ${this.id}...`);
+        this.$emit('remove');
+      },
       deleteConv() {
         console.log(`deleting conversation with id: ${this.id}...`);
         this.$emit('delete');
@@ -36,7 +60,7 @@
 </script>
 
 <style scoped>
-  #conversationDiv{
+  #conversationDiv {
     cursor: pointer;
     border-style: solid;
     border-color: white;
@@ -48,7 +72,7 @@
     border-radius: 5px;
   }
 
-  #conversationDiv:hover{
+  #conversationDiv:hover {
     border-color:  #337ab7;
   }
 
