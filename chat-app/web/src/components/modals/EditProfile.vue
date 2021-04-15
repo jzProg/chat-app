@@ -53,13 +53,12 @@
 
 <script>
   import Modal from '@/components/modals/GenericModal';
-  import ImageMixin from '@/common/utils';
+  import utils from '@/common/utils';
   import { mapActions, mapMutations, mapGetters } from 'vuex';
 
   export default {
     name: 'EditProfile',
     components: { Modal },
-    mixins: [ImageMixin],
     data() {
       return {
         showUpload: false,
@@ -106,7 +105,7 @@
       getImage() {
         const userImage = this.getUserPersonalInfo.image;
         if (userImage) {
-          return this.readBlobImage(userImage);
+          return utils.readBlobImage(userImage);
         } else {
           return require('@/assets/profile_default.png');
         }
