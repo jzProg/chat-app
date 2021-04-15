@@ -10,9 +10,10 @@
        <input type="text"
              v-model="user"
              style="margin:5%"
-             @keyup.enter="search"
+             @input="search()"
+             @click.prevent=""
              placeholder="Search Members">
-        <i class="fas fa-search" style="cursor: pointer" @click.prevent="search"></i>
+        <i class="fas fa-search"></i>
         <div v-for="(cand, index) in candidates" @click.prevent="addMember(cand, index)" class="candidate">
            <input type="checkbox" :id="cand.username">
             <label :for="cand.username">{{ cand.username }}</label>
@@ -36,6 +37,7 @@
 </template>
 
 <script>
+  import { mapActions } from 'vuex';
   import Modal from '@/components/modals/GenericModal';
 
   export default {
@@ -50,6 +52,9 @@
       }
     },
     methods: {
+      ...mapActions([
+        'searchUsers',
+      ]),
       addMember(member, index) {
         if (this.members.indexOf(member.username) === -1) {
           this.members.push(member.username);
@@ -57,8 +62,7 @@
         }
       },
       search() {
-        const token = localStorage.getItem('token');
-        this.axios(`/api/user/getUsers?name=${this.user}`, { headers: { Authorization: `Bearer ${token}` }}).then(response => {
+        this.searchUsers(this.user).then(response => {
           this.candidates = response.data;
         });
       },

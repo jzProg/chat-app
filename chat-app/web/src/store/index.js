@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
 import bus from "@/common/eventBus";
+import utils from '@/common/utils';
 import createPersistedState from "vuex-persistedstate";
 
 Vue.use(Vuex);
@@ -56,6 +57,16 @@ export default new Vuex.Store({
     },
   },
   actions: {
+    searchUsers: utils.debounce(({ commit }, usernameTerm) => {
+      const token = localStorage.getItem('token');
+      return axios({
+        url: `api/user/getUsers?name=${usernameTerm}`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    }, 300),
     fetchConversations({ commit }) {
       const token = localStorage.getItem('token');
       return axios({

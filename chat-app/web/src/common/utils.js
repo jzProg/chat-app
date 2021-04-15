@@ -25,7 +25,24 @@ const urlB64ToUint8Array = (base64String) => {
   return outputArray;
 };
 
+const debounce = (cb, duration) => {
+  let timer;
+  let resolves = [];
+
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      let result = cb(...args);
+      resolves.forEach(r => r(result));
+      resolves = [];
+    }, duration);
+
+    return new Promise(r => resolves.push(r));
+  };
+};
+
 export default {
   readBlobImage,
   urlB64ToUint8Array,
+  debounce,
 };
