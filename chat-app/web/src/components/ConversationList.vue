@@ -8,7 +8,7 @@
     <div class="container" style="margin-top:2%; width:100%">
       <div class="row" v-if="conversations.length">
         <div id="convDiv" class="col-md-5 scrollable">
-          <Conversation  v-for="(conv, index) in conversations"
+          <Conversation  v-for="(conv, index) in getSortedConversations"
                          :style="getConvStyle(conv.id)"
                          :key="index"
                          :id="conv.id"
@@ -87,7 +87,7 @@ export default {
     const token = localStorage.getItem('token');
     this.authorId = this.getUserPersonalInfo.id;
     this.fetchConversations().then(response => {
-      this.conversations = response.data.sort((item1, item2) => item1.date - item2.date);
+      this.conversations = response.data;
       this.connectToSocket();
     });
   },
@@ -214,7 +214,6 @@ export default {
       this.indicators[convId] = 0;
       this.activeConversationId = convId;
       const activeConversation = this.conversations.filter(conv => conv.id === this.activeConversationId)[0];
-
       this.fetchConversationMessages(convId).then(response => {
         this.$set(this.activeConvMessages, convId, response.data.sort((mess1, mess2) => mess1.createdDate - mess2.createdDate).map(mes => {
           if (!activeConversation.members || !activeConversation.members.includes(mes.authorUsername)) {
@@ -303,9 +302,12 @@ export default {
   computed: {
     ...mapGetters([
       'getUserPersonalInfo',
-    ])
-  }
-}
+    ]),
+    getSortedConversations() {
+      return this.conversations.sort((item1, item2) => item2.date - item1.date);
+    },
+  },
+};
 </script>
 
 <style scoped>
