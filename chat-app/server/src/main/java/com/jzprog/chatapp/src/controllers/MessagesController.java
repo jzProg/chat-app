@@ -1,12 +1,7 @@
 package com.jzprog.chatapp.src.controllers;
 
 import com.jzprog.chatapp.src.advices.ControllerAdvice;
-import com.jzprog.chatapp.src.model.Conversation;
-import com.jzprog.chatapp.src.model.ConversationDTO;
-import com.jzprog.chatapp.src.model.Message;
-import com.jzprog.chatapp.src.model.MessageDTO;
-import com.jzprog.chatapp.src.model.User;
-import com.jzprog.chatapp.src.model.ValidationResponse;
+import com.jzprog.chatapp.src.model.*;
 import com.jzprog.chatapp.src.services.MessagingService;
 import com.jzprog.chatapp.src.services.UserService;
 import com.jzprog.chatapp.src.services.validation.ValidationStrategy;
@@ -52,7 +47,8 @@ public class MessagesController {
 
     @ControllerAdvice
     @GetMapping(value = "/getConversationMessages")
-    public ResponseEntity<?> getMessages(@RequestParam("id") String id, @RequestHeader(value="Authorization") String authHeader) {
+    public ResponseEntity<?> getMessages(@RequestParam("id") String id,
+                                         @RequestHeader(value="Authorization") String authHeader) {
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
         User user = userService.searchForUserByUsername(username);
         ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.CONVERSATION_MEMBERSHIP, user, id);
@@ -72,13 +68,14 @@ public class MessagesController {
     
     @ControllerAdvice
     @RequestMapping("/getConversations")
-    public ResponseEntity<?> getConversations(@RequestHeader(value="Authorization") String authHeader) {      
+    public ResponseEntity<?> getConversations(@RequestHeader(value="Authorization") String authHeader,
+                                              @RequestParam("page") int page) {
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));  
         ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.USER_EXISTENCE, null, username);
         if (!validationResponse.isSuccess()) 
         	return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
         List<ConversationDTO> conversationDTOs = new ArrayList<>();
-        for (Conversation conv : messagingService.fetchUsersConversations(username)) {
+        for (Conversation conv : messagingService.fetchUsersConversations(username, page)) {
            ConversationDTO conversationDTO = new ConversationDTO.ConversationBuilder()
         		    .withId(conv.getId())
         		    .withTitle(conv.getTitle())
@@ -88,12 +85,16 @@ public class MessagesController {
         		    .build();
            conversationDTOs.add(conversationDTO);
         }
-        return new ResponseEntity<>(conversationDTOs, HttpStatus.OK);
+        ConversationListDTO conversationListDTO = new ConversationListDTO();
+        conversationListDTO.setConversationDTO(conversationDTOs);
+        conversationListDTO.setTotal(userService.searchForUserByUsername(username).getConversations().size());
+        return new ResponseEntity<>(conversationListDTO, HttpStatus.OK);
     }
 
     @ControllerAdvice
     @MessageMapping("/messages/{convId}")
-    public void addMessage(@DestinationVariable String convId, MessageDTO message) throws Exception {
+    public void addMessage(@DestinationVariable String convId,
+                           MessageDTO message) throws Exception {
         Date createdDate = new Date(System.currentTimeMillis());
         messagingService.addNewMessageToConversation(Integer.valueOf(convId), message.getText(), createdDate, message.getAuthorId());
         this.template.convertAndSend("/topic/conversation/" + convId, new MessageDTO.MessageBuilder()
@@ -108,7 +109,8 @@ public class MessagesController {
     @ControllerAdvice
     @MessageMapping("/src/{userId}")
     @SendTo("/topic/conversations")
-    public ConversationDTO createConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
+    public ConversationDTO createConversation(@DestinationVariable String userId,
+                                              ConversationDTO conv) throws Exception {
         Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date(System.currentTimeMillis()), conv.getMembers());
         return new ConversationDTO.ConversationBuilder()
         		.withId(newConversation.getId())
@@ -124,7 +126,8 @@ public class MessagesController {
     @ControllerAdvice
     @MessageMapping("/src/delete/{userId}") 
     @SendTo("/topic/conversations")
-    public ConversationDTO deleteConversation(@DestinationVariable String userId, ConversationDTO conv) throws Exception {
+    public ConversationDTO deleteConversation(@DestinationVariable String userId,
+                                              ConversationDTO conv) throws Exception {
         User user = userService.searchForUserByUserId(Integer.valueOf(userId));
         String eventType = SystemMessages.eventTypes.DELETE_CONVERSATION.name();
         Conversation existingConversation = messagingService.getExistingConversation(conv.getId());
@@ -147,7 +150,8 @@ public class MessagesController {
     @ControllerAdvice
     @MessageMapping("/messages/typing/{convId}")
     @SendTo("/topic/conversation/{convId}")
-    public MessageDTO getTyping(@DestinationVariable String convId, MessageDTO message) throws Exception {
+    public MessageDTO getTyping(@DestinationVariable String convId,
+                                MessageDTO message) {
         return new MessageDTO.MessageBuilder()
                 .withAuthorId(message.getAuthorId())
                 .withAuthorUsername(userService.searchForUserByUserId(message.getAuthorId()).getUsername())

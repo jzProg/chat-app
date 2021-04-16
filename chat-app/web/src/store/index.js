@@ -67,10 +67,10 @@ export default new Vuex.Store({
         },
       });
     }, 300),
-    fetchConversations({ commit }) {
+    fetchConversations({ commit }, page) {
       const token = localStorage.getItem('token');
       return axios({
-        url: 'api/messages/getConversations',
+        url: `api/messages/getConversations?page=${page}`,
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

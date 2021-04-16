@@ -20,6 +20,11 @@
                          @delete="deleteConversation(conv.id)"
                          @remove="removeConversation(conv.id)"
                          :get-messages="goToConversationMessages"/>
+           <navigation v-if="totalConversations > 3"
+                       :go-to-next="goToNext"
+                       :go-to-prev="goToPrev"
+                       :has-prev="hasPrev"
+                       :has-next="hasNext"/>
         </div>
         <div id="messDiv" class="col-md-7">
           <messages-of-active-conversation v-if="activeConversationId"
@@ -49,13 +54,22 @@ import { mapGetters, mapActions } from 'vuex';
 import Conversation from '@/components/Conversation';
 import MessagesOfActiveConversation from '@/components/MessagesList';
 import CreateConversationModal from '@/components/modals/CreateConversation';
+import Navigation from '@/components/shared/Navigation';
 import localForage from '../../static/localforage.min.js';
 
 export default {
   name: 'Conversations',
-  components: { Conversation, MessagesOfActiveConversation, CreateConversationModal },
+  components: {
+    Conversation,
+    MessagesOfActiveConversation,
+    CreateConversationModal,
+    Navigation,
+  },
   data () {
     return {
+      page: 0,
+      totalConversations: 0,
+      CONVERSATION_LIMIT: 3,
       eventTypes: {
         TYPING: 'TYPING',
         RECEIVE_MESSAGE: 'RECEIVE_MESSAGE',
@@ -86,15 +100,10 @@ export default {
     localForage.setItem('activeConv', null); // reset active conversation
     const token = localStorage.getItem('token');
     this.authorId = this.getUserPersonalInfo.id;
-    this.fetchConversations().then(response => {
-      this.conversations = response.data;
-      this.connectToSocket();
-    });
+    this.getUserConversations();
   },
   beforeDestroy() {
-    this.unsubscribeFromAllConversations();
-    if (this.conversationSubscription) this.conversationSubscription.unsubscribe();
-    if (this.stompClient) this.stompClient.disconnect();
+    this.disconnectSockets();
   },
   methods: {
     ...mapActions([
@@ -102,6 +111,34 @@ export default {
       'fetchConversationMessages',
       'fetchConversations',
     ]),
+    getUserConversations() {
+      this.fetchConversations(this.page).then(response => {
+        const { conversationDTO, total } = response.data;
+        this.conversations = conversationDTO;
+        this.totalConversations = total;
+        this.connectToSocket();
+      });
+    },
+    hasNext() {
+      return (this.page + 1) * this.CONVERSATION_LIMIT < this.totalConversations;
+    },
+    hasPrev() {
+      return !!this.page;
+    },
+    goToNext() {
+      if (this.hasNext()) {
+        this.disconnectSockets();
+        this.page = this.page + 1;
+        this.getUserConversations();
+      }
+    },
+    goToPrev() {
+      if (this.hasPrev()) {
+        this.disconnectSockets();
+        this.page = this.page - 1;
+        this.getUserConversations();
+      }
+    },
     getMembers(conv) {
       const members = conv.members;
       if (!conv.members) return [];
@@ -126,6 +163,11 @@ export default {
         this.connectToSocket();
       });
     },
+    disconnectSockets() {
+      this.unsubscribeFromAllConversations();
+      if (this.conversationSubscription) this.conversationSubscription.unsubscribe();
+      if (this.stompClient) this.stompClient.disconnect();
+    },
     listenForNewConversations() {
       this.conversationSubscription = this.stompClient.subscribe(`/topic/conversations`, (message) => {
         const conv = JSON.parse(message.body);
@@ -137,12 +179,18 @@ export default {
 
       switch (eventType) {
       case CONVERSATION_CREATED: // add new conversation
-        if (members.indexOf(this.getUserPersonalInfo.loginUsername) !== -1) {
-          this.subscribeToConversation({ id });
-          this.conversations = [
-            ...this.conversations,
-            { id, date, title, members, eventType },
-          ];
+        if (members.indexOf(this.getUserPersonalInfo.loginUsername) !== -1) { // if you are member
+          if (!this.page) { // if you are to initial page
+            this.subscribeToConversation({ id });
+            this.totalConversations += 1;
+            if (this.conversations.length === 3) {
+              this.removeConversation(this.findConversationIdByPosition(2)); // remove last conversation if limit reached
+            }
+            this.conversations = [
+              ...this.conversations,
+              { id, date, title, members, eventType },
+            ];
+          }
         }
         break;
       case DELETE_CONVERSATION: // remove conversation
@@ -154,6 +202,9 @@ export default {
             }
             return conv;
           }); // inform others about deletion
+        } else { // if owner
+          this.disconnectSockets();
+          this.getUserConversations(); // fetch conversation by current page
         }
         break;
         case LEAVE_CONVERSATION: // member left
@@ -186,6 +237,9 @@ export default {
     },
     findConversationPositionById(id) {
       return this.conversations.findIndex(x => x.id === id);
+    },
+    findConversationIdByPosition(index) {
+      return this.conversations[index].id;
     },
     closePreviousConversation() {
       this.clearTyping();
@@ -259,7 +313,6 @@ export default {
       this.showModal = false;
     },
     deleteConversation(id) {
-      this.removeConversation(id);
       this.stompClient.send(`/app/src/delete/${this.getUserPersonalInfo.id}`, {}, JSON.stringify({ 'id': id }));
     },
     removeConversation(id) {

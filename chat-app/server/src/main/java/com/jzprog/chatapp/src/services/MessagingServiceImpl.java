@@ -32,13 +32,19 @@ public class MessagingServiceImpl implements MessagingService {
 	
 	@Autowired
 	ConversationsRepository conversationsRepo;
+
+	private static final int CONVERSATION_LIMIT = 3;
 	
 	@LogMethodInfo
 	@Override
 	@Transactional 
-	public Set<Conversation> fetchUsersConversations(String username) {
-		 User user = (User) userRepo.findUserByUsername(username);
-	     return user.getConversations();
+	public Set<Conversation> fetchUsersConversations(String username, int index) {
+		 User user = userRepo.findUserByUsername(username);
+	     return user.getConversations().stream()
+				 .sorted((m1, m2) -> m2.getCreatedDate().compareTo(m1.getCreatedDate()))
+				 .skip((long) index * CONVERSATION_LIMIT) // skips first n
+				 .limit(CONVERSATION_LIMIT)
+				 .collect(Collectors.toSet());
 	}
 	
 	@LogMethodInfo
@@ -47,9 +53,9 @@ public class MessagingServiceImpl implements MessagingService {
 	public Conversation createNewConversation(Integer userId, String title, Date date, List<String> members) {
 		Conversation newConversation = new Conversation(title.isEmpty() ? SystemMessages.DEFAULT_CONVERSATION_NAME : title, date);
 		newConversation.setOwnerId(userId);
-        User currentUser = (User) userRepo.findUserById(userId);
+        User currentUser = userRepo.findUserById(userId);
         for (String memberName : members) {
-            User member = (User) userRepo.findUserByUsername(memberName);
+            User member = userRepo.findUserByUsername(memberName);
             newConversation.getUsers().add(member);
             member.getConversations().add(newConversation); 
         }
