@@ -5,7 +5,7 @@
     </div>
     <div class="container chatContainer">
       <div class="row" v-if="conversations.length">
-        <div id="convDiv" class="col-md-5 scrollable">
+        <div id="convDiv" class="col-md-5 scrollable" v-if="showConvTab()">
           <conversation  v-for="(conv, index) in getSortedConversations"
                          :style="getConvStyle(conv.id)"
                          :key="index"
@@ -26,9 +26,9 @@
                        :has-prev="hasPrev"
                        :has-next="hasNext"/>
         </div>
-        <div id="messDiv" class="col-md-7">
-          <messages-of-active-conversation v-if="activeConversationId"
-                                           :isHomeUser="isHomeUser"
+        <div id="messDiv" class="col-md-7" v-if="showMessageTab()">
+          <back-arrow v-if="isMobile()" :action="() => activeConversationId = ''"/>
+          <messages-of-active-conversation :isHomeUser="isHomeUser"
                                            :send-new-message="sendNewMessage"
                                            :typer="typer"
                                            :is-deleted="isConversationDeleted()"
@@ -50,6 +50,8 @@ import CreateConversationModal from '@/components/modals/CreateConversation';
 import AddMemberModal from '@/components/modals/AddMembers';
 import EmptyConversationListState from '@/components/EmptyConversationListState';
 import Navigation from '@/components/shared/Navigation';
+import BackArrow from '@/components/shared/BackArrow';
+import utils from '@/common/utils';
 import localForage from '../../static/localforage.min.js';
 
 export default {
@@ -59,6 +61,7 @@ export default {
     MessagesOfActiveConversation,
     EmptyConversationListState,
     Navigation,
+    BackArrow,
   },
   data () {
     return {
@@ -111,6 +114,16 @@ export default {
       'fetchConversationMessages',
       'fetchConversations',
     ]),
+    isMobile() {
+      console.log(window.innerWidth);
+      return utils.isMobile() || window.innerWidth < 1014;
+    },
+    showMessageTab() {
+       return !!this.activeConversationId;
+    },
+    showConvTab() {
+      return !this.isMobile() || !this.activeConversationId;
+    },
     closeModal() {
       this.setEditedConversationId({ value: -1 });
       this.currentModal = null;
