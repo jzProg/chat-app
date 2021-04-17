@@ -1,5 +1,5 @@
 <template>
-  <Modal>
+  <modal>
     <span slot="close" id="closeSymbol" @click.prevent="close">x</span><br>
     <h3 slot="header">
       Choose Emoji!
@@ -19,7 +19,7 @@
          </div>
     </div>
     </div>
-  </Modal>
+  </modal>
 </template>
 
 <script>
@@ -43,7 +43,7 @@ export default {
     },
     close() {
       this.$emit('close');
-    }
-  }
-}
+    },
+  },
+};
 </script>

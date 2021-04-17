@@ -1,5 +1,5 @@
 <template>
-  <Modal :width="'400px'">
+  <modal :width="'400px'">
     <span slot="close" id="closeSymbol" @click.prevent="close">x</span><br>
     <h3 slot="header">
       Edit Profile Info
@@ -44,7 +44,7 @@
               Logout <i class="fas fa-sign-out-alt"></i>
       </button>
     </div>
-  </Modal>
+  </modal>
 </template>
 
 <script>
@@ -61,8 +61,8 @@
         showUpload: false,
         selectedImage: '',
         uploadSuccess: false,
-        uploadError: ''
-      }
+        uploadError: '',
+      };
     },
     methods: {
       ...mapMutations([
@@ -105,7 +105,7 @@
     computed: {
       ...mapGetters([
         'getUserPersonalInfo'
-      ])
+      ]),
     },
-  }
+  };
 </script>

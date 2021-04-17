@@ -1,14 +1,12 @@
 <template>
   <div>
-    <div id="addConversationDiv"
-         v-if="conversations.length"
-         @click.prevent="showModal = true">
-         <i class="fas fa-plus fa-2x"></i>
-   </div>
-    <div class="container" style="margin-top:2%; width:100%">
+    <div id="addConversationDiv" v-if="conversations.length" @click.prevent="showModal = true">
+      <i class="fas fa-plus fa-2x"/>
+    </div>
+    <div class="container chatContainer">
       <div class="row" v-if="conversations.length">
         <div id="convDiv" class="col-md-5 scrollable">
-          <Conversation  v-for="(conv, index) in getSortedConversations"
+          <conversation  v-for="(conv, index) in getSortedConversations"
                          :style="getConvStyle(conv.id)"
                          :key="index"
                          :id="conv.id"
@@ -20,7 +18,7 @@
                          @delete="deleteConversation(conv.id)"
                          @remove="removeConversation(conv.id)"
                          :get-messages="goToConversationMessages"/>
-           <navigation v-if="totalConversations > 3"
+           <navigation v-if="totalConversations > CONVERSATION_LIMIT"
                        :go-to-next="goToNext"
                        :go-to-prev="goToPrev"
                        :has-prev="hasPrev"
@@ -36,14 +34,7 @@
                                            :messages="activeConvMessages[activeConversationId]"/>
         </div>
       </div>
-      <div v-else>
-        <h3><i>You don't have any conversation yet...</i></h3>
-        <button type="button"
-              class="btn btn-primary"
-              @click.prevent="showModal = true">
-              Create Conversation
-        </button>
-      </div>
+      <empty-conversation-list-state v-else @addConversation="showModal = true"/>
     </div>
     <create-conversation-modal v-if="showModal" @create="addNewConversation" @close="showModal = false"/>
    </div>
@@ -54,6 +45,7 @@ import { mapGetters, mapActions } from 'vuex';
 import Conversation from '@/components/Conversation';
 import MessagesOfActiveConversation from '@/components/MessagesList';
 import CreateConversationModal from '@/components/modals/CreateConversation';
+import EmptyConversationListState from '@/components/EmptyConversationListState';
 import Navigation from '@/components/shared/Navigation';
 import localForage from '../../static/localforage.min.js';
 
@@ -63,6 +55,7 @@ export default {
     Conversation,
     MessagesOfActiveConversation,
     CreateConversationModal,
+    EmptyConversationListState,
     Navigation,
   },
   data () {
@@ -88,8 +81,8 @@ export default {
       activeSubscriptions: [],
       typer: '',
       typingTimeout: null,
-      indicators: {}
-    }
+      indicators: {},
+    };
   },
   watch: {
     activeConversationId(value) {
@@ -201,7 +194,7 @@ export default {
               return { ...conv, deleted: true };
             }
             return conv;
-          }); // inform others about deletion
+          });
         } else { // if owner
           this.disconnectSockets();
           this.getUserConversations(); // fetch conversation by current page
@@ -380,5 +373,10 @@ export default {
     max-width: 100%;
     overflow-x: hidden;
     word-wrap:break-word;
+   }
+
+   .chatContainer {
+     margin-top: 2%;
+     width: 100%;
    }
 </style>

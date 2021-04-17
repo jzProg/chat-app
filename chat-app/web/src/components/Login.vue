@@ -26,7 +26,7 @@
           { type: 'text', id: 'username', text: 'Username', placeholder: 'enter username here' },
           { type: 'password', id: 'pass', text: 'Password', placeholder: 'enter password here' }
         ],
-      }
+      };
     },
     mounted() {
       this.removeErrorMessage();
@@ -58,7 +58,7 @@
           'getErrorLoginMessage',
       ]),
     },
-  }
+  };
 </script>
 
 <style scoped>

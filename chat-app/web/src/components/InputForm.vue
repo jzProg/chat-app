@@ -33,7 +33,7 @@
         },
       };
     },
-  }
+  };
 </script>
 
 <style scoped>

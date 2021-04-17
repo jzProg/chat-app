@@ -7,14 +7,12 @@
       </div>
     </header>
     <h4 style='font-weight: bold'>
-      <i class="fas fa-at"/>{{ getUserPersonalInfo.loginUsername }}
+      <i class="fas fa-at"/>
+      {{ getUserPersonalInfo.loginUsername }}
     </h4>
-    <profile-image class="profileImg"
-                   @clicked="editProfile()"/>
-    <router-view></router-view>
-    <EditProfile v-if="showEdit"
-                @close="showEdit = false">
-    </EditProfile>
+    <profile-image class="profileImg" @clicked="editProfile()"/>
+    <router-view/>
+    <edit-profile v-if="showEdit" @close="showEdit = false"/>
   </div>
 </template>
 
@@ -36,7 +34,7 @@ export default {
     return {
       conversations: [],
       showEdit: false,
-    }
+    };
   },
   methods: {
     editProfile() {
@@ -47,9 +45,9 @@ export default {
     ...mapGetters([
       'getUserPersonalInfo',
       'getPushNotificationPublicKey',
-    ])
-  }
-}
+    ]),
+  },
+};
 </script>
 
 <style>

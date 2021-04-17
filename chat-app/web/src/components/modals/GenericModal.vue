@@ -23,7 +23,7 @@
   export default {
     name: 'GenericModal',
     props: ['width'],
-  }
+  };
 </script>
 
 <style>

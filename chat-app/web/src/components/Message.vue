@@ -22,9 +22,9 @@ export default {
     getColorStyle() {
       const { r, g, b } = this.color;
       return `rgba(${r}, ${g}, ${b}, 0.5)`;
-    }
-  }
-}
+    },
+  },
+};
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <template>
-  <Modal>
+  <modal>
     <span slot="close" id="closeSymbol" @click.prevent="close">x</span><br>
     <h3 slot="header">Create New Conversation</h3>
     <div slot="body" style="text-align: left">
@@ -33,7 +33,7 @@
               Confirm
       </button>
     </div>
-  </Modal>
+  </modal>
 </template>
 
 <script>
@@ -49,8 +49,8 @@
         inputMessage: '',
         user: '',
         candidates: [],
-        members: []
-      }
+        members: [],
+      };
     },
     methods: {
       ...mapActions([
@@ -75,9 +75,9 @@
       },
       close() {
         this.$emit('close');
-      }
+      },
     },
-  }
+  };
 </script>
 
 <style scoped>

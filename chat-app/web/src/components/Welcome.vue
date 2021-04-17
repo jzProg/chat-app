@@ -4,7 +4,7 @@
     <h1>
       <b>{{ msg }}</b>
     </h1>
-    <router-view></router-view>
+    <router-view/>
   </div>
 </template>
 
@@ -22,10 +22,10 @@
      },
     data() {
       return {
-        msg: 'JZ Chat App'
-      }
-    }
-  }
+        msg: 'JZ Chat App',
+      };
+    },
+  };
 </script>
 
 <style scoped>

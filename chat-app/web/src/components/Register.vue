@@ -1,8 +1,8 @@
 <template>
  <div id="container" class="container">
    <div id="rowDiv" class="row">
-     <h1 class='text-center' style="margin-top: 5%">Be A Member!</h1>
-     <InputForm :fields="formItems"
+     <h1 class="text-center registerTitle">Be A Member!</h1>
+     <input-form :fields="formItems"
                 :error-message="getErrorRegisterMessage"
                 :on-focus="removeErrorMessage"
                 :on-submit="register"/>
@@ -29,7 +29,7 @@
           { type: 'password', id: 'pass', text: 'Password', placeholder: 'enter password here' }
         ],
         showModal: false,
-      }
+      };
     },
     mounted() {
       this.removeErrorMessage();
@@ -65,13 +65,17 @@
       ...mapGetters([
         'getErrorRegisterMessage',
       ])
-    }
-  }
+    },
+  };
 </script>
 
 <style scoped>
   .formContainer {
     text-align: left;
+  }
+
+  .registerTitle {
+    margin-top: 5%;
   }
 
   #container {

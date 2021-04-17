@@ -1,6 +1,6 @@
 <template>
  <div id="conversationDiv">
-   <template  v-if="isDeleted">
+   <template v-if="isDeleted">
     <deleted-content/>
     <button @click.stop="removeConversation()" class="btn btn-danger">
       <i class="far fa-trash-alt"/>
@@ -11,7 +11,7 @@
         {{ indicatorCount }}
      </div>
      <div @click.prevent="openConversation()">
-       <h3 style="font-weight: bold; color: white">{{ title }}</h3>
+       <h3 id="conversationTitle">{{ title }}</h3>
        <span> {{ members.join(', ') }}</span>
        <div>
          <i style="color:gray"> created: {{ new Date(date).toLocaleString() }}</i>
@@ -55,8 +55,8 @@
         console.log(`opening conversation with id: ${this.id}...`);
         this.getMessages(this.id);
       },
-    }
-  }
+    },
+  };
 </script>
 
 <style scoped>
@@ -84,5 +84,10 @@
     float: left;
     padding: 1%;
     border-radius: 50%;
+  }
+
+  #conversationTitle {
+     font-weight: bold;
+     color: white;
   }
 </style>
