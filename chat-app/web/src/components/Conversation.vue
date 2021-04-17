@@ -19,6 +19,9 @@
        <button @click.stop="deleteConv()" class="btn btn-danger">
         <i class="far fa-trash-alt"/>
        </button>
+      <button @click.stop="addMember()" v-if="isOwner" class="btn btn-success">
+       <i class="fas fa-user-plus"></i>
+      </button>
      </div>
    </template>
  </div>
@@ -37,6 +40,7 @@
       id: Number,
       title: String,
       date: Number,
+      isOwner: Boolean,
       getMessages: Function,
       members: Array,
       indicatorCount: Number,
@@ -50,6 +54,10 @@
       deleteConv() {
         console.log(`deleting conversation with id: ${this.id}...`);
         this.$emit('delete');
+      },
+      addMember() {
+        console.log(`adding member to conversation with id: ${this.id}...`);
+        this.$emit('addMember');
       },
       openConversation() {
         console.log(`opening conversation with id: ${this.id}...`);

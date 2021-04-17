@@ -1,12 +1,8 @@
 <template>
   <modal>
     <span slot="close" id="closeSymbol" @click.prevent="close">x</span><br>
-    <h3 slot="header">Create New Conversation</h3>
+    <h3 slot="header">Add members to conversation</h3>
     <div slot="body" style="text-align: left">
-       <input type="text"
-             v-model="inputMessage"
-             style="margin:5%"
-             placeholder="Conversation Title"><br>
        <search-user :members="members" :update-members="updateMembers"/>
     </div>
     <div slot="footer"
@@ -14,7 +10,7 @@
       <button type="button"
               class="btn btn-primary"
               :disabled="showConfirm()"
-              @click.prevent="create()">
+              @click.prevent="confirm()">
               Confirm
       </button>
     </div>
@@ -26,7 +22,7 @@
   import SearchUser from '@/components/shared/SearchUser';
 
   export default {
-    name: 'create-conversation',
+    name: 'add-members',
     emits: ['confirm', 'close'],
     components: {
       Modal,
@@ -34,7 +30,6 @@
      },
     data() {
       return {
-        inputMessage: '',
         members: [],
       };
     },
@@ -45,8 +40,8 @@
       showConfirm() {
         return !this.members.length;
       },
-      create() {
-        this.$emit('confirm', this.members, this.inputMessage);
+      confirm() {
+        this.$emit('confirm', this.members);
       },
       close() {
         this.$emit('close');

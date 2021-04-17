@@ -111,15 +111,21 @@ public class MessagesController {
     @SendTo("/topic/conversations")
     public ConversationDTO createConversation(@DestinationVariable String userId,
                                               ConversationDTO conv) throws Exception {
-        Conversation newConversation =  messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date(System.currentTimeMillis()), conv.getMembers());
+        Conversation newConversation;
+        String eventType = SystemMessages.eventTypes.CONVERSATION_CREATED.name();
+        if (conv.getId() != null) { // already existed conversation
+            eventType = SystemMessages.eventTypes.MEMBER_ADDED.name();
+            newConversation = messagingService.addMemberToConversation(conv.getId(), conv.getMembers()); // add new members
+        }
+        else newConversation = messagingService.createNewConversation(Integer.valueOf(userId), conv.getTitle(), new Date(System.currentTimeMillis()), conv.getMembers());
         return new ConversationDTO.ConversationBuilder()
         		.withId(newConversation.getId())
     		    .withTitle(newConversation.getTitle())
     		    .withDate(newConversation.getCreatedDate())
-    		    .withMembers(conv.getMembers())
+    		    .withMembers(newConversation.getUsers().stream().map(User::getUsername).collect(Collectors.toList()))
                 .withOwnerId(Integer.valueOf(userId))
                 .withMessagesCount(newConversation.getMessages().size())
-    		    .withEventType(SystemMessages.eventTypes.CONVERSATION_CREATED.name())
+    		    .withEventType(eventType)
     		    .build();
     }
     

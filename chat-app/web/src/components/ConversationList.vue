@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="addConversationDiv" v-if="conversations.length" @click.prevent="showModal = true">
+    <div id="addConversationDiv" v-if="conversations.length" @click.prevent="toggleConversationModal()">
       <i class="fas fa-plus fa-2x"/>
     </div>
     <div class="container chatContainer">
@@ -12,11 +12,13 @@
                          :id="conv.id"
                          :title="conv.title"
                          :date="conv.date"
+                         :is-owner="conv.ownerId === authorId"
                          :is-deleted="conv.deleted"
                          :indicator-count="getIndicator(conv.id)"
                          :members="getMembers(conv)"
                          @delete="deleteConversation(conv.id)"
                          @remove="removeConversation(conv.id)"
+                         @addMember="toggleMembersModal(conv.id)"
                          :get-messages="goToConversationMessages"/>
            <navigation v-if="totalConversations > CONVERSATION_LIMIT"
                        :go-to-next="goToNext"
@@ -34,17 +36,18 @@
                                            :messages="activeConvMessages[activeConversationId]"/>
         </div>
       </div>
-      <empty-conversation-list-state v-else @addConversation="showModal = true"/>
+      <empty-conversation-list-state v-else @addConversation="toggleConversationModal()"/>
     </div>
-    <create-conversation-modal v-if="showModal" @create="addNewConversation" @close="showModal = false"/>
+    <component :is="currentModal" @confirm="addNewConversationOrMember" @close="closeModal()"/>
    </div>
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapMutations, mapActions } from 'vuex';
 import Conversation from '@/components/Conversation';
 import MessagesOfActiveConversation from '@/components/MessagesList';
 import CreateConversationModal from '@/components/modals/CreateConversation';
+import AddMemberModal from '@/components/modals/AddMembers';
 import EmptyConversationListState from '@/components/EmptyConversationListState';
 import Navigation from '@/components/shared/Navigation';
 import localForage from '../../static/localforage.min.js';
@@ -54,7 +57,6 @@ export default {
   components: {
     Conversation,
     MessagesOfActiveConversation,
-    CreateConversationModal,
     EmptyConversationListState,
     Navigation,
   },
@@ -69,6 +71,7 @@ export default {
         CONVERSATION_CREATED: 'CONVERSATION_CREATED',
         DELETE_CONVERSATION: 'DELETE_CONVERSATION',
         LEAVE_CONVERSATION: 'LEAVE_CONVERSATION',
+        MEMBER_ADDED: 'MEMBER_ADDED',
       },
       conversations: [],
       stompClient: null,
@@ -76,7 +79,8 @@ export default {
       activeConversationId: '',
       activeConvMessages: {},
       authorId: '',
-      showModal: false,
+      currentModal: null,
+      showAddMemberModal: false,
       conversationSubscription: null,
       activeSubscriptions: [],
       typer: '',
@@ -99,11 +103,25 @@ export default {
     this.disconnectSockets();
   },
   methods: {
+    ...mapMutations([
+      'setEditedConversationId',
+    ]),
     ...mapActions([
       'broadcastMessage',
       'fetchConversationMessages',
       'fetchConversations',
     ]),
+    closeModal() {
+      this.setEditedConversationId({ value: -1 });
+      this.currentModal = null;
+    },
+    toggleConversationModal() {
+      this.currentModal = CreateConversationModal;
+    },
+    toggleMembersModal(convId) {
+      this.setEditedConversationId({ value: convId });
+      this.currentModal = AddMemberModal;
+    },
     getUserConversations() {
       this.fetchConversations(this.page).then(response => {
         const { conversationDTO, total } = response.data;
@@ -168,7 +186,7 @@ export default {
       });
     },
     handleReceivedConversation({ id, members, eventType, date, title, ownerId }) {
-      const { CONVERSATION_CREATED, DELETE_CONVERSATION, LEAVE_CONVERSATION } = this.eventTypes;
+      const { CONVERSATION_CREATED, DELETE_CONVERSATION, LEAVE_CONVERSATION, MEMBER_ADDED } = this.eventTypes;
 
       switch (eventType) {
       case CONVERSATION_CREATED: // add new conversation
@@ -206,6 +224,10 @@ export default {
             if (conv.id === id) {
               const oldMembers = conv.members;
               missingMember = oldMembers.filter(member => !members.includes(member))[0];
+              if (missingMember === this.getUserPersonalInfo.loginUsername) {
+                this.disconnectSockets();
+                this.getUserConversations(); // fetch conversation by current page
+              }
               return { ...conv, members }; // replace members
             }
             return conv;
@@ -222,6 +244,30 @@ export default {
              };
           }
           break;
+      case MEMBER_ADDED:
+        if (members.indexOf(this.getUserPersonalInfo.loginUsername) !== -1) { // if you are member and not owner
+          if (!this.page) { // if you are to initial page
+            if (this.conversations.filter(conv => conv.id === id).length) { // if you are already member
+              this.conversations = this.conversations.map(conv => {
+                if (conv.id === id) {
+                  return { ...conv, members: [...conv.members, members]}; // update members of conversation
+                }
+                return conv;
+              });
+            } else { // if you are new member
+              this.subscribeToConversation({ id });
+              this.totalConversations += 1;
+              if (this.conversations.length === 3) {
+                this.removeConversation(this.findConversationIdByPosition(2)); // remove last conversation if limit reached
+              }
+              this.conversations = [
+                ...this.conversations,
+                { id, date, title, members, eventType },
+              ];
+            }
+          }
+        }
+        break;
       default: break;
       }
     },
@@ -299,11 +345,23 @@ export default {
       default: break;
       }
     },
-    addNewConversation(name, members) {
+    addNewConversationOrMember(members, name) {
+      let convObject = {};
       const { id, loginUsername } = this.getUserPersonalInfo;
-      members.push(loginUsername);
-      this.stompClient.send(`/app/src/${id}`, {}, JSON.stringify({ 'title': name || '', 'members' : members }));
-      this.showModal = false;
+      if (name) { // add conversation case
+        members.push(loginUsername);
+        convObject = {
+          'title': name || '',
+          'members': members,
+        };
+      } else { // add member case
+        convObject = {
+          'id': this.getEditedConversationId,
+          'members': members,
+        };
+      }
+      this.stompClient.send(`/app/src/${id}`, {}, JSON.stringify(convObject));
+      this.closeModal();
     },
     deleteConversation(id) {
       this.stompClient.send(`/app/src/delete/${this.getUserPersonalInfo.id}`, {}, JSON.stringify({ 'id': id }));
@@ -348,6 +406,7 @@ export default {
   computed: {
     ...mapGetters([
       'getUserPersonalInfo',
+      'getEditedConversationId',
     ]),
     getSortedConversations() {
       return this.conversations.sort((item1, item2) => item2.date - item1.date);

@@ -17,4 +17,5 @@ public interface MessagingService {
 	Conversation getExistingConversation(Integer convId);
 	void deleteConversation(Integer id);
 	Conversation removeConversationMember(Integer id, User user);
+	Conversation addMemberToConversation(Integer convId, List<String> members);
 }

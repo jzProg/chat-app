@@ -134,4 +134,22 @@ public class MessagingServiceImpl implements MessagingService {
 		return conversationsRepo.findById(convId);
 	}
 
+	@LogMethodInfo
+	@Override
+	@Transactional
+	public Conversation addMemberToConversation(Integer convId, List<String> members) {
+		Conversation conversation = conversationsRepo.findById(convId);
+		if (conversation != null) {
+			conversation.getMessages().size();
+			for (String memberName : members) {
+				User member = userRepo.findUserByUsername(memberName);
+				if (member != null) {
+					conversation.getUsers().add(member);
+					member.getConversations().add(conversation);
+				}
+			}
+			conversationsRepo.save(conversation);
+		}
+		return conversation;
+	}
 }

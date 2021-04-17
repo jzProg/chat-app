@@ -20,6 +20,7 @@ export default new Vuex.Store({
     pushNotificationPublicKey: '',
     errorLoginMessage: '',
     errorRegisterMessage: '',
+    editedConversationId: -1,
   },
   getters: {
     getPushNotificationPublicKey(state) {
@@ -37,7 +38,10 @@ export default new Vuex.Store({
     },
     getErrorLoginMessage(state) {
       return state.errorLoginMessage;
-    }
+    },
+    getEditedConversationId(state) {
+      return state.editedConversationId;
+    },
   },
   mutations: {
     setPushNotificationPublicKey(state, payload) {
@@ -54,6 +58,9 @@ export default new Vuex.Store({
     },
     setLoginErrorMessage(state, payload) {
       state.errorLoginMessage = payload.value;
+    },
+    setEditedConversationId(state, payload) {
+      state.editedConversationId = payload.value;
     },
   },
   actions: {
