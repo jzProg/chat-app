@@ -40,6 +40,7 @@ import EmojiSelection from '@/components/modals/EmojiSelection';
 import Message from '@/components/Message';
 import DeletedContent from '@/components/shared/DeletedContent';
 import Typer from '@/components/shared/Typer';
+import utils from '@/common/utils';
 
 export default {
   name: 'Messages',
@@ -81,23 +82,21 @@ export default {
       return  this.userColors[id] || this.assignRandomColor(id);
     },
     onEmojiSelect(emoji) {
-      this.newMessage += String.fromCodePoint(emoji);
+      console.log(emoji);
+      this.newMessage += emoji.data;
       this.displayEmojis = false;
     },
     showEmojis() {
       this.displayEmojis = true;
     },
-    hexToRgb(hex) {
-      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-      return result ? { r: parseInt(result[1], 16), g: parseInt(result[2], 16), b: parseInt(result[3], 16) } : null;
-    },
+
     assignRandomColor(id){
       var letters = '0123456789ABCDEF';
       var color = '#';
       for (var i = 0; i < 6; i++) {
        color += letters[Math.floor(Math.random() * 16)];
       }
-      this.userColors[id] = this.hexToRgb(color);
+      this.userColors[id] = utils.hexToRgb(color);
       return this.userColors[id];
     },
   },
