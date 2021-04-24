@@ -1,13 +1,14 @@
 {
   "name": "chat-app",
   "version": "1.0.0",
+  "private": true,
   "description": "A messaging app",
   "author": "giannis <john_z94@hotmail.com>",
-  "private": true,
   "scripts": {
+    "build": "node build/build.js",
+    "test:unit": "vue-cli-service test:unit",
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
-    "start": "npm run dev",
-    "build": "node build/build.js"
+    "start": "npm run dev"
   },
   "dependencies": {
     "axios": "^0.19.0",
@@ -26,6 +27,8 @@
     "webpack-dev-server": "^3.3.0"
   },
   "devDependencies": {
+    "@vue/cli-plugin-unit-jest": "^4.5.12",
+    "@vue/test-utils": "^1.0.3",
     "autoprefixer": "^7.1.2",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.1",
@@ -60,13 +63,13 @@
     "webpack-hot-middleware": "^2.25.0",
     "webpack-merge": "^4.1.0"
   },
-  "engines": {
-    "node": ">= 6.0.0",
-    "npm": ">= 3.0.0"
-  },
   "browserslist": [
     "> 1%",
     "last 2 versions",
     "not ie <= 8"
-  ]
+  ],
+  "engines": {
+    "node": ">= 6.0.0",
+    "npm": ">= 3.0.0"
+  }
 }
