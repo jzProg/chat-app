@@ -1,6 +1,6 @@
 language: java
 before_install:
-  - rm -rf node_modules
+  - rm -rf chat-app/web/node_modules
 install:
   - mvn clean install -f chat-app/pom.xml
 script: 'true'
