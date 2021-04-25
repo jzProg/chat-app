@@ -19,13 +19,18 @@
   - Update profile image by uploading.
   - Push notifications (use of **Push API** and service workers) to notify when a user logs in.
 
+## Testing
+
+Frontend unit tests (Jest/Vue Test Utils) are added under **web/tests/unit** folder. In order to run all the test suites, execute:
+`npm run test:unit`.
+
 ## Setup Instructions
 
-- In the **/server/src/main/resources/application.properties** file, include the correct datasource info.
+- In the **server/src/main/resources/application.properties** file, include the correct datasource info.
 - cd to */server* folder.
-- Build with **mvn clean install**.
-- Run with **java -jar server-0.0.1-SNAPSHOT.jar** command.
+- Build with `mvn clean install`.
+- Run with `java -jar -Dspring.profiles.active=<dev or prod or test> server-0.0.1-SNAPSHOT.jar` command.
 - Access app on localhost:8080. 
-- For *dev server*, run **npm run dev** from */web* folder. All requests from localhost:9090 are configured to be proxied to localhost:8080, in order to bypass CORS issues.
+- For *dev server*, run `npm run dev` from */web* folder. All requests from localhost:9090 are configured to be proxied to localhost:8080, in order to bypass CORS issues.
 
-**Note**: To enable the Push notifications functionality, the **push.notifications.public.key**, **push.notifications.private.key** properties should be configured in the application.properties file (the keys can be produced through a VAPID key generator).
+**Note**: To enable the Push notifications functionality, the **push.notifications.public.key**, **push.notifications.private.key** properties should be configured in the `application.properties` file (the keys can be produced through a VAPID key generator).
