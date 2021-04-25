@@ -50,7 +50,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	@Transactional 
 	public List<User> searchForUsersMatchingString(String str) {
-		return (List<User>) userRepo.findByUsernameIgnoreCaseContaining(str);
+		return (List<User>) userRepo.findByUsernameIgnoreCaseStartingWith(str);
 	}
 
 	@LogMethodInfo

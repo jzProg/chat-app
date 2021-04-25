@@ -16,5 +16,5 @@ public interface UsersRepository extends CrudRepository<User,Integer> {
   User findUserByUsernameAndPassword(String username, String password);
   User findUserByUsername(String username);
   User findUserById(Integer id);
-  List<User> findByUsernameIgnoreCaseContaining(@Param("str") String str);
+  List<User> findByUsernameIgnoreCaseStartingWith(@Param("str") String str);
 }
