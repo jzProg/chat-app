@@ -12,10 +12,11 @@ import utils from '@/common/utils';
 
 export default {
   name: 'profileImage',
+  props: ['image'],
   emits: ['clicked'],
   methods: {
     getImage() {
-      const userImage = this.getUserPersonalInfo.image;
+      const userImage = this.image || this.getUserPersonalInfo.image;
       if (userImage) {
         return utils.readBlobImage(userImage);
       }

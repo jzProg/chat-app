@@ -90,7 +90,13 @@ public class UserController {
         String username = jwtTokenUtil.getUsernameFromToken(authHeader.substring(7));      
     	if (!inputName.isEmpty()) {
     		for (User user : userService.searchForUsersMatchingString(inputName)) {
-        		if (!user.getUsername().equals(username)) listOfUsers.add(new UserDTO.UserBuilder().withUserId(user.getId()).withUsername(user.getUsername()).build());
+        		if (!user.getUsername().equals(username)) {
+                    listOfUsers.add(new UserDTO.UserBuilder()
+                            .withUserId(user.getId())
+                            .withUsername(user.getUsername())
+                            .withImage(user.getImage())
+                            .build());
+                }
              }	
     	}
         return new ResponseEntity<>(listOfUsers, HttpStatus.OK);

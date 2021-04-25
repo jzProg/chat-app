@@ -9,7 +9,8 @@
      <i class="fas fa-search"></i>
      <div v-for="(cand, index) in candidates" @click.prevent="addMember(cand, index)" class="candidate">
         <input type="checkbox" :id="cand.username">
-         <label :for="cand.username">{{ cand.username }}</label>
+        <profile-image class="pic" :image="cand.image"/>
+        <label :for="cand.username">{{ cand.username }}</label>
      </div>
      <div v-for="(member, index) in members"
           style="text-align: center"
@@ -21,9 +22,13 @@
 
 <script>
   import { mapActions } from 'vuex';
+  import ProfileImage from '@/components/shared/ProfileImage';
 
   export default {
     name: 'search-user',
+    components: {
+      ProfileImage,
+    },
     props: {
       members: Array,
       updateMembers: Function,
@@ -61,5 +66,11 @@
  }
  .candidate {
    cursor: pointer;
+ }
+
+ .pic {
+   width: 20px;
+   height: 20px;
+   border-radius: 150px;
  }
 </style>
