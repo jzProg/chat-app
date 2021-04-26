@@ -22,6 +22,10 @@ const webpackConfig = merge(baseWebpackConfig, {
      usePostCSS: true
    })
  },
+ performance: {
+    maxEntrypointSize: 512000,
+    maxAssetSize: 512000
+  },
   devtool: config.build.productionSourceMap ? config.build.devtool : false,
   output: {
     path: config.build.assetsRoot,
