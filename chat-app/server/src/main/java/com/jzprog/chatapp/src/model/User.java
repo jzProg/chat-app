@@ -19,7 +19,7 @@ import javax.persistence.Lob;
 @Table(name="user", schema="public")
 public class User implements Validatable {
 
-	  @Id
+    @Id
     @GeneratedValue(strategy=GenerationType.IDENTITY)
     private Integer id;
 
@@ -96,7 +96,7 @@ public class User implements Validatable {
 		this.image = image;
 	}
 
-@Override
+    @Override
     public String toString() {
          return String.format(
                 "User[id=%d, username='%s', password='%s', email=%s, image=%s]",

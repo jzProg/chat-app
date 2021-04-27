@@ -27,13 +27,6 @@ public class UserServiceImpl implements UserService {
 	@LogMethodInfo
 	@Override
 	@Transactional
-	public User searchForUserByUsernameAndPassword(String username, String password) {
-		return (User) userRepo.findUserByUsernameAndPassword(username, password);
-	}
-
-	@LogMethodInfo
-	@Override
-	@Transactional
 	public void createNewUser(UserInfo userInfo, String password) {
 		User user = new User(userInfo.getUsername(), password, userInfo.getEmail());
         userRepo.save(user);
