@@ -35,7 +35,7 @@ public class JwtUserDetailsServiceTests {
 
     @Test(expected = Exception.class)
     public void loadUserByUsernameUserNotExistsCaseTest() {
-        jwtUserDetailsService.loadUserByUsername("testUser2");
+        jwtUserDetailsService.loadUserByUsername("testAuthUser2");
     }
 
     private User createTestUser() {
