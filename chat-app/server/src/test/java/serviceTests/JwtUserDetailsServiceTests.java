@@ -39,8 +39,11 @@ public class JwtUserDetailsServiceTests {
     }
 
     private User createTestUser() {
-        User user = new User("testUser", "1234", "jz@test.com");
-        usersRepository.save(user);
+        User user = usersRepository.findUserByUsername("testAuthUser");
+        if (user == null) {
+            user = new User("testAuthUser", "1234", "jz@test.com");
+            usersRepository.save(user);
+        }
         return user;
     }
 }
