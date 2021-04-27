@@ -74,11 +74,12 @@ public class MessagingServiceImpl implements MessagingService {
 	@LogMethodInfo
 	@Override
 	@Transactional 
-	public void addNewMessageToConversation(Integer convId, String text, Date date, Integer author) {
+	public Message addNewMessageToConversation(Integer convId, String text, Date date, Integer author) {
 		Message newMessage = new Message(text, author, date);
 		Conversation existingConversation = getExistingConversation(convId);
 		newMessage.setConversation(existingConversation);
-		messagesRepo.save(newMessage); 
+		messagesRepo.save(newMessage);
+		return newMessage;
 	}
 	
 	@LogMethodInfo

@@ -11,7 +11,7 @@ import com.jzprog.chatapp.src.model.User;
 public interface MessagingService {
 	Set<Conversation> fetchUsersConversations(String username, int index);
 	Conversation createNewConversation(Integer userId, String title, Date date, List<String> members);
-	void addNewMessageToConversation(Integer convId, String text, Date date, Integer author);
+	Message addNewMessageToConversation(Integer convId, String text, Date date, Integer author);
 	List<Message> fetchConversationMessages(Integer convId, int index, int limit);
 	List<String> fetchConversationMembers(Integer convId);
 	Conversation getExistingConversation(Integer convId);
