@@ -1,5 +1,6 @@
 package com.jzprog.chatapp.src.services.encryption;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -9,8 +10,8 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
 
+@Primary
 @Service("aes")
 public class AesEncryptionService implements EncryptionService {
 

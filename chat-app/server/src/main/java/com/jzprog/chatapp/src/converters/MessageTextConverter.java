@@ -1,5 +1,6 @@
 package com.jzprog.chatapp.src.converters;
 
+import com.jzprog.chatapp.src.services.encryption.AesEncryptionService;
 import com.jzprog.chatapp.src.services.encryption.EncryptionService;
 import com.jzprog.chatapp.src.utils.EncodingHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class MessageTextConverter implements AttributeConverter<String, String> 
     }
 
     @Autowired
-    public void initMyRepository(EncodingHelper encodingHelper, EncryptionService encryptionService) {
+    public void initMyRepository(EncodingHelper encodingHelper, AesEncryptionService encryptionService) {
         MessageTextConverter.encodingHelper = encodingHelper;
         MessageTextConverter.encryptionService = encryptionService;
     }

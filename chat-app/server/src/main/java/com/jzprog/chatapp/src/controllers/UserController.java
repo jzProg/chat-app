@@ -6,11 +6,12 @@ import com.jzprog.chatapp.src.model.UserDTO;
 import com.jzprog.chatapp.src.model.UserInfo;
 import com.jzprog.chatapp.src.model.ValidationResponse;
 import com.jzprog.chatapp.src.services.UserService;
+import com.jzprog.chatapp.src.services.encryption.EncryptionService;
 import com.jzprog.chatapp.src.services.validation.ValidationStrategy;
-import com.jzprog.chatapp.src.utils.AuthenticationUtils;
 import com.jzprog.chatapp.src.utils.JwtUtil;
 import com.jzprog.chatapp.src.utils.SystemMessages;
 import com.jzprog.chatapp.src.utils.SystemMessages.ValidationTypes;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -47,6 +48,10 @@ public class UserController {
 	@Autowired
     private ValidationStrategy validationStrategy;
 
+    @Autowired
+    @Qualifier("md5")
+    private EncryptionService md5Hashing;
+
 	@ControllerAdvice
     @RequestMapping(value = "/auth", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> userAuth(@RequestBody UserInfo userInfo) throws Exception {   
@@ -54,7 +59,7 @@ public class UserController {
        if (!validationResponse.isSuccess()) {
            return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
        }
-       String hashedPassword = AuthenticationUtils.getHashedPassword(userInfo.getPassword());
+       String hashedPassword = md5Hashing.encrypt(userInfo.getPassword(), false);
        jwtTokenUtil.authenticate(userInfo.getUsername(), hashedPassword);
        final UserDetails userDetails = userDetailsService.loadUserByUsername(userInfo.getUsername());
 	   final String token = jwtTokenUtil.generateToken(userDetails);
@@ -72,7 +77,7 @@ public class UserController {
     @ControllerAdvice
     @RequestMapping(value = "/registerUser", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     public ResponseEntity<?> register(@RequestBody UserInfo userInfo) throws Exception {
-    	String hashedPassword = AuthenticationUtils.getHashedPassword(userInfo.getPassword());
+    	String hashedPassword = md5Hashing.encrypt(userInfo.getPassword(), false);
         ValidationResponse validationResponse = validationStrategy.provideValidation(ValidationTypes.REGISTRATION_CHECK, userInfo);
         if (validationResponse.isSuccess()) {
           log.info(SystemMessages.USER_NOT_EXIST);
