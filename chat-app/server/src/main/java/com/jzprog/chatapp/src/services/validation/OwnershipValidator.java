@@ -1,7 +1,6 @@
 package com.jzprog.chatapp.src.services.validation;
 
 import com.jzprog.chatapp.src.model.Conversation;
-import com.jzprog.chatapp.src.model.ConversationDTO;
 import com.jzprog.chatapp.src.model.User;
 import com.jzprog.chatapp.src.model.Validatable;
 import com.jzprog.chatapp.src.utils.SystemMessages;

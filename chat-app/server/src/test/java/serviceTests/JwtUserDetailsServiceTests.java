@@ -25,7 +25,7 @@ public class JwtUserDetailsServiceTests {
     private UsersRepository usersRepository;
 
     @Test
-    public void loadUserByUsernameHappyPathTest() throws Exception {
+    public void loadUserByUsernameHappyPathTest() {
         User dbUser = createTestUser();
         UserDetails user = jwtUserDetailsService.loadUserByUsername(dbUser.getUsername());
         Assert.assertEquals(dbUser.getUsername(), user.getUsername());
@@ -34,7 +34,7 @@ public class JwtUserDetailsServiceTests {
     }
 
     @Test(expected = Exception.class)
-    public void loadUserByUsernameUserNotExistsCaseTest() throws Exception {
+    public void loadUserByUsernameUserNotExistsCaseTest() {
         jwtUserDetailsService.loadUserByUsername("testUser2");
     }
 
