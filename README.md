@@ -21,8 +21,10 @@
 
 ## Testing
 
-Frontend unit tests (Jest/Vue Test Utils) are added under **web/tests/unit** folder. In order to run all the test suites, execute:
+- Frontend unit tests (Jest/Vue Test Utils) are located under **web/tests/unit** folder. In order to run all the test suites, execute:
 `npm run test:unit`.
+  
+- Backend unit tests (JUnit) are located under **server/test/java** folder.
 
 ## Setup Instructions
 
