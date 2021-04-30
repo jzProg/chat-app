@@ -1,5 +1,7 @@
 package com.jzprog.chatapp.src.model;
 
+import java.util.Objects;
+
 public class UserInfo implements Validatable {
 
     private String username;
@@ -42,5 +44,13 @@ public class UserInfo implements Validatable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserInfo userInfo = (UserInfo) o;
+        return username.equals(userInfo.username) && Objects.equals(password, userInfo.password) && Objects.equals(email, userInfo.email);
     }
 }
