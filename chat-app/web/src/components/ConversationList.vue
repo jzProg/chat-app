@@ -333,12 +333,14 @@ export default {
     loadOlderMessages () {
       const convId = this.activeConversationId;
       const activeConversation = this.conversations.find(conv => conv.id === this.activeConversationId);
-      this.fetchConversationMessages({ convId, index: this.activeConvMessages[convId].length }).then(response => {
+      const messages = this.activeConvMessages[convId]
+      if (!messages) return;
+      this.fetchConversationMessages({ convId, index: messages.length }).then(response => {
         if (!response.data.length) return;
         this.activeConvMessages = {
           ...this.activeConvMessages,
           [convId]:
-            [...this.activeConvMessages[convId], ...response.data].sort((mess1, mess2) => mess1.createdDate - mess2.createdDate).map(mes => {
+            [...messages, ...response.data].sort((mess1, mess2) => mess1.createdDate - mess2.createdDate).map(mes => {
               if (!activeConversation.members || !activeConversation.members.includes(mes.authorUsername)) {
                 return { ...mes, authorUsername: null };
               }

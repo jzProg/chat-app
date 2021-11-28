@@ -3,6 +3,11 @@
    <div id="contentDiv" class="container scrollable" @scroll="onScroll">
      <deleted-content v-if="isDeleted"/>
      <template v-else>
+       <i class="fas fa-arrow-circle-down"
+          style="position: fixed"
+          v-if="showScrollButton"
+          @click="scrollTo(true)">
+       </i>
        <div v-for="mes in messages"
             class="inner-message">
             <message :content="getMessageContent(mes.text)"
@@ -58,28 +63,43 @@ export default {
     typer: String,
     isDeleted: Boolean,
   },
+  watch: {
+    $props: {
+      handler() {
+        this.handlePropsChange();
+      },
+      deep: true,
+      immediate: true,
+    },
+  },
   data () {
     return {
       newMessage: '',
       userColors: {},
       displayEmojis: false,
       moreMessagesLoaded: false,
-      previousBottom: 0
+      previousBottom: 0,
+      toLatest: false,
+      showScrollButton: false
     };
   },
-  updated() {
-    this.$nextTick(() => {
+  methods: {
+    handlePropsChange () {
+      this.$nextTick(() => {
+        this.scrollTo(!this.moreMessagesLoaded);
+      });
+    },
+    scrollTo(latest) {
       const content = document.getElementById('contentDiv');
       if (content) {
-        if (this.moreMessagesLoaded) {
+        if (!latest) {
           content.scrollTop = this.previousBottom;
         } else {
+          this.toLatest = true;
           content.scrollTop = content.scrollHeight; // scroll to latest messages
         }
       }
-    });
-  },
-  methods: {
+    },
     getMessageContent(message) {
       if (!message) return '';
       return message.replace(/(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r\s]*)?#?([^\n\r\s]*)?/gi, (match) => {
@@ -90,7 +110,6 @@ export default {
       return  this.userColors[id] || this.assignRandomColor(id);
     },
     onEmojiSelect(emoji) {
-      console.log(emoji);
       this.newMessage += emoji.data;
       this.displayEmojis = false;
     },
@@ -99,12 +118,15 @@ export default {
     },
     onScroll ({ target: { scrollTop, clientHeight, scrollHeight }}) {
       if (scrollTop === 0) {
+        this.showScrollButton = !!this.messages.length;
         this.moreMessagesLoaded = true;
         this.previousBottom = clientHeight + 200;
         this.$emit('loadMore');
       } else {
+        this.showScrollButton = !this.toLatest;
         this.moreMessagesLoaded = false;
       }
+      this.toLatest = false // reset
     },
     assignRandomColor(id) {
       var letters = '0123456789ABCDEF';
@@ -115,7 +137,7 @@ export default {
       this.userColors[id] = utils.hexToRgb(color);
       return this.userColors[id];
     },
-  },
+  }
 };
 </script>
 
