@@ -48,6 +48,7 @@ public class MessagesController {
     @ControllerAdvice
     @GetMapping(value = "/getConversationMessages")
     public ResponseEntity<?> getMessages(@RequestParam("id") String id,
+                                         @RequestParam("index") int index,
                                          @RequestHeader(value="Authorization") String authHeader) {
         String username = jwtUtil.getUsernameFromToken(authHeader.substring(7));      
         User user = userService.searchForUserByUsername(username);
@@ -55,7 +56,7 @@ public class MessagesController {
         if (!validationResponse.isSuccess()) 
         	return new ResponseEntity<>(validationResponse.getErrorMessage(), HttpStatus.UNAUTHORIZED);
         List<MessageDTO> messages = new ArrayList<>();
-    	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id), 0, 20)) {
+    	for (Message mes : messagingService.fetchConversationMessages(Integer.valueOf(id), index, 20)) {
             messages.add(new MessageDTO.MessageBuilder()
             		.withText(mes.getText())
             		.withAuthorId(mes.getPostedBy())

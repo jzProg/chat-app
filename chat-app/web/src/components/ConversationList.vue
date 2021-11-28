@@ -33,7 +33,9 @@
                                            :typer="typer"
                                            :is-deleted="isConversationDeleted()"
                                            :send-typing="sendTyping"
-                                           :messages="activeConvMessages[activeConversationId]"/>
+                                           :messages="activeConvMessages[activeConversationId]"
+                                           @loadMore="loadOlderMessages"
+                                           />
         </div>
       </div>
       <empty-conversation-list-state v-else @addConversation="toggleConversationModal()"/>
@@ -115,7 +117,6 @@ export default {
       'fetchConversations',
     ]),
     isMobile() {
-      console.log(window.innerWidth);
       return utils.isMobile() || window.innerWidth < 1014;
     },
     showMessageTab() {
@@ -319,14 +320,31 @@ export default {
       this.closePreviousConversation();
       this.indicators[convId] = 0;
       this.activeConversationId = convId;
-      const activeConversation = this.conversations.filter(conv => conv.id === this.activeConversationId)[0];
-      this.fetchConversationMessages(convId).then(response => {
+      const activeConversation = this.conversations.find(conv => conv.id === this.activeConversationId);
+      this.fetchConversationMessages({ convId, index: 0 }).then(response => {
         this.$set(this.activeConvMessages, convId, response.data.sort((mess1, mess2) => mess1.createdDate - mess2.createdDate).map(mes => {
           if (!activeConversation.members || !activeConversation.members.includes(mes.authorUsername)) {
             return { ...mes, authorUsername: null };
           }
           return mes;
         }));
+      });
+    },
+    loadOlderMessages () {
+      const convId = this.activeConversationId;
+      const activeConversation = this.conversations.find(conv => conv.id === this.activeConversationId);
+      this.fetchConversationMessages({ convId, index: this.activeConvMessages[convId].length }).then(response => {
+        if (!response.data.length) return;
+        this.activeConvMessages = {
+          ...this.activeConvMessages,
+          [convId]:
+            [...this.activeConvMessages[convId], ...response.data].sort((mess1, mess2) => mess1.createdDate - mess2.createdDate).map(mes => {
+              if (!activeConversation.members || !activeConversation.members.includes(mes.authorUsername)) {
+                return { ...mes, authorUsername: null };
+              }
+              return mes;
+            })
+        }
       });
     },
     handleReceivedMessage(messageObject, convId) {

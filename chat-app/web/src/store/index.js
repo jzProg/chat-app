@@ -84,10 +84,10 @@ export default new Vuex.Store({
         },
       });
     },
-    fetchConversationMessages({ commit }, convId) {
+    fetchConversationMessages({ commit }, { convId, index }) {
       const token = localStorage.getItem('token');
       return axios({
-        url: `api/messages/getConversationMessages?id=${convId}`,
+        url: `api/messages/getConversationMessages?id=${convId}&index=${index}`,
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,

@@ -1,6 +1,6 @@
 <template>
  <div id="messagesDiv">
-   <div id="contentDiv" class="container scrollable">
+   <div id="contentDiv" class="container scrollable" @scroll="onScroll">
      <deleted-content v-if="isDeleted"/>
      <template v-else>
        <div v-for="mes in messages"
@@ -63,17 +63,25 @@ export default {
       newMessage: '',
       userColors: {},
       displayEmojis: false,
+      moreMessagesLoaded: false,
+      previousBottom: 0
     };
   },
   updated() {
-    // scroll to latest messages
     this.$nextTick(() => {
       const content = document.getElementById('contentDiv');
-      if (content) content.scrollTop = content.scrollHeight;
+      if (content) {
+        if (this.moreMessagesLoaded) {
+          content.scrollTop = this.previousBottom;
+        } else {
+          content.scrollTop = content.scrollHeight; // scroll to latest messages
+        }
+      }
     });
   },
   methods: {
     getMessageContent(message) {
+      if (!message) return '';
       return message.replace(/(https?:\/\/)?([\w\-])+\.{1}([a-zA-Z]{2,63})([\/\w-]*)*\/?\??([^#\n\r\s]*)?#?([^\n\r\s]*)?/gi, (match) => {
         return `<a href='${match}' target='_blank'>${match}</a>`;
       });
@@ -89,8 +97,16 @@ export default {
     showEmojis() {
       this.displayEmojis = true;
     },
-
-    assignRandomColor(id){
+    onScroll ({ target: { scrollTop, clientHeight, scrollHeight }}) {
+      if (scrollTop === 0) {
+        this.moreMessagesLoaded = true;
+        this.previousBottom = clientHeight + 200;
+        this.$emit('loadMore');
+      } else {
+        this.moreMessagesLoaded = false;
+      }
+    },
+    assignRandomColor(id) {
       var letters = '0123456789ABCDEF';
       var color = '#';
       for (var i = 0; i < 6; i++) {
@@ -142,10 +158,10 @@ export default {
 
   .scrollable {
     height: 300px;
-    overflow-y:auto;
+    overflow-y: auto;
     max-width: 100%;
     overflow-x: hidden;
-    word-wrap:break-word;
+    word-wrap: break-word;
    }
 
    .typerContainer {
